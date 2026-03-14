@@ -1,0 +1,2413 @@
+<!-- file: index.html -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Licensed Business Exchange</title>
+    <meta
+      name="description"
+      content="Search licensed businesses and see what they buy and sell."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <style>
+      :root {
+        --bg: #f5f6f8;
+        --card: #ffffff;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --border: #e5e7eb;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.06);
+        --radius: 18px;
+        --radius-lg: 24px;
+        --accent: #ff6a00;
+        --accent-2: #111827;
+        --ok: #16a34a;
+        --warn: #f59e0b;
+        --bad: #ef4444;
+        --chip: #f3f4f6;
+        --chipText: #374151;
+        --focus: 0 0 0 4px rgba(255, 106, 0, 0.18);
+        --maxw: 1200px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system,
+          Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .container {
+        max-width: var(--maxw);
+        margin: 0 auto;
+        padding: 0 18px;
+      }
+
+      /* Header / Hero */
+      .hero-wrap {
+        position: relative;
+        overflow: hidden;
+        padding: 22px 0 28px;
+        background: radial-gradient(
+            1200px 420px at 30% -10%,
+            rgba(255, 106, 0, 0.18),
+            transparent 60%
+          ),
+          radial-gradient(
+            1100px 460px at 85% 10%,
+            rgba(17, 24, 39, 0.14),
+            transparent 60%
+          );
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 12px 0;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        background: linear-gradient(145deg, var(--accent), #ff9a44);
+        box-shadow: var(--shadow-soft);
+        position: relative;
+      }
+      .logo::after {
+        content: "";
+        position: absolute;
+        inset: 10px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.25);
+      }
+
+      .brand h1 {
+        font-size: 16px;
+        margin: 0;
+        letter-spacing: -0.2px;
+      }
+
+      .brand p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.75);
+        border: 1px solid rgba(229, 231, 235, 0.9);
+        border-radius: 999px;
+        box-shadow: var(--shadow-soft);
+        backdrop-filter: blur(6px);
+      }
+
+      .pill .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--ok);
+      }
+
+      .btn {
+        appearance: none;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.82);
+        border-radius: 999px;
+        padding: 10px 12px;
+        cursor: pointer;
+        box-shadow: var(--shadow-soft);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+      }
+      .btn:active {
+        transform: translateY(0);
+      }
+      .btn.primary {
+        border-color: rgba(255, 106, 0, 0.35);
+        background: rgba(255, 106, 0, 0.12);
+      }
+      .btn.danger {
+        border-color: rgba(239, 68, 68, 0.35);
+        background: rgba(239, 68, 68, 0.08);
+      }
+
+      .hero {
+        padding: 18px 0 10px;
+      }
+
+      .hero h2 {
+        margin: 0;
+        font-size: 34px;
+        line-height: 1.08;
+        letter-spacing: -0.8px;
+      }
+
+      .hero h2 span {
+        color: var(--accent);
+      }
+
+      .hero .sub {
+        margin: 10px 0 0;
+        color: var(--muted);
+        font-size: 15px;
+        max-width: 74ch;
+      }
+
+      /* Tabs */
+      .tabs {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin: 18px 0 10px;
+        flex-wrap: wrap;
+      }
+      .tab {
+        position: relative;
+        font-size: 16px;
+        font-weight: 800;
+        letter-spacing: -0.2px;
+        padding: 10px 4px;
+        cursor: pointer;
+        color: rgba(17, 24, 39, 0.72);
+      }
+      .tab.active {
+        color: var(--accent-2);
+      }
+      .tab.active::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 3px;
+        height: 4px;
+        border-radius: 999px;
+        background: var(--accent);
+      }
+      .divider {
+        width: 1px;
+        height: 22px;
+        background: rgba(107, 114, 128, 0.35);
+        margin: 0 4px;
+      }
+
+      /* Search bar */
+      .searchwrap {
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(229, 231, 235, 0.95);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        padding: 12px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin: 14px 0 8px;
+      }
+      .searchicon {
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        background: rgba(255, 106, 0, 0.12);
+        border: 1px solid rgba(255, 106, 0, 0.22);
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+      }
+      .searchicon svg {
+        width: 18px;
+        height: 18px;
+      }
+      .searchwrap input {
+        width: 100%;
+        border: 0;
+        outline: none;
+        font-size: 15px;
+        background: transparent;
+      }
+      .searchwrap input:focus {
+        outline: none;
+      }
+      .searchwrap:has(input:focus) {
+        box-shadow: var(--shadow), var(--focus);
+        border-color: rgba(255, 106, 0, 0.35);
+      }
+
+      .filters {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin: 10px 0 6px;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        background: var(--chip);
+        color: var(--chipText);
+        border: 1px solid rgba(229, 231, 235, 0.9);
+        border-radius: 999px;
+        cursor: pointer;
+        user-select: none;
+        font-weight: 600;
+      }
+      .chip.active {
+        background: rgba(255, 106, 0, 0.12);
+        border-color: rgba(255, 106, 0, 0.25);
+      }
+
+      .meta-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 10px 0 16px;
+        color: var(--muted);
+      }
+
+      .select {
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.85);
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      /* Cards */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 14px;
+        padding: 8px 0 30px;
+      }
+
+      .card {
+        grid-column: span 4;
+        background: var(--card);
+        border: 1px solid rgba(229, 231, 235, 0.95);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-soft);
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        min-height: 220px;
+      }
+
+      .card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .card h3 {
+        margin: 0;
+        font-size: 16px;
+        letter-spacing: -0.2px;
+      }
+
+      .badge {
+        font-size: 12px;
+        font-weight: 800;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(229, 231, 235, 0.95);
+        background: rgba(243, 244, 246, 0.9);
+        color: rgba(31, 41, 55, 0.85);
+        white-space: nowrap;
+      }
+      .badge.ok {
+        background: rgba(22, 163, 74, 0.1);
+        border-color: rgba(22, 163, 74, 0.22);
+      }
+
+      .card .small {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .kv {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 12px 0 0;
+      }
+
+      .tag {
+        font-size: 12px;
+        font-weight: 700;
+        padding: 7px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(229, 231, 235, 0.95);
+        background: rgba(249, 250, 251, 1);
+      }
+
+      .tag.buy {
+        background: rgba(59, 130, 246, 0.08);
+        border-color: rgba(59, 130, 246, 0.2);
+      }
+      .tag.sell {
+        background: rgba(255, 106, 0, 0.10);
+        border-color: rgba(255, 106, 0, 0.22);
+      }
+      .tag.cat {
+        background: rgba(17, 24, 39, 0.06);
+        border-color: rgba(17, 24, 39, 0.14);
+      }
+
+      .card-footer {
+        margin-top: auto;
+        padding-top: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border-top: 1px dashed rgba(229, 231, 235, 0.95);
+      }
+
+      .contact {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .contact strong {
+        color: var(--text);
+        font-size: 13px;
+      }
+
+      .mini-actions {
+        display: flex;
+        gap: 8px;
+      }
+      .iconbtn {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        width: 38px;
+        height: 38px;
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+      }
+      .iconbtn:hover {
+        transform: translateY(-1px);
+      }
+
+      /* Admin panel modal */
+      .backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(17, 24, 39, 0.45);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        z-index: 9999;
+      }
+      .backdrop.open {
+        display: flex;
+      }
+
+      .modal {
+        width: min(900px, 100%);
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(229, 231, 235, 0.95);
+        border-radius: 22px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .modal-header {
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        border-bottom: 1px solid rgba(229, 231, 235, 0.95);
+      }
+      .modal-header h4 {
+        margin: 0;
+        font-size: 16px;
+        letter-spacing: -0.2px;
+      }
+      .modal-body {
+        padding: 16px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 12px;
+      }
+
+      .field {
+        grid-column: span 6;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .field.full {
+        grid-column: span 12;
+      }
+      label {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+      input,
+      textarea,
+      select {
+        border: 1px solid rgba(229, 231, 235, 0.98);
+        border-radius: 14px;
+        padding: 10px 12px;
+        font: inherit;
+        background: white;
+        outline: none;
+      }
+      textarea {
+        min-height: 92px;
+        resize: vertical;
+      }
+      input:focus,
+      textarea:focus,
+      select:focus {
+        box-shadow: var(--focus);
+        border-color: rgba(255, 106, 0, 0.35);
+      }
+
+      .help {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 8px;
+      }
+
+      .modal-footer {
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border-top: 1px solid rgba(229, 231, 235, 0.95);
+        background: rgba(249, 250, 251, 0.9);
+      }
+
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 18px;
+        transform: translateX(-50%);
+        background: rgba(17, 24, 39, 0.92);
+        color: white;
+        padding: 10px 12px;
+        border-radius: 999px;
+        box-shadow: var(--shadow-soft);
+        display: none;
+        z-index: 99999;
+        font-weight: 700;
+      }
+      .toast.show {
+        display: inline-flex;
+      }
+
+      /* Responsive */
+      @media (max-width: 980px) {
+        .card {
+          grid-column: span 6;
+        }
+      }
+      @media (max-width: 640px) {
+        .hero h2 {
+          font-size: 28px;
+        }
+        .card {
+          grid-column: span 12;
+        }
+        .field {
+          grid-column: span 12;
+        }
+      }
+
+      .pill span {
+        display: inline-block;
+        max-width: 200px;    /* adjust if you want */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="hero-wrap">
+      <div class="container">
+        <div class="topbar">
+          <div class="brand">
+            <div class="logo" aria-hidden="true"></div>
+            <div>
+              <h1>Licensed Business Exchange</h1>
+              <p>Find who buys & sells what — fast.</p>
+            </div>
+          </div>
+
+          <div class="topbar-right">
+<button id="verifyLicenseBtn" class="pill" type="button" title="Verify your license before creating an account">
+            <span class="dot" aria-hidden="true"></span>
+            <span><strong>Verified</strong> directory</span>
+          </button>
+
+            <button id="signupBtn" class="btn" type="button" onclick="openSignup()">
+              Create account
+              <span aria-hidden="true">➕</span>
+            </button>
+
+            <button id="messagesBtn" class="btn" type="button">
+              Messages
+              <span aria-hidden="true">💬</span>
+            </button>
+
+            <button id="adminBtn" class="btn primary" type="button">
+              Admin
+              <span aria-hidden="true">⚙️</span>
+            </button>
+          </div>
+        </div>
+        <div class="hero">
+          <h2>
+            Search a <span>select group</span> of NYS licensed cannabis businesses.
+          </h2>
+          <p class="sub">
+            Use the tabs to browse Products, Buyers, and Sellers. Search by business name,
+            license ID, category, or specific items they buy/sell.
+          </p>
+
+          <nav class="tabs" aria-label="Directory tabs">
+            <div class="tab active" data-tab="all">All</div>
+            <div class="tab" data-tab="buyers">Buyers</div>
+            <div class="tab" data-tab="sellers">Sellers</div>
+            <div class="divider" aria-hidden="true"></div>
+            <div class="tab" data-tab="categories">Categories</div>
+          </nav>
+
+          <div class="searchwrap" role="search">
+            <div class="searchicon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M10.5 18.5a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  opacity="0.85"
+                />
+                <path
+                  d="M16.5 16.5 21 21"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </div>
+            <input
+              id="q"
+              type="search"
+              placeholder="Search: business, license ID, item (e.g., flower, edibles, concentrates), category..."
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <select id="sort" class="select" aria-label="Sort results">
+              <option value="relevance">Sort: Relevance</option>
+              <option value="name_asc">Sort: Name (A→Z)</option>
+              <option value="name_desc">Sort: Name (Z→A)</option>
+              <option value="updated_desc">Sort: Recently updated</option>
+            </select>
+          </div>
+
+          <div class="filters" id="chips" aria-label="Quick filters"></div>
+
+          <div class="meta-row">
+            <div>
+              <strong id="count">0</strong> results
+              <span id="hint" style="margin-left: 8px;"></span>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <button id="exportBtn" class="btn" type="button" title="Download directory as JSON">
+                Export JSON ⤓
+              </button>
+              <button id="resetBtn" class="btn danger" type="button" title="Reset local edits">
+                Reset local
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="grid" id="grid" aria-live="polite"></section>
+    </main>
+
+    <!-- Admin modal -->
+    <div class="backdrop" id="backdrop" role="dialog" aria-modal="true" aria-label="Admin editor">
+      <div class="modal">
+        <div class="modal-header">
+          <h4 id="modalTitle">Admin</h4>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button id="saveBtn" class="btn primary" type="button">Save</button>
+            <button id="closeBtn" class="btn" type="button">Close</button>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="field">
+              <label for="f_name">Business name</label>
+              <input id="f_name" type="text" placeholder="Acme Recycling LLC" />
+            </div>
+            <div class="field">
+              <label for="f_license">License ID</label>
+              <input id="f_license" type="text" placeholder="OCM-MICR-24-000000" />
+            </div>
+            <div class="field">
+              <label for="f_status">Status</label>
+              <select id="f_status">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="pending">Pending</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="f_location">Location</label>
+              <input id="f_location" type="text" placeholder="Newark, NJ" />
+            </div>
+            <div class="field full">
+              <label for="f_categories">Categories (comma-separated)</label>
+              <input id="f_categories" type="text" placeholder="Metals, Plastics, Logistics" />
+            </div>
+            <div class="field full">
+              <label for="f_buys">Buys (comma-separated items)</label>
+              <textarea id="f_buys" placeholder="Copper wire, Aluminum cans, Used pallets"></textarea>
+            </div>
+            <div class="field full">
+              <label for="f_sells">Sells (comma-separated items)</label>
+              <textarea id="f_sells" placeholder="Processed scrap, Recycled pellets"></textarea>
+            </div>
+            <div class="field">
+              <label for="f_contactName">Contact name</label>
+              <input id="f_contactName" type="text" placeholder="Jordan Lee" />
+            </div>
+            <div class="field">
+              <label for="f_contactEmail">Contact email</label>
+              <input id="f_contactEmail" type="email" placeholder="jordan@acme.com" />
+            </div>
+            <div class="field full">
+              <label for="f_notes">Notes (internal)</label>
+              <textarea id="f_notes" placeholder="Minimum order, preferred vendors, compliance notes..."></textarea>
+            </div>
+          </div>
+
+          <p class="help">
+            Admin mode persists edits in <strong>localStorage</strong> on this device.
+            For multi-user + real access control, connect this UI to a real backend.
+          </p>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;">
+            <button id="newBtn" class="btn primary" type="button">+ New business</button>
+            <button id="deleteBtn" class="btn danger" type="button">Delete</button>
+            <button id="importBtn" class="btn" type="button">Import JSON</button>
+            <input id="importFile" type="file" accept="application/json" hidden />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="help" id="adminState"></div>
+          <div style="display:flex; gap:10px;">
+            <button id="copyLinkBtn" class="btn" type="button" title="Copy share link with current filters">
+              Copy share link
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+<!-- Create Account modal -->
+<div class="backdrop" id="signupBackdrop" role="dialog" aria-modal="true" aria-label="Create account">
+  <div class="modal">
+    <div class="modal-header">
+      <h4 id="authModalTitle">Create account</h4>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button id="signupCreateBtn" class="btn primary" type="button">Create</button>
+        <button id="signupCloseBtn" class="btn" type="button">Close</button>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field">
+          <label for="su_email">Email</label>
+          <input id="su_email" type="email" placeholder="you@company.com" />
+        </div>
+
+        <div class="field">
+            <label for="su_license">License number</label>
+            <input id="su_license" type="text" placeholder="OCM license #" />
+            <div id="licenseStatus" class="help" style="margin-top:6px;">Click “Verified” to confirm your license.</div>
+        </div>
+      </div>
+
+      <p class="help">
+        This demo stores accounts in <strong>localStorage</strong> (browser-only). In production, connect this to your backend.
+      </p>
+      <p class="help" id="authToggle"></p>
+    </div>
+
+    <div class="modal-footer">
+      <div class="help" id="signupState">Not signed in</div>
+      <div style="display:flex; gap:10px;">
+        <button id="logoutBtn" class="btn danger" type="button">Logout</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Messages modal -->
+<div class="backdrop" id="messagesBackdrop" role="dialog" aria-modal="true" aria-label="Messages">
+  <div class="modal" style="max-width: 900px;">
+    <div class="modal-header">
+      <h4>Messages</h4>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button id="messagesCloseBtn" class="btn" type="button">Close</button>
+      </div>
+    </div>
+    <div class="modal-body" style="display:flex; gap:14px;">
+      <div style="width: 260px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+          <strong>Conversations</strong>
+          <button id="newConversationBtn" class="btn" type="button">New</button>
+        </div>
+        <div id="conversationList" style="max-height: 420px; overflow:auto; border: 1px solid rgba(229,231,235,0.9); border-radius: 14px; padding: 8px;"></div>
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column;">
+        <div style="margin-bottom: 10px; display:flex; align-items:center; justify-content:space-between;">
+          <strong id="chatWithLabel">Select a conversation</strong>
+        </div>
+        <div id="chatThread" style="flex:1; overflow:auto; border: 1px solid rgba(229,231,235,0.9); border-radius: 14px; padding: 10px; display:flex; flex-direction:column; gap: 10px;"></div>
+        <div style="margin-top: 10px; display:flex; gap: 10px; align-items: center;">
+          <input id="messageInput" type="text" placeholder="Type a message…" style="flex:1; padding: 10px 12px; border-radius: 14px; border: 1px solid rgba(229,231,235,0.9);" />
+          <button id="messageSendBtn" class="btn primary" type="button">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <!-- Supabase client (add your project URL + anon key below) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
+
+    <script>
+  /**
+   * Fixed “directory app”
+   * - Fixes broken admin button perception + JS scoping bugs
+   * - Cleans up duplicate event handlers
+   * - Correct URL/state sync
+   * - Admin gate: ?admin=1 OR session passcode unlock
+   */
+
+  // --- Supabase setup (replace with your own project values) ---
+  const SUPABASE_URL = "https://yniwdqnclqfzkksjiqei.supabase.co"; // <-- update
+  const SUPABASE_ANON_KEY = "sb_publishable_ePMUcJqV6V_lyuhQA6yp_Q_uNHh2CJE"; // <-- update
+
+  let supabaseClient = null;
+  if (typeof window?.supabase !== "undefined" && window.supabase?.createClient) {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } else {
+    console.warn("Supabase client not available; running in local fallback mode.");
+  }
+
+  const SUPABASE_TABLE = "listings"; // See Supabase table schema note in comments below
+  // (Optional) For chat, create a `messages` table with fields:
+  //   id (text primary key), sender (text), receiver (text), text (text), created_at (timestamp with time zone)
+  //   Plus: create a `presence` table with fields: email (text primary key), last_seen (timestamp with time zone)
+  // RLS example (Supabase): allow select/insert where sender = auth.email OR receiver = auth.email
+  // RLS for presence: allow read/insert/update only for the user matching auth.email
+  // OCM license validation (set to your API endpoint if available)
+  // Set this to your Supabase Edge Function URL after deploying:
+  //   supabase functions deploy verify-license
+  //   https://<project>.functions.supabase.co/verify-license
+  const OCM_LICENSE_API = "https://<project>.functions.supabase.co/verify-license";
+  const STORAGE_KEY = "licensed_business_exchange_v1";
+  const MESSAGES_KEY = "lbe_messages_v1";
+  const PRESENCE_KEY = "lbe_presence_v1";
+  const ADMIN_UNLOCK_KEY = "lbe_admin_unlocked_v1";
+  const ADMIN_PASSCODE = "1234"; // change this (or remove gating entirely)
+
+  async function getCurrentUserId() {
+    const session = await getAuthSession();
+    if (!session) return null;
+    return session.user?.id || session.email || null;
+  }
+
+  // When Supabase is enabled, these functions will read/write from the remote table.
+  // Otherwise, they fall back to localStorage.
+  async function fetchListings() {
+    const userId = await getCurrentUserId();
+
+    if (!isSupabaseConfigured()) {
+      const list = loadData();
+      if (!userId) return list;
+      return list.filter((x) => x.ownerId === "public" || x.ownerId === userId);
+    }
+
+    const publicOwner = "public";
+    // Fetch public listings plus listings owned by the current user
+    const orFilter = userId ? `owner_id.eq.${userId},owner_id.eq.${publicOwner}` : `owner_id.eq.${publicOwner}`;
+
+    const { data: rows, error } = await supabaseClient
+      .from(SUPABASE_TABLE)
+      .select("*")
+      .or(orFilter)
+      .order("updatedAt", { ascending: false });
+
+    if (error) {
+      console.warn("Supabase fetch failed", error);
+      toast("Unable to load listings (Supabase)");
+      const list = loadData();
+      return userId ? list.filter((x) => x.ownerId === "public" || x.ownerId === userId) : list;
+    }
+
+    return (rows ?? []).map((r) => ({
+      id: r.id,
+      ownerId: r.owner_id,
+      name: r.name || "",
+      licenseId: r.licenseId || "",
+      status: r.status || "pending",
+      location: r.location || "",
+      categories: Array.isArray(r.categories) ? r.categories : [],
+      buys: Array.isArray(r.buys) ? r.buys : [],
+      sells: Array.isArray(r.sells) ? r.sells : [],
+      contact: { name: r.contact?.name || "", email: r.contact?.email || "" },
+      notes: r.notes || "",
+      updatedAt: r.updatedAt || nowIso(),
+    }));
+  }
+
+  async function upsertListing(b) {
+    if (!isSupabaseConfigured()) {
+      const idx = data.findIndex((x) => x.id === b.id);
+      if (idx === -1) data.unshift(b);
+      else data[idx] = b;
+      saveData(data);
+      return b;
+    }
+
+    const { data: rows, error } = await supabaseClient
+      .from(SUPABASE_TABLE)
+      .upsert({ ...b, updatedAt: nowIso() }, { onConflict: "id" })
+      .select();
+
+    if (error) {
+      toast("Save failed (Supabase)");
+      console.warn(error);
+      throw error;
+    }
+
+    return rows?.[0] ?? b;
+  }
+
+  async function deleteListing(id, ownerId) {
+    if (!isSupabaseConfigured()) {
+      data = data.filter((x) => x.id !== id);
+      saveData(data);
+      return;
+    }
+
+    const query = supabaseClient.from(SUPABASE_TABLE).delete().eq("id", id);
+    if (ownerId) query.eq("owner_id", ownerId);
+
+    const { error } = await query;
+    if (error) {
+      toast("Delete failed (Supabase)");
+      console.warn(error);
+    }
+  }
+
+  async function getCurrentUserEmail() {
+    const session = await getAuthSession();
+    if (!session) return null;
+    return session.user?.email || session.email || null;
+  }
+
+  async function fetchMessages() {
+    const email = await getCurrentUserEmail();
+    if (!email) return [];
+
+    if (!isSupabaseConfigured()) {
+      const all = loadMessages();
+      return all.filter((m) => m.sender === email || m.receiver === email);
+    }
+
+    const { data: rows, error } = await supabaseClient
+      .from("messages")
+      .select("*")
+      .or(`sender.eq.${email},receiver.eq.${email}`)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      console.warn("Supabase message fetch failed", error);
+      toast("Unable to load messages");
+      const all = loadMessages();
+      return all.filter((m) => m.sender === email || m.receiver === email);
+    }
+
+    return (rows ?? []).map((r) => ({
+      id: r.id,
+      sender: r.sender,
+      receiver: r.receiver,
+      text: r.text,
+      created_at: r.created_at,
+    }));
+  }
+
+  async function sendMessage(to, text) {
+    const from = await getCurrentUserEmail();
+    if (!from) {
+      toast("Sign in to send messages");
+      return null;
+    }
+    if (!to?.trim()) {
+      toast("Enter a recipient");
+      return null;
+    }
+    if (!text?.trim()) {
+      toast("Enter a message");
+      return null;
+    }
+
+    const msg = {
+      id: makeId(),
+      sender: from,
+      receiver: to.trim().toLowerCase(),
+      text: text.trim(),
+      created_at: nowIso(),
+    };
+
+    if (!isSupabaseConfigured()) {
+      messages.push(msg);
+      saveMessages(messages);
+      return msg;
+    }
+
+    const { data: rows, error } = await supabaseClient.from("messages").insert(msg).select();
+    if (error) {
+      toast("Send failed");
+      console.warn(error);
+      return null;
+    }
+
+    return rows?.[0] ?? msg;
+  }
+
+  // Chat helpers
+  function renderConversations() {
+    const list = $("#conversationList");
+    const me = (currentUserEmail || "").toLowerCase();
+
+    const partners = [...new Set(messages.flatMap((m) => [m.sender, m.receiver]))]
+      .map((e) => String(e || "").trim().toLowerCase())
+      .filter(Boolean)
+      .filter((e) => e !== me)
+      .sort();
+
+    list.innerHTML = "";
+    if (!me) {
+      list.innerHTML = "<div style='color: var(--muted);'>Sign in to see conversations.</div>";
+      return;
+    }
+
+    if (!partners.length) {
+      list.innerHTML = "<div style='color: var(--muted);'>No conversations yet.</div>";
+      return;
+    }
+
+    for (const p of partners) {
+      const el = document.createElement("div");
+      el.style.padding = "8px 10px";
+      el.style.borderRadius = "12px";
+      el.style.cursor = "pointer";
+      el.style.marginBottom = "6px";
+      el.style.background = p === currentChatPartner ? "rgba(255, 106, 0, 0.15)" : "rgba(255,255,255,0.8)";
+
+      const statusDot = document.createElement("span");
+      statusDot.style.display = "inline-block";
+      statusDot.style.width = "10px";
+      statusDot.style.height = "10px";
+      statusDot.style.borderRadius = "999px";
+      statusDot.style.marginRight = "8px";
+      statusDot.style.background = isOnline(p) ? "var(--ok)" : "rgba(0,0,0,0.15)";
+
+      const label = document.createElement("span");
+      label.textContent = p;
+
+      el.appendChild(statusDot);
+      el.appendChild(label);
+
+      el.addEventListener("click", () => {
+        currentChatPartner = p;
+        renderChatThread();
+        renderConversations();
+      });
+      list.appendChild(el);
+    }
+  }
+
+  function renderChatThread() {
+    const thread = $("#chatThread");
+    const me = (currentUserEmail || "").toLowerCase();
+    const partner = (currentChatPartner || "").toLowerCase();
+
+    thread.innerHTML = "";
+    if (!me) {
+      thread.innerHTML = "<div style='color: var(--muted);'>Sign in to view messages.</div>";
+      $("#chatWithLabel").textContent = "Messages";
+      return;
+    }
+
+    if (!partner) {
+      thread.innerHTML = "<div style='color: var(--muted);'>Select a conversation.</div>";
+      $("#chatWithLabel").textContent = "Messages";
+      return;
+    }
+
+    const online = isOnline(partner);
+    $("#chatWithLabel").textContent = `Chat with ${partner} ${online ? "(online)" : "(offline)"}`;
+
+    const convo = messages
+      .filter((m) => {
+        const sender = String(m.sender || "").toLowerCase();
+        const receiver = String(m.receiver || "").toLowerCase();
+        return (
+          (sender === me && receiver === partner) ||
+          (receiver === me && sender === partner)
+        );
+      })
+      .sort((a, b) => (a.created_at || "").localeCompare(b.created_at || ""));
+
+    if (!convo.length) {
+      thread.innerHTML = "<div style='color: var(--muted);'>No messages yet.</div>";
+      return;
+    }
+
+    for (const m of convo) {
+      const isMine = String(m.sender || "").toLowerCase() === me;
+      const msgEl = document.createElement("div");
+      msgEl.style.display = "flex";
+      msgEl.style.justifyContent = isMine ? "flex-end" : "flex-start";
+
+      const bubble = document.createElement("div");
+      bubble.style.maxWidth = "72%";
+      bubble.style.padding = "10px 12px";
+      bubble.style.borderRadius = "14px";
+      bubble.style.background = isMine ? "rgba(255, 106, 0, 0.15)" : "rgba(243, 244, 246, 1)";
+
+      const text = document.createElement("div");
+      text.textContent = m.text;
+      bubble.appendChild(text);
+
+      const time = document.createElement("div");
+      time.style.fontSize = "11px";
+      time.style.color = "var(--muted)";
+      time.style.marginTop = "4px";
+      time.textContent = new Date(m.created_at).toLocaleString();
+      bubble.appendChild(time);
+
+      msgEl.appendChild(bubble);
+      thread.appendChild(msgEl);
+    }
+
+    thread.scrollTop = thread.scrollHeight;
+  }
+
+  async function openMessages() {
+    messagesBackdrop.classList.add("open");
+    messages = await fetchMessages();
+    currentUserEmail = await getCurrentUserEmail();
+
+    await markOnline();
+    if (presenceTimer) clearInterval(presenceTimer);
+    presenceTimer = setInterval(() => void markOnline(), 30_000);
+
+    // If no conversation selected, open the most recent one
+    if (!currentChatPartner) {
+      const me = (currentUserEmail || "").toLowerCase();
+      const partners = [...new Set(messages.flatMap((m) => [m.sender, m.receiver]))]
+        .map((e) => String(e || "").trim().toLowerCase())
+        .filter(Boolean)
+        .filter((e) => e !== me)
+        .sort();
+      currentChatPartner = partners[0] || null;
+    }
+
+    renderConversations();
+    renderChatThread();
+  }
+
+  function closeMessages() {
+    messagesBackdrop.classList.remove("open");
+    if (presenceTimer) {
+      clearInterval(presenceTimer);
+      presenceTimer = null;
+    }
+  }
+
+  async function sendCurrentMessage() {
+    const input = $("#messageInput");
+    const to = currentChatPartner;
+    const text = input.value;
+    if (!to) return toast("Select a conversation");
+    const sent = await sendMessage(to, text);
+    if (!sent) return;
+
+    messages.push(sent);
+    saveMessages(messages);
+    input.value = "";
+    void markOnline();
+    renderChatThread();
+    renderConversations();
+  }
+
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+  const toastEl = $("#toast");
+  function toast(msg) {
+    if (!toastEl) return alert(msg);
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastEl.__t);
+    toastEl.__t = setTimeout(() => toastEl.classList.remove("show"), 1800);
+  }
+// --- Local account demo (localStorage) ---
+const USERS_KEY = "lbe_users_v1";
+const SESSION_KEY = "lbe_session_v1";
+
+function loadUsers() {
+  try {
+    return JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+function saveUsers(users) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+}
+function getSession() {
+  try {
+    return JSON.parse(localStorage.getItem(SESSION_KEY) || "null");
+  } catch {
+    return null;
+  }
+}
+function setSession(session) {
+  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+}
+function clearSession() {
+  localStorage.removeItem(SESSION_KEY);
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || "").trim());
+}
+
+async function sha256(text) {
+  const enc = new TextEncoder().encode(text);
+  const buf = await crypto.subtle.digest("SHA-256", enc);
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+  function norm(s) {
+    return String(s ?? "").trim();
+  }
+  function splitList(s) {
+    return norm(s)
+      .split(",")
+      .map((x) => x.trim())
+      .filter(Boolean);
+  }
+  function uniq(arr) {
+    return Array.from(new Set(arr));
+  }
+  function safeLower(s) {
+    return norm(s).toLowerCase();
+  }
+  function nowIso() {
+    return new Date().toISOString();
+  }
+  function makeId() {
+    return "biz_" + Math.random().toString(16).slice(2) + "_" + Date.now().toString(16);
+  }
+
+  const seedData = [
+    {
+      id: "biz_001",
+      ownerId: "public",
+      name: "The Weigh Station",
+      licenseId: "OCM-MICR-24-000075",
+      status: "active",
+      location: "Evans Mills, NY",
+      categories: ["Flower", "Prerolls"],
+      buys: ["Bulk FLower", "Trim", "Rosin"],
+      sells: ["Prepackaged flower", "Prepackaged prerolls"],
+      contact: { name: "Chad Johnson", email: "futurefarmer46@gmail.com" },
+      notes: "Prefers baled materials; weekly pickups.",
+      updatedAt: "2026-02-10T15:22:00.000Z",
+    },
+    {
+      id: "biz_002",
+      ownerId: "public",
+      name: "Blue Harbor Logistics",
+      licenseId: "LIC-55011",
+      status: "active",
+      location: "Elizabeth, NJ",
+      categories: ["Preolls", "Vapes"],
+      buys: ["Trim", "Vapes"],
+      sells: ["Prerolls", "Rosin"],
+      contact: { name: "Sam Rivera", email: "sam@blueharbor.io" },
+      notes: "Same-day drayage available.",
+      updatedAt: "2026-01-28T09:05:00.000Z",
+    },
+    {
+      id: "biz_003",
+      ownerId: "public",
+      name: "North Star Wholesale",
+      licenseId: "LIC-88007",
+      status: "pending",
+      location: "Jersey City, NJ",
+      categories: ["Bulk Flower", "Gummy's"],
+      buys: ["Flower", "Rosin"],
+      sells: ["Prepackaged flower", "Prepackaged gummies"],
+      contact: { name: "A. Chen", email: "achen@northstarwholesale.com" },
+      notes: "Awaiting license verification.",
+      updatedAt: "2026-02-22T19:40:00.000Z",
+    },
+    {
+      id: "biz_004",
+      ownerId: "public",
+      name: "Greenline Organics",
+      licenseId: "LIC-22019",
+      status: "active",
+      location: "Paterson, NJ",
+      categories: ["Tinctures", "Topicals"],
+      buys: ["Rosin"],
+      sells: ["4 oz. tinctures", "Skin Cream"],
+      contact: { name: "Mina Patel", email: "mina@greenline.co" },
+      notes: "Requires COAs for all inbound lots.",
+      updatedAt: "2026-02-18T12:10:00.000Z",
+    },
+    {
+      id: "biz_005",
+      ownerId: "public",
+      name: "Everbright Electronics Repair",
+      licenseId: "LIC-77304",
+      status: "inactive",
+      location: "Hoboken, NJ",
+      categories: ["Beverages", "Edibles"],
+      buys: ["Flower", "Rosin"],
+      sells: ["10mg Beverages", "10mg Edibles"],
+      contact: { name: "Taylor Knox", email: "support@everbrightrepair.com" },
+      notes: "Currently paused intake (seasonal).",
+      updatedAt: "2025-12-12T16:00:00.000Z",
+    },
+  ];
+
+  function loadData() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return structuredClone(seedData);
+    try {
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) throw new Error("Invalid data");
+      return parsed;
+    } catch {
+      return structuredClone(seedData);
+    }
+  }
+
+  function saveData(data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  function loadMessages() {
+    const raw = localStorage.getItem(MESSAGES_KEY);
+    if (!raw) return [];
+    try {
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) throw new Error("Invalid data");
+      return parsed;
+    } catch {
+      return [];
+    }
+  }
+
+  function saveMessages(messages) {
+    localStorage.setItem(MESSAGES_KEY, JSON.stringify(messages));
+  }
+
+  function loadPresence() {
+    const raw = localStorage.getItem(PRESENCE_KEY);
+    if (!raw) return {};
+    try {
+      const parsed = JSON.parse(raw);
+      return typeof parsed === "object" && parsed !== null ? parsed : {};
+    } catch {
+      return {};
+    }
+  }
+
+  function savePresence(presence) {
+    localStorage.setItem(PRESENCE_KEY, JSON.stringify(presence));
+  }
+
+  async function markOnline() {
+    const email = (await getCurrentUserEmail()) || currentUserEmail;
+    if (!email) return;
+    const key = email.trim().toLowerCase();
+
+    presence[key] = nowIso();
+    savePresence(presence);
+
+    // Optional: keep Supabase presence table in sync if it exists
+    if (isSupabaseConfigured()) {
+      try {
+        await supabaseClient.from("presence").upsert({ email: key, last_seen: nowIso() });
+      } catch {
+        // ignore if table doesn't exist
+      }
+    }
+
+    // refresh UI when presence changes
+    renderConversations();
+    renderChatThread();
+  }
+
+  function isOnline(email) {
+    if (!email) return false;
+    const key = String(email).trim().toLowerCase();
+
+    const ts = presence[key];
+    if (!ts) return false;
+    const ageMs = Date.now() - new Date(ts).getTime();
+    return ageMs < 1000 * 60 * 5; // online if active within last 5 minutes
+  }
+
+  async function verifyLicense(license) {
+    const normalized = norm(license);
+    if (!normalized) return false;
+
+    // If you have an OCM API endpoint, set OCM_LICENSE_API above.
+    if (OCM_LICENSE_API) {
+      try {
+        // Socrata / data.ny.gov dataset endpoints can be queried using `q=`.
+        // Example: https://data.ny.gov/resource/jskf-tt3q.json?q=LICENSE123
+        const url = new URL(OCM_LICENSE_API);
+        if (url.hostname.endsWith("data.ny.gov")) {
+        url.searchParams.set("q", normalized);
+        url.searchParams.set("$limit", "1");
+        const res = await fetch(url.toString());
+        if (!res.ok) return false;
+        const json = await res.json();
+
+        // Socrata query returns { data: [...] } or array of rows
+        if (Array.isArray(json)) return json.length > 0;
+        if (Array.isArray(json?.data)) return json.data.length > 0;
+        return false;
+      }
+
+      const res = await fetch(`${OCM_LICENSE_API}?license=${encodeURIComponent(normalized)}`);
+      if (!res.ok) return false;
+      const json = await res.json();
+      // Example response format: { active: true }
+      return json?.active === true;
+      } catch {
+        return false;
+      }
+    }
+
+    // Fallback: basic format check (replace with real validation)
+    return /^[A-Za-z0-9\- ]{5,30}$/.test(normalized);
+  }
+
+  function setupPresenceRealtime() {
+    if (!isSupabaseConfigured()) return;
+    if (presenceChannel) return;
+
+    try {
+      presenceChannel = supabaseClient
+        .channel("presence")
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "presence" },
+          (payload) => {
+            const row = payload.new;
+            if (!row?.email) return;
+            presence[row.email.trim().toLowerCase()] = row.last_seen;
+            savePresence(presence);
+            renderConversations();
+            renderChatThread();
+          }
+        )
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "presence" },
+          (payload) => {
+            const row = payload.new;
+            if (!row?.email) return;
+            presence[row.email.trim().toLowerCase()] = row.last_seen;
+            savePresence(presence);
+            renderConversations();
+            renderChatThread();
+          }
+        )
+        .on(
+          "postgres_changes",
+          { event: "DELETE", schema: "public", table: "presence" },
+          (payload) => {
+            const row = payload.old;
+            if (!row?.email) return;
+            delete presence[row.email.trim().toLowerCase()];
+            savePresence(presence);
+            renderConversations();
+            renderChatThread();
+          }
+        )
+        .subscribe();
+    } catch {
+      // ignore if realtime not available
+    }
+  }
+
+  function teardownPresenceRealtime() {
+    if (!presenceChannel) return;
+    try {
+      supabaseClient.removeChannel(presenceChannel);
+    } catch {
+      // ignore
+    }
+    presenceChannel = null;
+  }
+
+  let data = [];
+  let messages = [];
+  let currentUserEmail = null;
+  let currentChatPartner = null;
+  let verifiedLicense = null;
+  let presenceTimer = null;
+  let presence = loadPresence();
+  let presenceChannel = null;
+
+  const state = {
+    tab: "all",
+    q: "",
+    chip: "All",
+    sort: "relevance",
+    selectedId: null,
+  };
+
+  function allCategories(list) {
+    return uniq(list.flatMap((b) => (Array.isArray(b.categories) ? b.categories : []))).sort((a, b) =>
+      a.localeCompare(b)
+    );
+  }
+
+  function statusBadge(status) {
+    if (status === "active") return { label: "Active", cls: "ok" };
+    if (status === "pending") return { label: "Pending", cls: "" };
+    return { label: "Inactive", cls: "" };
+  }
+
+  function matchesTab(b, tab) {
+    const hasBuys = (b.buys?.length ?? 0) > 0;
+    const hasSells = (b.sells?.length ?? 0) > 0;
+    if (tab === "buyers") return hasBuys;
+    if (tab === "sellers") return hasSells;
+    return true;
+  }
+
+  function matchesChip(b, chip) {
+    if (!chip || chip === "All") return true;
+    const cats = (b.categories ?? []).map(norm);
+    return cats.some((c) => c.toLowerCase() === chip.toLowerCase());
+  }
+
+  function searchableText(b) {
+    const parts = [
+      b.name,
+      b.licenseId,
+      b.status,
+      b.location,
+      ...(b.categories ?? []),
+      ...(b.buys ?? []),
+      ...(b.sells ?? []),
+      b.contact?.name,
+      b.contact?.email,
+      b.notes,
+    ];
+    return safeLower(parts.filter(Boolean).join(" • "));
+  }
+
+  function scoreRelevance(b, q) {
+    if (!q) return 0;
+    const s = searchableText(b);
+    const qq = safeLower(q);
+
+    let score = 0;
+    if (safeLower(b.name).includes(qq)) score += 40;
+    if (safeLower(b.licenseId).includes(qq)) score += 24;
+    if (safeLower(b.location).includes(qq)) score += 14;
+
+    const listFields = [...(b.categories ?? []), ...(b.buys ?? []), ...(b.sells ?? [])].map(safeLower);
+    for (const v of listFields) if (v.includes(qq)) score += 10;
+    if (s.includes(qq)) score += 6;
+
+    return score;
+  }
+
+  function applyFilters(list) {
+    const q = state.q.trim();
+    let out = list
+      .filter((b) => matchesTab(b, state.tab))
+      .filter((b) => matchesChip(b, state.chip))
+      .filter((b) => (!q ? true : searchableText(b).includes(safeLower(q))));
+
+    if (state.sort === "name_asc") out.sort((a, b) => a.name.localeCompare(b.name));
+    else if (state.sort === "name_desc") out.sort((a, b) => b.name.localeCompare(a.name));
+    else if (state.sort === "updated_desc") out.sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""));
+    else out.sort((a, b) => scoreRelevance(b, q) - scoreRelevance(a, q));
+
+    return out;
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function renderMeta(list) {
+    $("#count").textContent = String(list.length);
+    const hint = $("#hint");
+    hint.textContent =
+      state.tab === "buyers"
+        ? "Showing businesses that buy items."
+        : state.tab === "sellers"
+        ? "Showing businesses that sell items/services."
+        : state.tab === "categories"
+        ? "Browse by category filters."
+        : "";
+  }
+
+  function setActiveTabs() {
+    $$(".tab").forEach((t) => t.classList.remove("active"));
+    const cur = $(`.tab[data-tab="${state.tab}"]`);
+    if (cur) cur.classList.add("active");
+  }
+
+  function renderChips() {
+    const cats = allCategories(data);
+    const chips = ["All", ...cats];
+    const wrap = $("#chips");
+    wrap.innerHTML = "";
+
+    for (const c of chips) {
+      const el = document.createElement("div");
+      el.className = "chip" + (state.chip === c ? " active" : "");
+      el.textContent = c;
+      el.addEventListener("click", () => {
+        state.chip = c;
+        syncUrlFromState();
+        render();
+      });
+      wrap.appendChild(el);
+    }
+  }
+
+  function iconSvg(name) {
+    if (name === "edit") {
+      return `
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+          <path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0 0-3L16.5 4.5a2.1 2.1 0 0 0-3 0L3 15v5Z" stroke="currentColor" stroke-width="2" />
+          <path d="M13 6l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      `;
+    }
+    if (name === "copy") {
+      return `
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
+          <path d="M9 9h10v10H9V9Z" stroke="currentColor" stroke-width="2"/>
+          <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      `;
+    }
+    return "";
+  }
+
+  const gridEl = $("#grid");
+
+  function formatSummary(b) {
+    const buys = (b.buys ?? []).join(", ") || "—";
+    const sells = (b.sells ?? []).join(", ") || "—";
+    const cats = (b.categories ?? []).join(", ") || "—";
+    return [
+      `Business: ${b.name}`,
+      `License: ${b.licenseId} (${b.status})`,
+      `Location: ${b.location ?? "—"}`,
+      `Categories: ${cats}`,
+      `Buys: ${buys}`,
+      `Sells: ${sells}`,
+      `Contact: ${b.contact?.name ?? "—"} <${b.contact?.email ?? "—"}>`,
+    ].join("\n");
+  }
+
+  function renderCards(list) {
+    gridEl.innerHTML = "";
+
+    for (const b of list) {
+      const badge = statusBadge(b.status);
+      const el = document.createElement("article");
+      el.className = "card";
+
+      const buys = (b.buys ?? []).slice(0, 6);
+      const sells = (b.sells ?? []).slice(0, 6);
+      const cats = (b.categories ?? []).slice(0, 4);
+
+      el.innerHTML = `
+        <div class="card-top">
+          <div>
+            <h3>${escapeHtml(b.name)}</h3>
+            <div class="small">
+              <span class="badge ${badge.cls}">${badge.label}</span>
+              <span style="margin-left:8px;">•</span>
+              <span style="margin-left:8px;"><strong>${escapeHtml(b.licenseId)}</strong></span>
+              <span style="margin-left:8px;">•</span>
+              <span style="margin-left:8px;">${escapeHtml(b.location ?? "")}</span>
+            </div>
+          </div>
+          <span class="badge">Licensed</span>
+        </div>
+
+        <div class="kv" style="margin-top: 12px;">
+          ${cats.map((c) => `<span class="tag cat">${escapeHtml(c)}</span>`).join("")}
+        </div>
+
+        <div class="kv">
+          ${buys.map((x) => `<span class="tag buy">Buys: ${escapeHtml(x)}</span>`).join("")}
+        </div>
+
+        <div class="kv">
+          ${sells.map((x) => `<span class="tag sell">Sells: ${escapeHtml(x)}</span>`).join("")}
+        </div>
+
+        <div class="card-footer">
+          <div class="contact">
+            <strong>${escapeHtml(b.contact?.name ?? "Contact")}</strong>
+            <span>${escapeHtml(b.contact?.email ?? "")}</span>
+          </div>
+          <div class="mini-actions">
+            <button class="iconbtn" data-act="copy" data-id="${escapeHtml(b.id)}" title="Copy summary">
+              ${iconSvg("copy")}
+            </button>
+            <button class="iconbtn" data-act="edit" data-id="${escapeHtml(b.id)}" title="Edit (admin)">
+              ${iconSvg("edit")}
+            </button>
+          </div>
+        </div>
+      `;
+      gridEl.appendChild(el);
+    }
+  }
+
+  function onGridClick(e) {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+
+    const id = btn.getAttribute("data-id");
+    const act = btn.getAttribute("data-act");
+    const b = data.find((x) => x.id === id);
+    if (!b) return;
+
+    if (act === "copy") {
+      navigator.clipboard?.writeText(formatSummary(b)).then(
+        () => toast("Copied summary"),
+        () => toast("Copy failed")
+      );
+      return;
+    }
+
+    if (act === "edit") {
+      openAdmin();
+      loadForm(b.id);
+    }
+  }
+
+  gridEl.addEventListener("click", onGridClick);
+
+  function syncStateFromUrl() {
+    const u = new URL(location.href);
+    state.tab = u.searchParams.get("tab") || "all";
+    state.q = u.searchParams.get("q") || "";
+    state.chip = u.searchParams.get("cat") || "All";
+    state.sort = u.searchParams.get("sort") || "relevance";
+    $("#q").value = state.q;
+    $("#sort").value = state.sort;
+  }
+
+  function syncUrlFromState() {
+    const u = new URL(location.href);
+    u.searchParams.set("tab", state.tab);
+
+    if (state.q.trim()) u.searchParams.set("q", state.q.trim());
+    else u.searchParams.delete("q");
+
+    if (state.chip && state.chip !== "All") u.searchParams.set("cat", state.chip);
+    else u.searchParams.delete("cat");
+
+    if (state.sort && state.sort !== "relevance") u.searchParams.set("sort", state.sort);
+    else u.searchParams.delete("sort");
+
+    history.replaceState({}, "", u.toString());
+  }
+
+  // Admin modal
+  const backdrop = $("#backdrop");
+  const adminBtn = $("#adminBtn");
+  const closeBtn = $("#closeBtn");
+  const saveBtn = $("#saveBtn");
+  const newBtn = $("#newBtn");
+  const deleteBtn = $("#deleteBtn");
+  const importBtn = $("#importBtn");
+  const importFile = $("#importFile");
+  const adminState = $("#adminState");
+  const modalTitle = $("#modalTitle");
+  const copyLinkBtn = $("#copyLinkBtn");
+// --- Create account / login modal wiring ---
+const signupBtn = $("#signupBtn");
+const signupBackdrop = $("#signupBackdrop");
+const signupCloseBtn = $("#signupCloseBtn");
+const signupCreateBtn = $("#signupCreateBtn");
+const signupState = $("#signupState");
+const logoutBtn = $("#logoutBtn");
+const messagesBtn = $("#messagesBtn");
+const messagesBackdrop = $("#messagesBackdrop");
+const messagesCloseBtn = $("#messagesCloseBtn");
+const newConversationBtn = $("#newConversationBtn");
+const messageInput = $("#messageInput");
+const messageSendBtn = $("#messageSendBtn");
+const authModalTitle = $("#authModalTitle");
+const authToggle = $("#authToggle");
+const suDisplayField = $("#su_display_field");
+const suLicenseInput = $("#su_license");
+const verifyLicenseBtn = $("#verifyLicenseBtn");
+
+let authMode = "signin"; // "signin" or "signup"
+
+function setAuthMode(mode) {
+  authMode = mode;
+  const isSignup = mode === "signup";
+
+  authModalTitle.textContent = isSignup ? "Create account" : "Sign in";
+  signupCreateBtn.textContent = isSignup ? "Create" : "Sign in";
+
+  if (authToggle) {
+    authToggle.innerHTML = isSignup
+      ? 'Already have an account? <a href="#" id="authToggleLink">Sign in</a>'
+      : 'New here? <a href="#" id="authToggleLink">Create account</a>';
+  }
+
+  // show display name only during signup
+  if (suDisplayField) {
+    suDisplayField.style.display = isSignup ? "block" : "none";
+  }
+}
+
+function openSignup() {
+  signupBackdrop.classList.add("open");
+  setAuthMode("signup");
+  if (suLicenseInput) suLicenseInput.value = "";
+  const statusEl = $("#licenseStatus");
+  if (statusEl) statusEl.textContent = "Click “Verified” to confirm your license.";
+  verifiedLicense = null;
+  void updateSignupState();
+}
+function closeSignup() {
+  signupBackdrop.classList.remove("open");
+}
+
+function isSupabaseConfigured() {
+  return (
+    supabaseClient &&
+    SUPABASE_URL &&
+    !SUPABASE_URL.includes("YOUR_") &&
+    SUPABASE_ANON_KEY &&
+    !SUPABASE_ANON_KEY.includes("YOUR_")
+  );
+}
+
+async function getAuthSession() {
+  if (!isSupabaseConfigured()) return getSession();
+  const { data } = await supabaseClient.auth.getSession();
+  return data?.session || null;
+}
+
+async function updateSignupState() {
+  const session = await getAuthSession();
+  const isLoggedIn = !!session;
+
+  signupState.textContent = isLoggedIn
+    ? `Signed in as ${session.user?.email ?? session.email}`
+    : "Not signed in";
+
+  // track active user for messaging presence
+  currentUserEmail = session?.user?.email ?? session?.email ?? null;
+  if (isLoggedIn) {
+    void markOnline();
+    setupPresenceRealtime();
+  } else {
+    teardownPresenceRealtime();
+  }
+
+  // show/hide logout button based on login state
+  if (logoutBtn) {
+    logoutBtn.style.display = isLoggedIn ? "inline-flex" : "none";
+  }
+}
+
+async function signIn() {
+  const email = norm($("#su_email").value).toLowerCase();
+  const password = String($("#su_password").value || "");
+
+  if (!isValidEmail(email)) return toast("Enter a valid email");
+  if (password.length < 8) return toast("Password must be at least 8 characters");
+
+  if (isSupabaseConfigured()) {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) return toast(error.message);
+    toast("Signed in");
+    await updateSignupState();
+    closeSignup();
+    return;
+  }
+
+  const users = loadUsers();
+  const user = users.find((u) => u.email === email);
+  if (!user) return toast("No account found");
+
+  const passwordHash = await sha256(password);
+  if (passwordHash !== user.passwordHash) return toast("Incorrect password");
+
+  setSession({ email: user.email, display: user.display });
+  toast("Signed in");
+  await updateSignupState();
+  closeSignup();
+}
+
+async function createAccount() {
+  const email = norm($("#su_email").value).toLowerCase();
+  const password = String($("#su_password").value || "");
+  const license = norm($("#su_license").value);
+  const display = norm($("#su_display").value);
+
+  if (!isValidEmail(email)) return toast("Enter a valid email");
+  if (!license) return toast("Enter your license number");
+  if (password.length < 8) return toast("Password must be at least 8 characters");
+  if (!display) return toast("Display name is required");
+
+  const licenseValid = await verifyLicense(license);
+  if (!licenseValid) return toast("Unable to verify license. Please check your license number.");
+  verifiedLicense = license;
+
+  if (isSupabaseConfigured()) {
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password,
+      options: { data: { display, license } },
+    });
+
+    if (error) return toast(error.message);
+    toast("Account created — check your email to confirm (if enabled).");
+    await updateSignupState();
+    closeSignup();
+    return;
+  }
+
+  // Fallback: localStorage demo accounts (no real auth)
+  const users = loadUsers();
+  if (users.some((u) => u.email === email)) return toast("Account already exists");
+
+  const passwordHash = await sha256(password);
+
+  users.push({
+    id: "u_" + Math.random().toString(16).slice(2),
+    email,
+    display,
+    license,
+    passwordHash,
+    createdAt: nowIso(),
+  });
+
+  saveUsers(users);
+  setSession({ email, display });
+  await updateSignupState();
+  toast("Account created");
+  closeSignup();
+}
+
+async function logout() {
+  teardownPresenceRealtime();
+  if (presenceTimer) {
+    clearInterval(presenceTimer);
+    presenceTimer = null;
+  }
+
+  if (isSupabaseConfigured()) {
+    await supabaseClient.auth.signOut();
+  } else {
+    clearSession();
+  }
+  await updateSignupState();
+  toast("Logged out");
+}
+
+// events
+signupBtn.addEventListener("click", openSignup);
+signupCloseBtn.addEventListener("click", closeSignup);
+signupBackdrop.addEventListener("click", (e) => {
+  if (e.target === signupBackdrop) closeSignup();
+});
+signupCreateBtn.addEventListener("click", () => {
+  if (authMode === "signup") {
+    void createAccount();
+  } else {
+    void signIn();
+  }
+});
+logoutBtn.addEventListener("click", logout);
+
+// messages modal wiring
+if (messagesBtn) messagesBtn.addEventListener("click", openMessages);
+if (messagesCloseBtn) messagesCloseBtn.addEventListener("click", closeMessages);
+if (messagesBackdrop)
+  messagesBackdrop.addEventListener("click", (e) => {
+    if (e.target === messagesBackdrop) closeMessages();
+  });
+if (newConversationBtn)
+  newConversationBtn.addEventListener("click", async () => {
+    const email = prompt("Enter recipient email");
+    if (!email) return;
+    currentChatPartner = email.trim().toLowerCase();
+    renderConversations();
+    renderChatThread();
+  });
+if (messageSendBtn) messageSendBtn.addEventListener("click", () => void sendCurrentMessage());
+
+if (verifyLicenseBtn) {
+  verifyLicenseBtn.addEventListener("click", async () => {
+    const license = norm(suLicenseInput?.value);
+    if (!license) return toast("Enter a license number first");
+
+    const statusEl = $("#licenseStatus");
+    if (statusEl) statusEl.textContent = "Verifying…";
+
+    const ok = await verifyLicense(license);
+    if (ok) {
+      verifiedLicense = license.trim();
+      if (statusEl) statusEl.textContent = "License verified ✅";
+      toast("License verified");
+    } else {
+      verifiedLicense = null;
+      if (statusEl) statusEl.textContent = "License not found. Please check the number.";
+      toast("License could not be verified");
+    }
+  });
+}
+
+// auth state updates
+if (isSupabaseConfigured()) {
+  supabaseClient.auth.onAuthStateChange(() => {
+    void updateSignupState();
+  });
+}
+
+// toggle between login/signup
+if (authToggle) {
+  authToggle.addEventListener("click", (e) => {
+    const link = e.target.closest("a");
+    if (!link) return;
+    e.preventDefault();
+    setAuthMode(authMode === "signup" ? "signin" : "signup");
+  });
+}
+
+// init state once
+void updateSignupState();
+
+function isAdminAllowed() {
+    const u = new URL(location.href);
+    const urlUnlock = u.searchParams.get("admin") === "1";
+    const sessionUnlock = sessionStorage.getItem(ADMIN_UNLOCK_KEY) === "true";
+    return urlUnlock || sessionUnlock;
+  }
+
+  function ensureAdminUnlocked() {
+    if (isAdminAllowed()) return true;
+
+    const entered = prompt("Admin passcode:");
+    if (!entered) return false;
+
+    if (entered === ADMIN_PASSCODE) {
+      sessionStorage.setItem(ADMIN_UNLOCK_KEY, "true");
+      return true;
+    }
+
+    toast("Incorrect passcode");
+    return false;
+  }
+
+  function openAdmin() {
+    if (!ensureAdminUnlocked()) {
+      toast("Admin locked");
+      return;
+    }
+    backdrop.classList.add("open");
+    updateAdminState();
+    if (!state.selectedId && data[0]?.id) loadForm(data[0].id);
+  }
+
+  function closeAdmin() {
+    backdrop.classList.remove("open");
+  }
+
+  function updateAdminState() {
+    const sel = data.find((x) => x.id === state.selectedId);
+    adminState.textContent = isAdminAllowed()
+      ? `Admin mode enabled • Editing: ${sel ? sel.name : "None"}`
+      : "Admin mode locked";
+  }
+
+  function readForm() {
+    return {
+      name: norm($("#f_name").value),
+      licenseId: norm($("#f_license").value),
+      status: $("#f_status").value,
+      location: norm($("#f_location").value),
+      categories: splitList($("#f_categories").value),
+      buys: splitList($("#f_buys").value),
+      sells: splitList($("#f_sells").value),
+      contact: {
+        name: norm($("#f_contactName").value),
+        email: norm($("#f_contactEmail").value),
+      },
+      notes: norm($("#f_notes").value),
+    };
+  }
+
+  function writeForm(b) {
+    $("#f_name").value = b?.name ?? "";
+    $("#f_license").value = b?.licenseId ?? "";
+    $("#f_status").value = b?.status ?? "active";
+    $("#f_location").value = b?.location ?? "";
+    $("#f_categories").value = (b?.categories ?? []).join(", ");
+    $("#f_buys").value = (b?.buys ?? []).join(", ");
+    $("#f_sells").value = (b?.sells ?? []).join(", ");
+    $("#f_contactName").value = b?.contact?.name ?? "";
+    $("#f_contactEmail").value = b?.contact?.email ?? "";
+    $("#f_notes").value = b?.notes ?? "";
+  }
+
+  function loadForm(id) {
+    state.selectedId = id;
+    const b = data.find((x) => x.id === id);
+    writeForm(b);
+    modalTitle.textContent = b ? `Admin • ${b.name}` : "Admin";
+    updateAdminState();
+  }
+
+  function validateBiz(b) {
+    const errs = [];
+    if (!b.name) errs.push("Business name required");
+    if (!b.licenseId) errs.push("License ID required");
+    if (!b.location) errs.push("Location required");
+    if (!b.contact.email) errs.push("Contact email required");
+    return errs;
+  }
+
+  async function saveCurrent() {
+    if (!ensureAdminUnlocked()) return;
+
+    const id = state.selectedId;
+    if (!id) return toast("No business selected");
+
+    const idx = data.findIndex((x) => x.id === id);
+    if (idx === -1) return toast("Not found");
+
+    const patch = readForm();
+    const errs = validateBiz(patch);
+    if (errs.length) return toast(errs[0]);
+
+    const ownerId = await getCurrentUserId();
+    if (!ownerId) {
+      toast("Please sign in to save listings.");
+      return;
+    }
+
+    const updated = {
+      ...data[idx],
+      ...patch,
+      ownerId,
+      updatedAt: nowIso(),
+    };
+
+    try {
+      const saved = await upsertListing(updated);
+      const updatedIdx = data.findIndex((x) => x.id === saved.id);
+      if (updatedIdx === -1) data.unshift(saved);
+      else data[updatedIdx] = saved;
+
+      toast("Saved");
+      modalTitle.textContent = `Admin • ${saved.name}`;
+      render();
+      updateAdminState();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function createNew() {
+    if (!ensureAdminUnlocked()) return;
+
+    const ownerId = await getCurrentUserId();
+    if (!ownerId) {
+      toast("Please sign in to create listings.");
+      return;
+    }
+
+    const b = {
+      id: makeId(),
+      ownerId,
+      name: "New Business",
+      licenseId: "LIC-",
+      status: "pending",
+      location: "",
+      categories: [],
+      buys: [],
+      sells: [],
+      contact: { name: "", email: "" },
+      notes: "",
+      updatedAt: nowIso(),
+    };
+
+    try {
+      const saved = await upsertListing(b);
+      data.unshift(saved);
+      loadForm(saved.id);
+      render();
+      toast("Created");
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function deleteCurrent() {
+    if (!ensureAdminUnlocked()) return;
+
+    const id = state.selectedId;
+    if (!id) return;
+
+    const ownerId = await getCurrentUserId();
+    if (!ownerId) {
+      toast("Please sign in to delete listings.");
+      return;
+    }
+
+    const b = data.find((x) => x.id === id);
+    if (!b) return;
+
+    if (!confirm(`Delete "${b.name}"?`)) return;
+
+    await deleteListing(id, ownerId);
+
+    data = data.filter((x) => x.id !== id);
+
+    const next = data[0]?.id ?? null;
+    state.selectedId = next;
+    if (next) loadForm(next);
+    else writeForm(null);
+
+    render();
+    toast("Deleted");
+  }
+
+  function exportJson() {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "licensed-business-directory.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function resetLocal() {
+    if (!confirm("Reset local edits and restore the default seed dataset?")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    data = structuredClone(seedData);
+    toast("Reset complete");
+    render();
+  }
+
+  function importJsonFile(file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(String(reader.result ?? "[]"));
+        if (!Array.isArray(parsed)) throw new Error("JSON must be an array");
+
+        const cleaned = parsed.map((x) => ({
+          id: norm(x.id) || makeId(),
+          name: norm(x.name),
+          licenseId: norm(x.licenseId),
+          status: norm(x.status) || "pending",
+          location: norm(x.location),
+          categories: Array.isArray(x.categories) ? x.categories.map(norm).filter(Boolean) : [],
+          buys: Array.isArray(x.buys) ? x.buys.map(norm).filter(Boolean) : [],
+          sells: Array.isArray(x.sells) ? x.sells.map(norm).filter(Boolean) : [],
+          contact: { name: norm(x.contact?.name), email: norm(x.contact?.email) },
+          notes: norm(x.notes),
+          updatedAt: norm(x.updatedAt) || nowIso(),
+        }));
+
+        data = cleaned;
+        saveData(data);
+        toast("Imported");
+        render();
+        if (data[0]?.id) loadForm(data[0].id);
+      } catch (e) {
+        console.error(e);
+        toast("Import failed");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function copyShareLink() {
+    syncUrlFromState();
+    navigator.clipboard?.writeText(location.href).then(
+      () => toast("Link copied"),
+      () => toast("Copy failed")
+    );
+  }
+
+  function render() {
+    renderChips();
+    const filtered = applyFilters(data);
+    renderMeta(filtered);
+    renderCards(filtered);
+    setActiveTabs();
+  }
+
+  // Wire events (clean)
+  $$(".tab").forEach((t) => {
+    t.addEventListener("click", () => {
+      state.tab = t.getAttribute("data-tab") || "all";
+      syncUrlFromState();
+      render();
+    });
+  });
+
+  $("#q").addEventListener("input", (e) => {
+    state.q = e.target.value;
+    syncUrlFromState();
+    render();
+  });
+
+  $("#sort").addEventListener("change", (e) => {
+    state.sort = e.target.value;
+    syncUrlFromState();
+    render();
+  });
+
+  adminBtn.addEventListener("click", openAdmin);
+  closeBtn.addEventListener("click", closeAdmin);
+  backdrop.addEventListener("click", (e) => {
+    if (e.target === backdrop) closeAdmin();
+  });
+
+  saveBtn.addEventListener("click", saveCurrent);
+  newBtn.addEventListener("click", createNew);
+  deleteBtn.addEventListener("click", deleteCurrent);
+
+  importBtn.addEventListener("click", () => importFile.click());
+  importFile.addEventListener("change", () => {
+    const f = importFile.files?.[0];
+    if (f) importJsonFile(f);
+    importFile.value = "";
+  });
+
+  $("#exportBtn").addEventListener("click", exportJson);
+  $("#resetBtn").addEventListener("click", resetLocal);
+  copyLinkBtn.addEventListener("click", copyShareLink);
+
+  // Init
+  (async function init() {
+    syncStateFromUrl();
+    if (!new URL(location.href).searchParams.get("tab")) syncUrlFromState();
+
+    data = await fetchListings();
+    render();
+  })();
+</script>
+  </body>
+</html>

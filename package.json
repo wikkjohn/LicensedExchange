@@ -1,0 +1,18 @@
+{
+  "name": "licensed-business-exchange",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Static marketplace UI with Supabase auth, listings, chat, and license verification.",
+  "scripts": {
+    "start": "npx http-server -c-1 -p 3000",
+    "deploy:functions": "supabase functions deploy verify-license",
+    "dev": "npm run start",
+    "test": "jest --passWithNoTests"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1"
+  },
+  "devDependencies": {
+    "jest": "^30.3.0"
+  }
+}
