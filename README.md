@@ -143,3 +143,32 @@ For a static frontend, you can deploy this folder to any static host:
 
 For the backend / license API, use Supabase Functions (as shown above).
 
+## 📢 Ad Integration
+
+This project includes Google Ad Manager (GAM) integration for displaying ads.
+
+### Setup
+
+1. **Configure your ad network**: Update `ads.js` with your Google Ad Manager network code and ad unit paths.
+
+2. **Replace placeholders**: In `ads.js`, change:
+   - `YOUR_NETWORK_CODE` to your actual GAM network code
+   - `/YOUR_NETWORK_CODE/...` paths to your ad unit paths
+
+3. **Ad slots included**:
+   - Header leaderboard (728x90, responsive to 320x50)
+   - Hero banner (970x90, responsive to 728x90)
+   - Sidebar ads (3x 300x250)
+
+### Files
+
+- `ads.js`: Main ad configuration and initialization
+- `docs/ad-reference/ads_bundle.html`: Reference implementation (DO NOT use in production)
+- `docs/ad-reference/AdsNote.txt`: Important notes about ad setup
+
+### Important Notes
+
+- Ads will only display if you have live creatives in GAM targeting the configured ad units
+- The site must be served over HTTPS for ads to load
+- Test thoroughly before going live
+

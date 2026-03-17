@@ -567,6 +567,13 @@
         .field {
           grid-column: span 12;
         }
+        main.container {
+          flex-direction: column;
+        }
+        aside {
+          width: 100% !important;
+          order: -1; /* Move ads above content on mobile */
+        }
       }
 
       .pill span {
@@ -575,6 +582,42 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+      }
+
+      /* Ad placeholders */
+      .ad-placeholder {
+        background: #f6f6f6;
+        border: 1px dashed #bbb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .ad-placeholder.leaderboard {
+        width: 728px;
+        height: 90px;
+        margin: 0 auto;
+      }
+      .ad-placeholder.banner {
+        width: 970px;
+        height: 90px;
+        margin: 0 auto;
+      }
+      .ad-placeholder.sidebar {
+        width: 300px;
+        height: 250px;
+      }
+      @media (max-width: 768px) {
+        .ad-placeholder.leaderboard {
+          width: 320px;
+          height: 50px;
+        }
+        .ad-placeholder.banner {
+          width: 728px;
+          height: 90px;
+        }
       }
     </style>
   </head>
@@ -621,6 +664,13 @@
             Use the tabs to browse Products, Buyers, and Sellers. Search by business name,
             license ID, category, or specific items they buy/sell.
           </p>
+
+          <!-- Header Leaderboard Ad -->
+          <div style="text-align: center; margin: 20px 0;">
+            <div id="ad-header-leaderboard" class="ad-placeholder leaderboard">
+              <img src="OnlineStoreLogoTheWeighStation222.png" alt="The Weigh Station Logo" style="width: 100%; max-width: 728px; height: 90px; object-fit: contain; border-radius: 8px; background: #fff;" />
+            </div>
+          </div>
 
           <nav class="tabs" aria-label="Directory tabs">
             <div class="tab active" data-tab="all">All</div>
@@ -682,8 +732,22 @@
       </div>
     </header>
 
-    <main class="container">
-      <section class="grid" id="grid" aria-live="polite"></section>
+    <!-- Hero Banner Ad -->
+    <div style="text-align: center; margin: 20px 0; background: var(--bg);">
+      <div id="ad-hero-banner" class="ad-placeholder banner">
+        Hero Banner (970×90)
+      </div>
+    </div>
+
+    <main class="container" style="display: flex; gap: 20px; align-items: flex-start;">
+      <section class="grid" id="grid" aria-live="polite" style="flex: 1;"></section>
+
+      <!-- Sidebar with ads -->
+      <aside style="width: 300px; display: flex; flex-direction: column; gap: 20px;">
+        <div id="ad-sidebar-top" class="ad-placeholder sidebar">Sidebar Top (300×250)</div>
+        <div id="ad-sidebar-middle" class="ad-placeholder sidebar">Sidebar Middle (300×250)</div>
+        <div id="ad-sidebar-bottom" class="ad-placeholder sidebar">Sidebar Bottom (300×250)</div>
+      </aside>
     </main>
 
     <!-- Admin modal -->
@@ -841,6 +905,9 @@
 
     <!-- Supabase client (add your project URL + anon key below) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
+
+    <!-- Ad script -->
+    <script src="ads.js"></script>
 
     <script>
   /**

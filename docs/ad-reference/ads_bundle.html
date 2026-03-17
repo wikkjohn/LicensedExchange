@@ -1,0 +1,226 @@
+<!doctype html>
+<!--
+ads_bundle.html
+A single-file, reusable "ad layout bundle" based on the Newzjunky page snippet you shared.
+
+IMPORTANT:
+- The ad unit paths (e.g. /1006631/top_main_728x90) and div IDs are specific to THAT site's Google Ad Manager setup.
+- To run ads legally/for-real on your site, replace adUnitPath values with your own Google Ad Manager network + ad units.
+- This file is meant as a STORAGE + REUSE artifact: you can drop it into a project, then copy the pieces you need.
+
+How to use:
+1) Replace AD_NETWORK_CODE + adUnitPath values with your own.
+2) Ensure this file is served over HTTPS.
+3) Open it and verify that the placeholders render (ads will show only if you have live creatives targeting those units).
+-->
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Ad Layout Bundle</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    /* Simple layout scaffolding to mirror the structure you showed */
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; padding: 16px; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+    .row.center { justify-content: center; }
+    .slot { background: #f6f6f6; border: 1px dashed #bbb; display: flex; align-items: center; justify-content: center; color: #666; }
+    /* Exact slot sizes */
+    .w240h130 { width: 240px; height: 130px; }
+    .w728h90  { width: 728px; height: 90px; }
+    .w970h90  { width: 970px; height: 90px; }
+    .w300h250 { width: 300px; height: 250px; }
+    .w1h1     { width: 1px;   height: 1px; overflow: hidden; }
+
+    /* Example columns like your three-column content zone */
+    .cols-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    @media (max-width: 1050px) {
+      .cols-3 { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <!-- =========================
+       1) CONFIG (store this)
+       ========================= -->
+  <script>
+    /**
+     * Store all ad metadata in ONE place.
+     * This is the most reusable/maintainable approach:
+     * - You can render slots dynamically
+     * - You can change sizes/units without hunting through the HTML
+     */
+    window.AD_LAYOUT_CONFIG = {
+      networkCode: "1006631", // replace with your own network code if needed
+      gptLibraryUrl: "https://www.googletagservices.com/tag/js/gpt.js",
+      options: {
+        collapseEmptyDivs: true,
+        singleRequest: true
+      },
+      slots: [
+        // 1x1 "utility" slot
+        { name: "1x1", adUnitPath: "/1006631/1x1", sizes: [[1,1]], divId: "div-gpt-ad-1566591554908-0" },
+
+        // top header leaderboard
+        { name: "top_main_728x90", adUnitPath: "/1006631/top_main_728x90", sizes: [[728,90]], divId: "div-gpt-ad-1521483546510-0" },
+
+        // header quad
+        { name: "header1_240", adUnitPath: "/1006631/header1_240", sizes: [[240,130]], divId: "div-gpt-ad-1521483916684-0" },
+        { name: "header2_240", adUnitPath: "/1006631/header2_240", sizes: [[240,130]], divId: "div-gpt-ad-1521484064507-0" },
+        { name: "header3_240", adUnitPath: "/1006631/header3_240", sizes: [[240,130]], divId: "div-gpt-ad-1521484164304-0" },
+        // note: original had a typo "headrer4_240"
+        { name: "header4_240", adUnitPath: "/1006631/headrer4_240", sizes: [[240,130]], divId: "div-gpt-ad-1521484253706-0" },
+
+        // large banner
+        { name: "Freshy_Main_970_90", adUnitPath: "/1006631/Freshy_Main_970_90", sizes: [[970,90]], divId: "div-gpt-ad-1521486708477-0", collapseEmptyDiv: true },
+
+        // 300x250 boxes
+        { name: "Freshy_Main_300_250_1",  adUnitPath: "/1006631/Freshy_Main_300_250_1",  sizes: [[300,250]], divId: "div-gpt-ad-1521484624320-0" },
+        { name: "Freshy_Main_300_250_2",  adUnitPath: "/1006631/Freshy_Main_300_250_2",  sizes: [[300,250]], divId: "div-gpt-ad-1521485129004-0" },
+        { name: "Freshy_Main_300_250_3",  adUnitPath: "/1006631/Freshy_Main_300_250_3",  sizes: [[300,250]], divId: "div-gpt-ad-1522328050750-0" },
+        { name: "Freshy_Main_300_250_4",  adUnitPath: "/1006631/Freshy_Main_300_250_4",  sizes: [[300,250]], divId: "div-gpt-ad-1521485478343-0" },
+        { name: "Freshy_Main_300_250_5",  adUnitPath: "/1006631/Freshy_Main_300_250_5",  sizes: [[300,250]], divId: "div-gpt-ad-1521485803502-0" },
+        { name: "Freshy_Main_300_250_6",  adUnitPath: "/1006631/Freshy_Main_300_250_6",  sizes: [[300,250]], divId: "div-gpt-ad-1522328380481-0" },
+        { name: "Freshy_Main_300_250_7",  adUnitPath: "/1006631/Freshy_Main_300_250_7",  sizes: [[300,250]], divId: "div-gpt-ad-1521486087427-0" },
+        { name: "Freshy_Main_300_250_8",  adUnitPath: "/1006631/Freshy_Main_300_250_8",  sizes: [[300,250]], divId: "div-gpt-ad-1521486249824-0" },
+        { name: "Freshy_Main_300_250_9",  adUnitPath: "/1006631/Freshy_Main_300_250_9",  sizes: [[300,250]], divId: "div-gpt-ad-1521486349604-0" },
+        { name: "Freshy_Main_300_250_10", adUnitPath: "/1006631/Freshy_Main_300_250_10", sizes: [[300,250]], divId: "div-gpt-ad-1522328828763-0" }
+      ]
+    };
+  </script>
+
+  <!-- =========================
+       2) GPT LOADER + SETUP
+       ========================= -->
+  <script>
+    /**
+     * Efficient approach:
+     * - load GPT once
+     * - define all slots from AD_LAYOUT_CONFIG
+     * - display only slots that exist in the DOM
+     *
+     * This avoids copy/pasting a bunch of defineSlot/display calls across templates.
+     */
+    (function loadAndInitGPT() {
+      // create googletag queue early
+      window.googletag = window.googletag || { cmd: [] };
+
+      // load GPT library once
+      var gptScript = document.createElement("script");
+      gptScript.async = true;
+      gptScript.src = window.AD_LAYOUT_CONFIG.gptLibraryUrl;
+      document.head.appendChild(gptScript);
+
+      // after GPT loads, define slots
+      window.googletag.cmd.push(function() {
+        var cfg = window.AD_LAYOUT_CONFIG;
+        var pubads = googletag.pubads();
+
+        if (cfg.options && cfg.options.collapseEmptyDivs) {
+          pubads.collapseEmptyDivs();
+        }
+
+        // define all slots
+        cfg.slots.forEach(function(s) {
+          // only define if the placeholder div is present on the page
+          if (!document.getElementById(s.divId)) return;
+
+          var slot = googletag.defineSlot(s.adUnitPath, s.sizes, s.divId);
+          if (!slot) return;
+
+          slot.addService(pubads);
+
+          if (s.collapseEmptyDiv) {
+            slot.setCollapseEmptyDiv(true, true);
+          }
+        });
+
+        if (cfg.options && cfg.options.singleRequest) {
+          pubads.enableSingleRequest();
+        }
+
+        googletag.enableServices();
+
+        // display all slots that exist in DOM
+        cfg.slots.forEach(function(s) {
+          if (document.getElementById(s.divId)) {
+            googletag.display(s.divId);
+          }
+        });
+      });
+    })();
+  </script>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- 1x1 utility pixel/slot -->
+    <div id="div-gpt-ad-1566591554908-0" class="slot w1h1"></div>
+
+    <!-- Top leaderboard -->
+    <h2>Header</h2>
+    <div class="row center">
+      <div id="div-gpt-ad-1521483546510-0" class="slot w728h90">
+        <span>top_main_728x90 (728×90)</span>
+      </div>
+    </div>
+
+    <!-- Header quad (4x 240×130) -->
+    <div class="row center">
+      <div id="div-gpt-ad-1521483916684-0" class="slot w240h130"><span>header1_240</span></div>
+      <div id="div-gpt-ad-1521484064507-0" class="slot w240h130"><span>header2_240</span></div>
+      <div id="div-gpt-ad-1521484164304-0" class="slot w240h130"><span>header3_240</span></div>
+      <div id="div-gpt-ad-1521484253706-0" class="slot w240h130"><span>header4_240</span></div>
+    </div>
+
+    <!-- Big banner -->
+    <div class="row center">
+      <div id="div-gpt-ad-1521486708477-0" class="slot w970h90">
+        <span>Freshy_Main_970_90 (970×90)</span>
+      </div>
+    </div>
+
+    <h2>Main content area (example 3-column)</h2>
+    <div class="cols-3">
+      <!-- Column 1 example -->
+      <div>
+        <h3>Column 1</h3>
+        <div id="div-gpt-ad-1522328828763-0" class="slot w300h250"><span>300_250_10</span></div>
+        <div style="height:12px"></div>
+        <div id="div-gpt-ad-1521486249824-0" class="slot w300h250"><span>300_250_8</span></div>
+      </div>
+
+      <!-- Column 2 example -->
+      <div>
+        <h3>Column 2</h3>
+        <div id="div-gpt-ad-1521484624320-0" class="slot w300h250"><span>300_250_1</span></div>
+        <div style="height:12px"></div>
+        <div id="div-gpt-ad-1521485129004-0" class="slot w300h250"><span>300_250_2</span></div>
+      </div>
+
+      <!-- Column 3 example -->
+      <div>
+        <h3>Column 3</h3>
+        <div id="div-gpt-ad-1522328050750-0" class="slot w300h250"><span>300_250_3</span></div>
+        <div style="height:12px"></div>
+        <div id="div-gpt-ad-1521485478343-0" class="slot w300h250"><span>300_250_4</span></div>
+        <div style="height:12px"></div>
+        <div id="div-gpt-ad-1521485803502-0" class="slot w300h250"><span>300_250_5</span></div>
+        <div style="height:12px"></div>
+        <div id="div-gpt-ad-1522328380481-0" class="slot w300h250"><span>300_250_6</span></div>
+        <div style="height:12px"></div>
+        <div id="div-gpt-ad-1521486087427-0" class="slot w300h250"><span>300_250_7</span></div>
+        <div style="height:12px"></div>
+        <div id="div-gpt-ad-1521486349604-0" class="slot w300h250"><span>300_250_9</span></div>
+      </div>
+    </div>
+
+    <p style="margin-top: 24px; color:#666">
+      Tip: In your real site, remove the gray placeholder styling. Keep only the divs and the GPT setup code.
+    </p>
+
+  </div>
+</body>
+</html>

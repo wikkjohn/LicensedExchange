@@ -1,0 +1,11 @@
+Notes before you reuse it
+
+The ad unit paths in your snippet (e.g. /1006631/...) belong to that publisher's Google Ad Manager setup. To run ads on your site, you must replace them with your own GAM network + ad units.
+
+The divId values can be whatever you want, but they must match between:
+
+the config entry, and
+
+the <div id="..."> on the page
+
+If you want, paste your intended page layout/wireframe (where each ad should appear), and I'll restructure the file so the markup matches your exact layout (desktop + mobile).
