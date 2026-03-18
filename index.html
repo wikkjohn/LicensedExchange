@@ -995,7 +995,36 @@
   // Set this to your Supabase Edge Function URL after deploying:
   //   supabase functions deploy verify-license
   //   https://<project>.functions.supabase.co/verify-license
-  const OCM_LICENSE_API = "https://data.ny.gov/api/views/jskf-tt3q/rows.json?accessType=DOWNLOAD";
+  async function verifyLicense(license) {
+  const normalized = norm(license);
+  if (!normalized) return false;
+
+  if (OCM_LICENSE_API && !OCM_LICENSE_API.includes("<project>")) {
+    try {
+      const url = new URL(OCM_LICENSE_API);
+
+      if (url.hostname.endsWith("data.ny.gov")) {
+        url.searchParams.set("q", normalized);
+        url.searchParams.set("$limit", "1");
+        const res = await fetch(url.toString());
+        if (!res.ok) return false;
+        const json = await res.json();
+        if (Array.isArray(json)) return json.length > 0;
+        if (Array.isArray(json?.data)) return json.data.length > 0;
+        return false;
+      }
+
+      const res = await fetch(`${OCM_LICENSE_API}?license=${encodeURIComponent(normalized)}`);
+      if (!res.ok) return false;
+      const json = await res.json();
+      return json?.active === true;
+    } catch {
+      return false;
+    }
+  }
+
+  return /^[A-Za-z0-9\- ]{5,30}$/.test(normalized);
+}
   const STORAGE_KEY = "licensed_business_exchange_v1";
   const MESSAGES_KEY = "lbe_messages_v1";
   const PRESENCE_KEY = "lbe_presence_v1";
