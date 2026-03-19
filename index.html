@@ -345,6 +345,62 @@
         letter-spacing: -0.2px;
       }
 
+      .card-meta {
+        margin: 8px 0 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 10px;
+        align-items: center;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .card-line {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border: 1px solid rgba(229, 231, 235, 0.9);
+        border-radius: 14px;
+        background: rgba(249, 250, 251, 0.72);
+      }
+
+      .card-line-label {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+
+      .card-line.compact {
+        margin-top: 10px;
+        padding: 10px 12px;
+      }
+
+      .card-line.compact .card-line-label {
+        font-size: 10px;
+        margin-bottom: 4px;
+      }
+
+      .card-line.compact .card-line-value {
+        font-size: 13px;
+        line-height: 1.35;
+      }
+
+      .card-line-value {
+        font-size: 14px;
+        line-height: 1.45;
+        color: var(--text);
+      }
+
+      .card-line-value.muted {
+        color: var(--muted);
+      }
+
+      .card-summary {
+        margin-top: 12px;
+      }
+
       .badge {
         font-size: 12px;
         font-weight: 800;
@@ -397,29 +453,51 @@
 
       .card-footer {
         margin-top: auto;
-        padding-top: 12px;
+        padding-top: 14px;
         display: flex;
         align-items: center;
-        justify-content: space-between;
         gap: 10px;
+        flex-wrap: wrap;
         border-top: 1px dashed rgba(229, 231, 235, 0.95);
       }
 
-      .contact {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        color: var(--muted);
-        font-size: 12px;
+      .card-footer .btn {
+        min-width: 0;
       }
-      .contact strong {
-        color: var(--text);
-        font-size: 13px;
+
+      .card-footer .btn.wide {
+        flex: 1 1 170px;
+        justify-content: center;
       }
 
       .mini-actions {
+        flex: 0 0 auto;
+        margin-left: auto;
         display: flex;
         gap: 8px;
+      }
+      .details-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+      .details-block {
+        border: 1px solid rgba(229,231,235,0.9);
+        border-radius: 16px;
+        padding: 14px;
+        background: rgba(249,250,251,0.8);
+      }
+      .details-block h5 {
+        margin: 0 0 8px;
+        font-size: 14px;
+      }
+      .details-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .details-list .tag {
+        margin: 0;
       }
       .iconbtn {
         border: 1px solid var(--border);
@@ -620,10 +698,17 @@
         }
       }
     </style>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7794813397476471"
-     crossorigin="anonymous"></script>
-     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7794813397476471"
-     crossorigin="anonymous"></script>
+
+    <script>
+  // Load AdSense only on a real web origin, not when opening the file locally.
+  if (/^https?:$/i.test(location.protocol)) {
+    const s = document.createElement("script");
+    s.async = true;
+    s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7794813397476471";
+    s.crossOrigin = "anonymous";
+    document.head.appendChild(s);
+  }
+</script>
   </head>
 
   <body>
@@ -639,39 +724,31 @@
           </div>
 
           <div class="topbar-right">
-<button id="verifyLicenseBtn" class="pill" type="button" title="Verify your license before creating an account">
-            <span class="dot" aria-hidden="true"></span>
-            <span><strong>Verified</strong> directory</span>
-          </button>
-
-            <button id="signupBtn" class="btn" type="button" onclick="openSignup()">
-              Create account
+            <button id="signupBtn" class="btn" type="button">
+              Join Marketplace
               <span aria-hidden="true">➕</span>
             </button>
 
-            <button id="messagesBtn" class="btn" type="button">
-              Messages
-              <span aria-hidden="true">💬</span>
+            <button id="signInBtn" class="btn" type="button">
+              Sign In
+              <span aria-hidden="true">🔐</span>
             </button>
 
             <button id="adminBtn" class="btn primary" type="button">
-              Admin
-              <span aria-hidden="true">⚙️</span>
+              Add Listing
+              <span aria-hidden="true">📝</span>
             </button>
           </div>
         </div>
         <div class="hero">
           <h2>
-            Search a <span>select group</span> of NYS licensed cannabis businesses.
+            Find licensed buyers and sellers for <span>craft-grown and microbusiness</span> cannabis products.
           </h2>
           <p class="sub">
-            Use the tabs to browse Products, Buyers, and Sellers. Search by business name,
-            license ID, category, or specific items they buy/sell.
+            Browse licensed businesses, open listing details, contact the right partner fast, and request supply from craft producers and microbusinesses.
           </p>
 
           <!-- Header Leaderboard Ad -->
-           <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7794813397476471"
-     crossorigin="anonymous"></script>
 <!-- TopPage_Main -->
 <ins class="adsbygoogle"
      style="display:block"
@@ -680,7 +757,7 @@
      data-ad-format="auto"
      data-full-width-responsive="true"></ins>
 <script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
+     (window.safeInitAds ? window.safeInitAds() : void 0);
 </script>
           
           <nav class="tabs" aria-label="Directory tabs">
@@ -730,14 +807,7 @@
               <strong id="count">0</strong> results
               <span id="hint" style="margin-left: 8px;"></span>
             </div>
-            <div style="display:flex; gap:10px; align-items:center;">
-              <button id="exportBtn" class="btn" type="button" title="Download directory as JSON">
-                Export JSON ⤓
-              </button>
-              <button id="resetBtn" class="btn danger" type="button" title="Reset local edits">
-                Reset local
-              </button>
-            </div>
+
           </div>
         </div>
       </div>
@@ -754,8 +824,6 @@
       <section class="grid" id="grid" aria-live="polite" style="flex: 1;"></section>
 
       <!-- Sidebar with ads -->
-     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7794813397476471"
-     crossorigin="anonymous"></script>
 <!-- SideBar_Top -->
 <ins class="adsbygoogle"
      style="display:block"
@@ -764,10 +832,8 @@
      data-ad-format="auto"
      data-full-width-responsive="true"></ins>
 <script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
+     (window.safeInitAds ? window.safeInitAds() : void 0);
 </script>
-     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7794813397476471"
-     crossorigin="anonymous"></script>
 <!-- SideBar_Middle -->
 <ins class="adsbygoogle"
      style="display:block"
@@ -776,10 +842,8 @@
      data-ad-format="auto"
      data-full-width-responsive="true"></ins>
 <script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
+     (window.safeInitAds ? window.safeInitAds() : void 0);
 </script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7794813397476471"
-     crossorigin="anonymous"></script>
 <!-- SideBar_Bottom -->
 <ins class="adsbygoogle"
      style="display:block"
@@ -788,7 +852,7 @@
      data-ad-format="auto"
      data-full-width-responsive="true"></ins>
 <script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
+     (window.safeInitAds ? window.safeInitAds() : void 0);
 </script>
       <aside style="width: 300px; display: flex; flex-direction: column; gap: 20px;">
         <div id="ad-sidebar-top" class="ad-placeholder sidebar">Sidebar Top (300×250)</div>
@@ -798,10 +862,10 @@
     </main>
 
     <!-- Admin modal -->
-    <div class="backdrop" id="backdrop" role="dialog" aria-modal="true" aria-label="Admin editor">
+    <div class="backdrop" id="backdrop" role="dialog" aria-modal="true" aria-label="Listing editor">
       <div class="modal">
         <div class="modal-header">
-          <h4 id="modalTitle">Admin</h4>
+          <h4 id="modalTitle">Listing Editor</h4>
           <div style="display:flex; gap:10px; align-items:center;">
             <button id="saveBtn" class="btn primary" type="button">Save</button>
             <button id="closeBtn" class="btn" type="button">Close</button>
@@ -856,13 +920,13 @@
           </div>
 
           <p class="help">
-            Admin mode persists edits in <strong>localStorage</strong> on this device.
+            Your listing updates are saved in <strong>localStorage</strong> on this device during this demo.
             For multi-user + real access control, connect this UI to a real backend.
           </p>
 
           <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;">
-            <button id="newBtn" class="btn primary" type="button">+ New business</button>
-            <button id="deleteBtn" class="btn danger" type="button">Delete</button>
+            <button id="newBtn" class="btn primary" type="button">+ Add another listing</button>
+            <button id="deleteBtn" class="btn danger" type="button">Delete listing</button>
             <button id="importBtn" class="btn" type="button">Import JSON</button>
             <input id="importFile" type="file" accept="application/json" hidden />
           </div>
@@ -871,7 +935,7 @@
           <div class="help" id="adminState"></div>
           <div style="display:flex; gap:10px;">
             <button id="copyLinkBtn" class="btn" type="button" title="Copy share link with current filters">
-              Copy share link
+              Copy search link
             </button>
           </div>
         </div>
@@ -886,41 +950,110 @@
         <button id="signupCreateBtn" class="btn primary" type="button">Create</button>
         <button id="signupCloseBtn" class="btn" type="button">Close</button>
       </div>
-    <div id="su_display_field" class="field">
-  <label for="su_display">Display name</label>
-  <input id="su_display" type="text" placeholder="Your name or business name" />
-</div>
-
-<div class="field">
-  <label for="su_password">Password</label>
-  <input id="su_password" type="password" placeholder="At least 8 characters" />
-</div>
     </div>
 
     <div class="modal-body">
       <div class="form-grid">
+        <div id="su_display_field" class="field">
+          <label for="su_display">Display name</label>
+          <input id="su_display" type="text" placeholder="Your name or business name" />
+        </div>
+
+        <div class="field">
+          <label for="su_password">Password</label>
+          <input id="su_password" type="password" placeholder="At least 8 characters" />
+        </div>
+
         <div class="field">
           <label for="su_email">Email</label>
           <input id="su_email" type="email" placeholder="you@company.com" />
+          <p class="help" id="authToggle" style="margin-top:6px;"></p>
         </div>
 
         <div class="field">
-            <label for="su_license">License number</label>
-            <input id="su_license" type="text" placeholder="OCM license #" />
-            <div id="licenseStatus" class="help" style="margin-top:6px;">Click “Verified” to confirm your license.</div>
+          <label for="su_license">License number</label>
+          <input id="su_license" type="text" placeholder="OCM license #" />
+          <button id="verifyLicenseBtn" class="btn" type="button" style="margin-top:8px; width:max-content;">
+            Verify license
+          </button>
+          <div id="licenseStatus" class="help" style="margin-top:6px;">
+            License verification will appear here when a live verification service is connected.
+          </div>
         </div>
       </div>
 
-      <p class="help">
-        This demo stores accounts in <strong>localStorage</strong> (browser-only). In production, connect this to your backend.
-      </p>
-      <p class="help" id="authToggle"></p>
     </div>
 
     <div class="modal-footer">
       <div class="help" id="signupState">Not signed in</div>
       <div style="display:flex; gap:10px;">
         <button id="logoutBtn" class="btn danger" type="button">Logout</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Listing details modal -->
+<div class="backdrop" id="detailsBackdrop" role="dialog" aria-modal="true" aria-label="Listing details">
+  <div class="modal">
+    <div class="modal-header">
+      <h4 id="detailsTitle">Listing details</h4>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button id="detailsCloseBtn" class="btn" type="button">Close</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div id="detailsContent"></div>
+    </div>
+    <div class="modal-footer">
+      <div class="help" id="detailsState">Open a listing to see contact options.</div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button id="detailsContactBtn" class="btn primary" type="button">Contact Business</button>
+        <button id="detailsRequestBtn" class="btn" type="button">Buy Now</button>
+        <button id="detailsEditBtn" class="btn" type="button">Edit Listing</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Buy request modal -->
+<div class="backdrop" id="buyRequestBackdrop" role="dialog" aria-modal="true" aria-label="Send buy request">
+  <div class="modal">
+    <div class="modal-header">
+      <h4 id="buyRequestTitle">Buy Request</h4>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button id="buyRequestCloseBtn" class="btn" type="button">Close</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <p class="help" id="buyRequestHelp" style="margin-top:0;">Fill out this short form and your request will open ready to send to the seller.</p>
+      <div class="form-grid">
+        <div class="field">
+          <label for="buyCompanyName">Company Name</label>
+          <input id="buyCompanyName" type="text" placeholder="Your company name" />
+        </div>
+        <div class="field">
+          <label for="buyLicenseNumber">License Number</label>
+          <input id="buyLicenseNumber" type="text" placeholder="Your license number" />
+        </div>
+        <div class="field">
+          <label for="buyProduct">Product</label>
+          <input id="buyProduct" type="text" placeholder="What do you want to buy?" />
+        </div>
+        <div class="field">
+          <label for="buyQuantity">Quantity</label>
+          <input id="buyQuantity" type="text" placeholder="Example: 10 lbs or 500 units" />
+        </div>
+        <div class="field">
+          <label for="buyNeedByDate">Need By Date</label>
+          <input id="buyNeedByDate" type="date" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer wrap">
+      <div class="help" id="buyRequestState">This will open your email app with the completed buy request.</div>
+      <div class="stack-actions">
+        <button id="buyRequestSubmitBtn" class="btn primary" type="button">Send Buy Request</button>
       </div>
     </div>
   </div>
@@ -960,7 +1093,10 @@
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <!-- Supabase client (add your project URL + anon key below) -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
+    <script>
+  // Supabase is optional. Load the library only when backend mode is enabled later.
+  window.supabase = window.supabase || null;
+</script>
 
     <!-- Ad script -->
     <script src="ads.js"></script>
@@ -975,14 +1111,16 @@
    */
 
   // --- Supabase setup (replace with your own project values) ---
-  const SUPABASE_URL = "https://yniwdqnclqfzkksjiqei.supabase.co"; // <-- update
-  const SUPABASE_ANON_KEY = "sb_publishable_ePMUcJqV6V_lyuhQA6yp_Q_uNHh2CJE"; // <-- update
+  const SUPABASE_URL = "https://yniwdqnclqfzkksjiqei.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_ePMUcJqV6V_lyuhQA6yp_Q_uNHh2CJE";
+  const USE_SUPABASE = false;
+  const OCM_LICENSE_API = "";
 
   let supabaseClient = null;
   if (typeof window?.supabase !== "undefined" && window.supabase?.createClient) {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   } else {
-    console.warn("Supabase client not available; running in local fallback mode.");
+    console.info("Running in local fallback mode.");
   }
 
   const SUPABASE_TABLE = "listings"; // See Supabase table schema note in comments below
@@ -995,40 +1133,56 @@
   // Set this to your Supabase Edge Function URL after deploying:
   //   supabase functions deploy verify-license
   //   https://<project>.functions.supabase.co/verify-license
-  async function verifyLicense(license) {
-  const normalized = norm(license);
-  if (!normalized) return false;
-
-  if (OCM_LICENSE_API && !OCM_LICENSE_API.includes("<project>")) {
-    try {
-      const url = new URL(OCM_LICENSE_API);
-
-      if (url.hostname.endsWith("data.ny.gov")) {
-        url.searchParams.set("q", normalized);
-        url.searchParams.set("$limit", "1");
-        const res = await fetch(url.toString());
-        if (!res.ok) return false;
-        const json = await res.json();
-        if (Array.isArray(json)) return json.length > 0;
-        if (Array.isArray(json?.data)) return json.data.length > 0;
-        return false;
-      }
-
-      const res = await fetch(`${OCM_LICENSE_API}?license=${encodeURIComponent(normalized)}`);
-      if (!res.ok) return false;
-      const json = await res.json();
-      return json?.active === true;
-    } catch {
-      return false;
-    }
+  function isSupabaseConfigured() {
+    return !!(
+      USE_SUPABASE &&
+      supabaseClient &&
+      SUPABASE_URL &&
+      SUPABASE_ANON_KEY &&
+      !SUPABASE_URL.includes("<project>") &&
+      !SUPABASE_ANON_KEY.includes("<") &&
+      !SUPABASE_URL.includes("YOUR_") &&
+      !SUPABASE_ANON_KEY.includes("YOUR_")
+    );
   }
 
-  return /^[A-Za-z0-9\- ]{5,30}$/.test(normalized);
-}
-  const STORAGE_KEY = "licensed_business_exchange_v1";
-  const MESSAGES_KEY = "lbe_messages_v1";
-  const PRESENCE_KEY = "lbe_presence_v1";
-  const ADMIN_UNLOCK_KEY = "lbe_admin_unlocked_v1";
+  async function verifyLicense(license) {
+    const normalized = norm(license);
+    if (!normalized) return false;
+
+    if (OCM_LICENSE_API) {
+      try {
+        const url = new URL(OCM_LICENSE_API);
+
+        if (url.hostname.endsWith("data.ny.gov")) {
+          url.searchParams.set("q", normalized);
+          url.searchParams.set("$limit", "1");
+          const res = await fetch(url.toString());
+          if (!res.ok) return false;
+          const json = await res.json();
+          if (Array.isArray(json)) return json.length > 0;
+          if (Array.isArray(json?.data)) return json.data.length > 0;
+          return false;
+        }
+
+        const res = await fetch(`${OCM_LICENSE_API}?license=${encodeURIComponent(normalized)}`);
+        if (!res.ok) return false;
+        const json = await res.json();
+        return json?.active === true;
+      } catch (err) {
+        console.warn("License verification failed", err);
+        return false;
+      }
+    }
+
+    return /^[A-Za-z0-9\- ]{5,30}$/.test(normalized);
+  }
+
+  const STORAGE_KEY = "licensed_business_exchange_v4";
+  // v4 storage keys intentionally start fresh from the known-good v3 base.
+  const MESSAGES_KEY = "lbe_messages_v4";
+  const PRESENCE_KEY = "lbe_presence_v4";
+  const ADMIN_UNLOCK_KEY = "lbe_admin_unlocked_v4";
   const ADMIN_PASSCODE = "1234"; // change this (or remove gating entirely)
 
   async function getCurrentUserId() {
@@ -1090,9 +1244,24 @@
       return b;
     }
 
+    const payload = {
+      id: b.id,
+      owner_id: b.ownerId,
+      name: b.name || "",
+      licenseId: b.licenseId || "",
+      status: b.status || "pending",
+      location: b.location || "",
+      categories: Array.isArray(b.categories) ? b.categories : [],
+      buys: Array.isArray(b.buys) ? b.buys : [],
+      sells: Array.isArray(b.sells) ? b.sells : [],
+      contact: b.contact || { name: "", email: "" },
+      notes: b.notes || "",
+      updatedAt: nowIso(),
+    };
+
     const { data: rows, error } = await supabaseClient
       .from(SUPABASE_TABLE)
-      .upsert({ ...b, updatedAt: nowIso() }, { onConflict: "id" })
+      .upsert(payload, { onConflict: "id" })
       .select();
 
     if (error) {
@@ -1377,8 +1546,8 @@
     toastEl.__t = setTimeout(() => toastEl.classList.remove("show"), 1800);
   }
 // --- Local account demo (localStorage) ---
-const USERS_KEY = "lbe_users_v1";
-const SESSION_KEY = "lbe_session_v1";
+const USERS_KEY = "lbe_users_v4";
+const SESSION_KEY = "lbe_session_v4";
 
 function loadUsers() {
   try {
@@ -1444,7 +1613,7 @@ async function sha256(text) {
       status: "active",
       location: "Evans Mills, NY",
       categories: ["Flower", "Prerolls"],
-      buys: ["Bulk FLower", "Trim", "Rosin"],
+      buys: ["Bulk Flower", "Trim", "Rosin"],
       sells: ["Prepackaged flower", "Prepackaged prerolls"],
       contact: { name: "Chad Johnson", email: "futurefarmer46@gmail.com" },
       notes: "Prefers baled materials; weekly pickups.",
@@ -1457,7 +1626,7 @@ async function sha256(text) {
       licenseId: "LIC-55011",
       status: "active",
       location: "Elizabeth, NJ",
-      categories: ["Preolls", "Vapes"],
+      categories: ["Prerolls", "Vapes"],
       buys: ["Trim", "Vapes"],
       sells: ["Prerolls", "Rosin"],
       contact: { name: "Sam Rivera", email: "sam@blueharbor.io" },
@@ -1471,7 +1640,7 @@ async function sha256(text) {
       licenseId: "LIC-88007",
       status: "pending",
       location: "Jersey City, NJ",
-      categories: ["Bulk Flower", "Gummy's"],
+      categories: ["Bulk Flower", "Gummies"],
       buys: ["Flower", "Rosin"],
       sells: ["Prepackaged flower", "Prepackaged gummies"],
       contact: { name: "A. Chen", email: "achen@northstarwholesale.com" },
@@ -1587,42 +1756,6 @@ async function sha256(text) {
     return ageMs < 1000 * 60 * 5; // online if active within last 5 minutes
   }
 
-  async function verifyLicense(license) {
-    const normalized = norm(license);
-    if (!normalized) return false;
-
-    // If you have an OCM API endpoint, set OCM_LICENSE_API above.
-    if (OCM_LICENSE_API) {
-      try {
-        // Socrata / data.ny.gov dataset endpoints can be queried using `q=`.
-        // Example: https://data.ny.gov/resource/jskf-tt3q.json?q=LICENSE123
-        const url = new URL(OCM_LICENSE_API);
-        if (url.hostname.endsWith("data.ny.gov")) {
-        url.searchParams.set("q", normalized);
-        url.searchParams.set("$limit", "1");
-        const res = await fetch(url.toString());
-        if (!res.ok) return false;
-        const json = await res.json();
-
-        // Socrata query returns { data: [...] } or array of rows
-        if (Array.isArray(json)) return json.length > 0;
-        if (Array.isArray(json?.data)) return json.data.length > 0;
-        return false;
-      }
-
-      const res = await fetch(`${OCM_LICENSE_API}?license=${encodeURIComponent(normalized)}`);
-      if (!res.ok) return false;
-      const json = await res.json();
-      // Example response format: { active: true }
-      return json?.active === true;
-      } catch {
-        return false;
-      }
-    }
-
-    // Fallback: basic format check (replace with real validation)
-    return /^[A-Za-z0-9\- ]{5,30}$/.test(normalized);
-  }
 
   function setupPresenceRealtime() {
     if (!isSupabaseConfigured()) return;
@@ -1858,88 +1991,308 @@ async function sha256(text) {
     ].join("\n");
   }
 
+  async function copyText(text) {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (err) {
+      console.warn("Clipboard API failed", err);
+    }
+
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    } catch (err) {
+      console.warn("execCommand copy failed", err);
+      return false;
+    }
+  }
+
   function renderCards(list) {
     gridEl.innerHTML = "";
 
     for (const b of list) {
       const badge = statusBadge(b.status);
       const el = document.createElement("article");
+      const canEdit = !!(currentUserId && b.ownerId === currentUserId);
       el.className = "card";
+      el.setAttribute("data-id", b.id);
+      el.setAttribute("tabindex", "0");
+      el.setAttribute("role", "button");
+      el.setAttribute("aria-label", `View details for ${b.name}`);
 
-      const buys = (b.buys ?? []).slice(0, 6);
-      const sells = (b.sells ?? []).slice(0, 6);
-      const cats = (b.categories ?? []).slice(0, 4);
+      const sells = (b.sells ?? []).filter(Boolean);
+      const sellPreview = sells.length ? sells.slice(0, 3).join(", ") : "No products listed yet";
+      const extraSellCount = sells.length > 3 ? ` +${sells.length - 3} more` : "";
+      const categories = (b.categories ?? []).filter(Boolean);
+      const categoryPreview = categories.length ? categories.slice(0, 2).join(", ") : "Not specified";
 
       el.innerHTML = `
         <div class="card-top">
           <div>
             <h3>${escapeHtml(b.name)}</h3>
-            <div class="small">
+            <div class="card-meta">
               <span class="badge ${badge.cls}">${badge.label}</span>
-              <span style="margin-left:8px;">•</span>
-              <span style="margin-left:8px;"><strong>${escapeHtml(b.licenseId)}</strong></span>
-              <span style="margin-left:8px;">•</span>
-              <span style="margin-left:8px;">${escapeHtml(b.location ?? "")}</span>
+              <span>${escapeHtml(b.location || "Location not listed")}</span>
             </div>
           </div>
-          <span class="badge">Licensed</span>
+          ${canEdit ? `<button class="iconbtn" data-act="edit" data-id="${escapeHtml(b.id)}" title="Edit listing" aria-label="Edit listing for ${escapeHtml(b.name)}" type="button">${iconSvg("edit")}</button>` : ""}
         </div>
 
-        <div class="kv" style="margin-top: 12px;">
-          ${cats.map((c) => `<span class="tag cat">${escapeHtml(c)}</span>`).join("")}
+        <div class="card-line card-summary">
+          <div class="card-line-label">On Sale</div>
+          <div class="card-line-value">${escapeHtml(sellPreview)}${escapeHtml(extraSellCount)}</div>
         </div>
 
-        <div class="kv">
-          ${buys.map((x) => `<span class="tag buy">Buys: ${escapeHtml(x)}</span>`).join("")}
-        </div>
-
-        <div class="kv">
-          ${sells.map((x) => `<span class="tag sell">Sells: ${escapeHtml(x)}</span>`).join("")}
+        <div class="card-line compact">
+          <div class="card-line-label">Category</div>
+          <div class="card-line-value ${categories.length ? "" : "muted"}">${escapeHtml(categoryPreview)}</div>
         </div>
 
         <div class="card-footer">
-          <div class="contact">
-            <strong>${escapeHtml(b.contact?.name ?? "Contact")}</strong>
-            <span>${escapeHtml(b.contact?.email ?? "")}</span>
-          </div>
-          <div class="mini-actions">
-            <button class="iconbtn" data-act="copy" data-id="${escapeHtml(b.id)}" title="Copy summary">
-              ${iconSvg("copy")}
-            </button>
-            <button class="iconbtn" data-act="edit" data-id="${escapeHtml(b.id)}" title="Edit (admin)">
-              ${iconSvg("edit")}
-            </button>
-          </div>
+          <button class="btn" data-act="view" data-id="${escapeHtml(b.id)}" type="button">View Details</button>
+          <button class="btn primary wide" data-act="buy" data-id="${escapeHtml(b.id)}" type="button">Buy Now</button>
         </div>
       `;
       gridEl.appendChild(el);
     }
   }
 
-  function onGridClick(e) {
-    const btn = e.target.closest("button");
-    if (!btn) return;
 
-    const id = btn.getAttribute("data-id");
-    const act = btn.getAttribute("data-act");
-    const b = data.find((x) => x.id === id);
-    if (!b) return;
-
-    if (act === "copy") {
-      navigator.clipboard?.writeText(formatSummary(b)).then(
-        () => toast("Copied summary"),
-        () => toast("Copy failed")
-      );
+  function openEmailAction(b, mode = "contact") {
+    const email = norm(b?.contact?.email);
+    if (!email) {
+      toast("No contact email available for this listing");
       return;
     }
 
-    if (act === "edit") {
-      openAdmin();
-      loadForm(b.id);
+    const subject = mode === "request"
+      ? `Supply request for ${b.name}`
+      : `Interested in connecting with ${b.name}`;
+    const body = mode === "request"
+      ? `Hello ${b.contact?.name || "there"},\n\nI am interested in sourcing products from ${b.name}. Please let me know what is currently available, along with order minimums and next steps.\n\nThank you.`
+      : `Hello ${b.contact?.name || "there"},\n\nI found your listing on Licensed Exchange and would like to connect about your products and availability.\n\nThank you.`;
+
+    const href = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = href;
+  }
+
+
+  let selectedBuyRequestId = null;
+
+  function safeInitAds() {
+    try {
+      if (!/^https?:$/i.test(location.protocol)) return;
+      const ads = document.querySelectorAll('ins.adsbygoogle');
+      ads.forEach((el) => {
+        if (!el || el.dataset.adStatus || el.dataset.adsInit === "1") return;
+        const rect = el.getBoundingClientRect();
+        if (rect.width <= 0) return;
+        try {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+          el.dataset.adsInit = "1";
+        } catch (err) {
+          console.warn("Ad init skipped", err);
+        }
+      });
+    } catch (err) {
+      console.warn("safeInitAds failed", err);
     }
+  }
+  window.safeInitAds = safeInitAds;
+
+  function openBuyRequest(id) {
+    const b = data.find((x) => x.id === id);
+    if (!b) {
+      toast("Listing not found");
+      return;
+    }
+    selectedBuyRequestId = id;
+    if (buyRequestTitle) buyRequestTitle.textContent = `Buy Request — ${b.name}`;
+    if (buyRequestHelp) {
+      buyRequestHelp.textContent = "Fill out this short form and your request will open ready to send to the seller.";
+    }
+    if (buyRequestState) {
+      buyRequestState.textContent = "This will open your email app with the completed buy request.";
+    }
+    if (buyProduct && !buyProduct.value) {
+      const firstSell = Array.isArray(b.sells) && b.sells.length ? b.sells[0] : "";
+      buyProduct.value = firstSell || "";
+    }
+    if (buyCompanyName && !buyCompanyName.value) {
+      const session = getSession();
+      buyCompanyName.value = session?.display || "";
+    }
+    if (buyLicenseNumber && !buyLicenseNumber.value) {
+      const users = loadUsers();
+      const session = getSession();
+      const user = users.find((u) => u.email === session?.email);
+      buyLicenseNumber.value = user?.license || "";
+    }
+    if (buyRequestBackdrop) buyRequestBackdrop.classList.add("open");
+  }
+
+  function closeBuyRequest() {
+    if (buyRequestBackdrop) buyRequestBackdrop.classList.remove("open");
+    selectedBuyRequestId = null;
+  }
+
+  function submitBuyRequest() {
+    const b = data.find((x) => x.id === selectedBuyRequestId);
+    if (!b) {
+      toast("Please choose a seller first");
+      return;
+    }
+    const to = norm(b?.contact?.email);
+    if (!to) {
+      toast("No seller email is listed for this business");
+      return;
+    }
+
+    const companyName = norm(buyCompanyName?.value);
+    const licenseNumber = norm(buyLicenseNumber?.value);
+    const product = norm(buyProduct?.value);
+    const quantity = norm(buyQuantity?.value);
+    const needByDate = norm(buyNeedByDate?.value);
+
+    if (!companyName || !licenseNumber || !product || !quantity || !needByDate) {
+      toast("Please complete all buy request fields");
+      return;
+    }
+
+    const subject = `Buy request for ${product} from ${companyName}`;
+    const body = [
+      `Hello ${b.contact?.name || "there"},`,
+      "",
+      `We would like to place a buy request for the following product from ${b.name}:`,
+      "",
+      `Company Name: ${companyName}`,
+      `License Number: ${licenseNumber}`,
+      `Product: ${product}`,
+      `Quantity: ${quantity}`,
+      `Need By Date: ${needByDate}`,
+      "",
+      "Please reply with availability and next steps.",
+      "",
+      "Thank you."
+    ].join("\n");
+
+    window.location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    closeBuyRequest();
+  }
+
+
+  function renderDetailsContent(b) {
+    const badge = statusBadge(b.status);
+    const cats = (b.categories ?? []).length ? (b.categories ?? []).map((c) => `<span class="tag cat">${escapeHtml(c)}</span>`).join("") : '<span class="small">None listed</span>';
+    const buys = (b.buys ?? []).length ? (b.buys ?? []).map((x) => `<span class="tag buy">${escapeHtml(x)}</span>`).join("") : '<span class="small">None listed</span>';
+    const sells = (b.sells ?? []).length ? (b.sells ?? []).map((x) => `<span class="tag sell">${escapeHtml(x)}</span>`).join("") : '<span class="small">None listed</span>';
+
+    detailsTitle.textContent = b.name;
+    detailsContent.innerHTML = `
+      <div class="details-grid">
+        <div class="details-block">
+          <div class="small">
+            <span class="badge ${badge.cls}">${badge.label}</span>
+            <span style="margin-left:8px;"><strong>${escapeHtml(b.licenseId || "No license listed")}</strong></span>
+            <span style="margin-left:8px;">• ${escapeHtml(b.location || "Location not listed")}</span>
+          </div>
+          <p style="margin:10px 0 0; color: var(--muted);">${escapeHtml(b.notes || "Open this listing to review products, contact details, and next steps.")}</p>
+        </div>
+        <div class="details-block">
+          <h5>Categories</h5>
+          <div class="details-list">${cats}</div>
+        </div>
+        <div class="details-block">
+          <h5>Looking to buy</h5>
+          <div class="details-list">${buys}</div>
+        </div>
+        <div class="details-block">
+          <h5>Currently selling</h5>
+          <div class="details-list">${sells}</div>
+        </div>
+        <div class="details-block">
+          <h5>Contact</h5>
+          <div><strong>${escapeHtml(b.contact?.name || "Contact")}</strong></div>
+          <div style="margin-top:6px; color: var(--muted);">${escapeHtml(b.contact?.email || "No email listed")}</div>
+        </div>
+      </div>
+    `;
+    detailsState.textContent = `View ${b.name} details, contact the seller, or send a buy request.`;
+    const canEdit = !!(currentUserId && b.ownerId === currentUserId);
+    detailsEditBtn.style.display = canEdit ? "inline-flex" : "none";
+  }
+
+  function openDetails(id) {
+    const b = data.find((x) => x.id === id);
+    if (!b) return;
+    selectedDetailsId = id;
+    renderDetailsContent(b);
+    detailsBackdrop.classList.add("open");
+  }
+
+  function closeDetails() {
+    detailsBackdrop.classList.remove("open");
+  }
+
+  function onGridClick(e) {
+    const btn = e.target.closest("button[data-id]");
+    if (btn) {
+      const id = btn.getAttribute("data-id");
+      const act = btn.getAttribute("data-act");
+      const b = data.find((x) => x.id === id);
+      if (!b) return;
+
+      if (act === "view") {
+        e.stopPropagation();
+        openDetails(b.id);
+        return;
+      }
+
+      if (act === "edit") {
+        e.stopPropagation();
+        openAdmin(b.id);
+        return;
+      }
+
+      if (act === "buy") {
+        e.stopPropagation();
+        openBuyRequest(b.id);
+        return;
+      }
+      return;
+    }
+
+    const card = e.target.closest(".card[data-id]");
+    if (!card || !gridEl.contains(card)) return;
+
+    const id = card.getAttribute("data-id");
+    if (!id) return;
+    openDetails(id);
+  }
+
+  function onGridKeydown(e) {
+    const card = e.target.closest(".card[data-id]");
+    if (!card) return;
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    const id = card.getAttribute("data-id");
+    if (!id) return;
+    openDetails(id);
   }
 
   gridEl.addEventListener("click", onGridClick);
+  gridEl.addEventListener("keydown", onGridKeydown);
 
   function syncStateFromUrl() {
     const u = new URL(location.href);
@@ -1981,12 +2334,32 @@ async function sha256(text) {
   const copyLinkBtn = $("#copyLinkBtn");
 // --- Create account / login modal wiring ---
 const signupBtn = $("#signupBtn");
+const signInBtn = $("#signInBtn");
 const signupBackdrop = $("#signupBackdrop");
 const signupCloseBtn = $("#signupCloseBtn");
 const signupCreateBtn = $("#signupCreateBtn");
 const signupState = $("#signupState");
 const logoutBtn = $("#logoutBtn");
 const messagesBtn = $("#messagesBtn");
+const detailsBackdrop = $("#detailsBackdrop");
+const detailsCloseBtn = $("#detailsCloseBtn");
+const detailsTitle = $("#detailsTitle");
+const detailsContent = $("#detailsContent");
+const detailsState = $("#detailsState");
+const detailsContactBtn = $("#detailsContactBtn");
+const detailsRequestBtn = $("#detailsRequestBtn");
+const detailsEditBtn = $("#detailsEditBtn");
+const buyRequestBackdrop = $("#buyRequestBackdrop");
+const buyRequestCloseBtn = $("#buyRequestCloseBtn");
+const buyRequestTitle = $("#buyRequestTitle");
+const buyRequestHelp = $("#buyRequestHelp");
+const buyRequestState = $("#buyRequestState");
+const buyCompanyName = $("#buyCompanyName");
+const buyLicenseNumber = $("#buyLicenseNumber");
+const buyProduct = $("#buyProduct");
+const buyQuantity = $("#buyQuantity");
+const buyNeedByDate = $("#buyNeedByDate");
+const buyRequestSubmitBtn = $("#buyRequestSubmitBtn");
 const messagesBackdrop = $("#messagesBackdrop");
 const messagesCloseBtn = $("#messagesCloseBtn");
 const newConversationBtn = $("#newConversationBtn");
@@ -1999,32 +2372,45 @@ const suLicenseInput = $("#su_license");
 const verifyLicenseBtn = $("#verifyLicenseBtn");
 
 let authMode = "signin"; // "signin" or "signup"
+let currentUserId = null;
+let selectedDetailsId = null;
 
 function setAuthMode(mode) {
   authMode = mode;
   const isSignup = mode === "signup";
 
-  authModalTitle.textContent = isSignup ? "Create account" : "Sign in";
-  signupCreateBtn.textContent = isSignup ? "Create" : "Sign in";
+  authModalTitle.textContent = isSignup ? "Join Marketplace" : "Sign In";
+  signupCreateBtn.textContent = isSignup ? "Join Marketplace" : "Sign In";
 
   if (authToggle) {
     authToggle.innerHTML = isSignup
       ? 'Already have an account? <a href="#" id="authToggleLink">Sign in</a>'
-      : 'New here? <a href="#" id="authToggleLink">Create account</a>';
+      : 'New here? <a href="#" id="authToggleLink">Join Marketplace</a>';
   }
 
   // show display name only during signup
   if (suDisplayField) {
-    suDisplayField.style.display = isSignup ? "block" : "none";
+    suDisplayField.style.display = isSignup ? "flex" : "none";
+  }
+
+  const hasLicenseEndpoint = !!OCM_LICENSE_API;
+  if (verifyLicenseBtn) verifyLicenseBtn.style.display = isSignup && hasLicenseEndpoint ? "inline-flex" : "none";
+  const statusEl = $("#licenseStatus");
+  if (statusEl) {
+    statusEl.textContent = hasLicenseEndpoint
+      ? 'Click "Verify license" to confirm your license.'
+      : 'License verification will be completed after signup once the live verification service is connected.';
   }
 }
 
-function openSignup() {
+function openSignup(mode = "signup") {
   signupBackdrop.classList.add("open");
-  setAuthMode("signup");
+  setAuthMode(mode);
   if (suLicenseInput) suLicenseInput.value = "";
   const statusEl = $("#licenseStatus");
-  if (statusEl) statusEl.textContent = "Click “Verified” to confirm your license.";
+  if (statusEl) statusEl.textContent = !!OCM_LICENSE_API
+    ? 'Click "Verify license" to confirm your license.'
+    : 'License verification will be completed after signup once the live verification service is connected.';
   verifiedLicense = null;
   void updateSignupState();
 }
@@ -2032,15 +2418,6 @@ function closeSignup() {
   signupBackdrop.classList.remove("open");
 }
 
-function isSupabaseConfigured() {
-  return (
-    supabaseClient &&
-    SUPABASE_URL &&
-    !SUPABASE_URL.includes("YOUR_") &&
-    SUPABASE_ANON_KEY &&
-    !SUPABASE_ANON_KEY.includes("YOUR_")
-  );
-}
 
 async function getAuthSession() {
   if (!isSupabaseConfigured()) return getSession();
@@ -2055,6 +2432,10 @@ async function updateSignupState() {
   signupState.textContent = isLoggedIn
     ? `Signed in as ${session.user?.email ?? session.email}`
     : "Not signed in";
+
+  currentUserId = session?.user?.id || session?.email || null;
+  if (signupBtn) signupBtn.style.display = isLoggedIn ? "none" : "inline-flex";
+  if (signInBtn) signInBtn.innerHTML = isLoggedIn ? 'Account <span aria-hidden="true">👤</span>' : 'Sign In <span aria-hidden="true">🔐</span>';
 
   // track active user for messaging presence
   currentUserEmail = session?.user?.email ?? session?.email ?? null;
@@ -2093,7 +2474,14 @@ async function signIn() {
 
   const users = loadUsers();
   const user = users.find((u) => u.email === email);
-  if (!user) return toast("No account found");
+  if (!user) {
+    setAuthMode("signup");
+    const statusEl = $("#licenseStatus");
+    if (statusEl) statusEl.textContent = !!OCM_LICENSE_API
+      ? 'Finish joining the marketplace, then verify your license.'
+      : 'No account was found for that email. Finish joining the marketplace to create one.';
+    return toast("No account found. Please click Join Marketplace to create your account.");
+  }
 
   const passwordHash = await sha256(password);
   if (passwordHash !== user.passwordHash) return toast("Incorrect password");
@@ -2115,9 +2503,15 @@ async function createAccount() {
   if (password.length < 8) return toast("Password must be at least 8 characters");
   if (!display) return toast("Display name is required");
 
-  const licenseValid = await verifyLicense(license);
-  if (!licenseValid) return toast("Unable to verify license. Please check your license number.");
-  verifiedLicense = license;
+  if (OCM_LICENSE_API) {
+    if (verifiedLicense !== license) {
+      return toast("Please click Verify license before creating your account");
+    }
+
+    const licenseValid = await verifyLicense(license);
+    if (!licenseValid) return toast("Unable to verify license. Please check your license number.");
+    verifiedLicense = license;
+  }
 
   if (isSupabaseConfigured()) {
     const { data, error } = await supabaseClient.auth.signUp({
@@ -2151,7 +2545,7 @@ async function createAccount() {
   saveUsers(users);
   setSession({ email, display });
   await updateSignupState();
-  toast("Account created");
+  toast(OCM_LICENSE_API ? "Account created" : "Account created — license review will happen once live verification is connected.");
   closeSignup();
 }
 
@@ -2172,7 +2566,8 @@ async function logout() {
 }
 
 // events
-signupBtn.addEventListener("click", openSignup);
+signupBtn.addEventListener("click", () => openSignup("signup"));
+if (signInBtn) signInBtn.addEventListener("click", () => openSignup("signin"));
 signupCloseBtn.addEventListener("click", closeSignup);
 signupBackdrop.addEventListener("click", (e) => {
   if (e.target === signupBackdrop) closeSignup();
@@ -2187,6 +2582,33 @@ signupCreateBtn.addEventListener("click", () => {
 logoutBtn.addEventListener("click", logout);
 
 // messages modal wiring
+if (detailsCloseBtn) detailsCloseBtn.addEventListener("click", closeDetails);
+if (detailsBackdrop) {
+  detailsBackdrop.addEventListener("click", (e) => {
+    if (e.target === detailsBackdrop) closeDetails();
+  });
+}
+if (detailsContactBtn) detailsContactBtn.addEventListener("click", () => {
+  const b = data.find((x) => x.id === selectedDetailsId);
+  if (b) openEmailAction(b, "contact");
+});
+if (detailsRequestBtn) detailsRequestBtn.addEventListener("click", () => {
+  const b = data.find((x) => x.id === selectedDetailsId);
+  if (b) openBuyRequest(b.id);
+});
+if (buyRequestCloseBtn) buyRequestCloseBtn.addEventListener("click", closeBuyRequest);
+if (buyRequestBackdrop) {
+  buyRequestBackdrop.addEventListener("click", (e) => {
+    if (e.target === buyRequestBackdrop) closeBuyRequest();
+  });
+}
+if (buyRequestSubmitBtn) buyRequestSubmitBtn.addEventListener("click", submitBuyRequest);
+if (detailsEditBtn) detailsEditBtn.addEventListener("click", () => {
+  if (!selectedDetailsId) return;
+  closeDetails();
+  openAdmin(selectedDetailsId);
+});
+
 if (messagesBtn) messagesBtn.addEventListener("click", openMessages);
 if (messagesCloseBtn) messagesCloseBtn.addEventListener("click", closeMessages);
 if (messagesBackdrop)
@@ -2224,6 +2646,16 @@ if (verifyLicenseBtn) {
   });
 }
 
+if (suLicenseInput) {
+  suLicenseInput.addEventListener("input", () => {
+    verifiedLicense = null;
+    const statusEl = $("#licenseStatus");
+    if (statusEl) statusEl.textContent = !!OCM_LICENSE_API
+    ? 'Click "Verify license" to confirm your license.'
+    : 'License verification will be completed after signup once the live verification service is connected.';
+  });
+}
+
 // auth state updates
 if (isSupabaseConfigured()) {
   supabaseClient.auth.onAuthStateChange(() => {
@@ -2241,39 +2673,46 @@ if (authToggle) {
   });
 }
 
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (signupBackdrop?.classList.contains("open")) closeSignup();
+  if (detailsBackdrop?.classList.contains("open")) closeDetails();
+  if (messagesBackdrop?.classList.contains("open")) closeMessages();
+  if (backdrop?.classList.contains("open")) closeAdmin();
+});
+
 // init state once
 void updateSignupState();
 
 function isAdminAllowed() {
-    const u = new URL(location.href);
-    const urlUnlock = u.searchParams.get("admin") === "1";
-    const sessionUnlock = sessionStorage.getItem(ADMIN_UNLOCK_KEY) === "true";
-    return urlUnlock || sessionUnlock;
+    return true;
   }
 
   function ensureAdminUnlocked() {
-    if (isAdminAllowed()) return true;
-
-    const entered = prompt("Admin passcode:");
-    if (!entered) return false;
-
-    if (entered === ADMIN_PASSCODE) {
-      sessionStorage.setItem(ADMIN_UNLOCK_KEY, "true");
-      return true;
-    }
-
-    toast("Incorrect passcode");
-    return false;
+    return true;
   }
 
-  function openAdmin() {
+  function openAdmin(preferredId = null) {
     if (!ensureAdminUnlocked()) {
       toast("Admin locked");
       return;
     }
+
+    const targetId =
+      preferredId && data.some((x) => x.id === preferredId)
+        ? preferredId
+        : state.selectedId && data.some((x) => x.id === state.selectedId)
+        ? state.selectedId
+        : data[0]?.id ?? null;
+
     backdrop.classList.add("open");
-    updateAdminState();
-    if (!state.selectedId && data[0]?.id) loadForm(data[0].id);
+
+    if (targetId) loadForm(targetId);
+    else {
+      writeForm(null);
+      modalTitle.textContent = "Listing Editor";
+      updateAdminState();
+    }
   }
 
   function closeAdmin() {
@@ -2283,8 +2722,8 @@ function isAdminAllowed() {
   function updateAdminState() {
     const sel = data.find((x) => x.id === state.selectedId);
     adminState.textContent = isAdminAllowed()
-      ? `Admin mode enabled • Editing: ${sel ? sel.name : "None"}`
-      : "Admin mode locked";
+      ? `Editing listing: ${sel ? sel.name : "None selected"}`
+       : "Listing editor ready";
   }
 
   function readForm() {
@@ -2321,7 +2760,7 @@ function isAdminAllowed() {
     state.selectedId = id;
     const b = data.find((x) => x.id === id);
     writeForm(b);
-    modalTitle.textContent = b ? `Admin • ${b.name}` : "Admin";
+    modalTitle.textContent = b ? `Edit Listing • ${b.name}` : "Listing Editor";
     updateAdminState();
   }
 
@@ -2367,7 +2806,7 @@ function isAdminAllowed() {
       else data[updatedIdx] = saved;
 
       toast("Saved");
-      modalTitle.textContent = `Admin • ${saved.name}`;
+      modalTitle.textContent = `Edit Listing • ${saved.name}`;
       render();
       updateAdminState();
     } catch (e) {
@@ -2401,7 +2840,6 @@ function isAdminAllowed() {
 
     try {
       const saved = await upsertListing(b);
-      data.unshift(saved);
       loadForm(saved.id);
       render();
       toast("Created");
@@ -2507,6 +2945,7 @@ function isAdminAllowed() {
     const filtered = applyFilters(data);
     renderMeta(filtered);
     renderCards(filtered);
+    safeInitAds();
     setActiveTabs();
   }
 
@@ -2531,7 +2970,16 @@ function isAdminAllowed() {
     render();
   });
 
-  adminBtn.addEventListener("click", openAdmin);
+  adminBtn.addEventListener("click", async () => {
+    const ownerId = await getCurrentUserId();
+    if (!ownerId) {
+      toast("Please join the marketplace or sign in to add a listing.");
+      openSignup("signup");
+      return;
+    }
+    openAdmin();
+    await createNew();
+  });
   closeBtn.addEventListener("click", closeAdmin);
   backdrop.addEventListener("click", (e) => {
     if (e.target === backdrop) closeAdmin();
@@ -2548,8 +2996,10 @@ function isAdminAllowed() {
     importFile.value = "";
   });
 
-  $("#exportBtn").addEventListener("click", exportJson);
-  $("#resetBtn").addEventListener("click", resetLocal);
+  const exportBtn = $("#exportBtn");
+  const resetBtn = $("#resetBtn");
+  if (exportBtn) exportBtn.addEventListener("click", exportJson);
+  if (resetBtn) resetBtn.addEventListener("click", resetLocal);
   copyLinkBtn.addEventListener("click", copyShareLink);
 
   // Init
@@ -2559,6 +3009,7 @@ function isAdminAllowed() {
 
     data = await fetchListings();
     render();
+    safeInitAds();
   })();
 </script>
   </body>
