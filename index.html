@@ -153,6 +153,8 @@
         align-items: center;
         gap: 8px;
         font-weight: 600;
+        font-size: 16px;
+        line-height: 1.2;
       }
       .btn:hover {
         transform: translateY(-1px);
@@ -762,7 +764,7 @@
           line-height: 1.12;
         }
         .hero .sub {
-          font-size: 14px;
+          font-size: 16px;
           line-height: 1.5;
         }
         .tabs {
@@ -997,7 +999,7 @@
 
           <div class="topbar-right">
             <button id="signupBtn" class="btn" type="button">
-              Join Marketplace
+              Join
               <span aria-hidden="true">➕</span>
             </button>
 
@@ -2304,8 +2306,8 @@ async function sha256(text) {
       const sells = (b.sells ?? []).filter(Boolean);
       const sellPreview = sells.length ? sells.slice(0, 3).join(", ") : "No products listed yet";
       const extraSellCount = sells.length > 3 ? ` +${sells.length - 3} more` : "";
-      const categories = (b.categories ?? []).filter(Boolean);
-      const categoryPreview = categories.length ? categories.slice(0, 2).join(", ") : "Not specified";
+      const buys = (b.buys ?? []).filter(Boolean);
+      const buysPreview = buys.length ? buys.slice(0, 2).join(", ") : "Not specified";
 
       el.innerHTML = `
         <div class="card-top">
@@ -2325,8 +2327,8 @@ async function sha256(text) {
         </div>
 
         <div class="card-line compact">
-          <div class="card-line-label">Category</div>
-          <div class="card-line-value ${categories.length ? "" : "muted"}">${escapeHtml(categoryPreview)}</div>
+          <div class="card-line-label">I'm Buying</div>
+          <div class="card-line-value ${buys.length ? "" : "muted"}">${escapeHtml(buysPreview)}</div>
         </div>
 
         <div class="card-footer">
@@ -2649,13 +2651,13 @@ function setAuthMode(mode) {
   authMode = mode;
   const isSignup = mode === "signup";
 
-  authModalTitle.textContent = isSignup ? "Join Marketplace" : "Sign In";
-  signupCreateBtn.textContent = isSignup ? "Join Marketplace" : "Sign In";
+  authModalTitle.textContent = isSignup ? "Join" : "Sign In";
+  signupCreateBtn.textContent = isSignup ? "Join" : "Sign In";
 
   if (authToggle) {
     authToggle.innerHTML = isSignup
       ? 'Already have an account? <a href="#" id="authToggleLink">Sign in</a>'
-      : 'New here? <a href="#" id="authToggleLink">Join Marketplace</a>';
+      : 'New here? <a href="#" id="authToggleLink">Join</a>';
   }
 
   // show display name only during signup
@@ -2750,7 +2752,7 @@ async function signIn() {
     if (statusEl) statusEl.textContent = !!OCM_LICENSE_API
       ? 'Finish joining the marketplace, then verify your license.'
       : 'No account was found for that email. Finish joining the marketplace to create one.';
-    return toast("No account found. Please click Join Marketplace to create your account.");
+    return toast("No account found. Please click Join to create your account.");
   }
 
   const passwordHash = await sha256(password);
