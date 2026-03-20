@@ -1221,6 +1221,30 @@
         .step-footer .btn { flex: 1 1 auto; }
       }
 
+      /* Mobile safe-area adjustment for listing flow and other modals */
+      @media (max-width: 720px) {
+        .backdrop {
+          padding-top: max(8px, env(safe-area-inset-top));
+          padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
+        }
+        .modal,
+        .step-modal {
+          margin-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+          max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 96px);
+        }
+        .modal-footer,
+        .step-footer {
+          position: sticky;
+          bottom: 0;
+          z-index: 3;
+          padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+          background: rgba(249, 250, 251, 0.98);
+        }
+        .step-modal .modal-body {
+          padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+        }
+      }
+
     </style>
 
     <script>
