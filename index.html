@@ -287,7 +287,43 @@
       }
 
       .match-badge { display:none; }
-      .card.top-match-card {
+      
+      .welcome-banner {
+        margin-top: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.82);
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        color: var(--text);
+        font-size: 14px;
+        font-weight: 700;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      }
+      .welcome-banner::before {
+        content: "👋";
+      }
+
+      .card {
+        position: relative;
+        cursor: pointer;
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      }
+      .card:hover,
+      .card:focus-visible {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 32px rgba(15,23,42,0.12);
+      }
+      .card:active {
+        transform: translateY(0);
+      }
+      .card.your-listing-card {
+        border: 6px solid rgba(16, 185, 129, 0.72);
+        box-shadow: 0 10px 28px rgba(16, 185, 129, 0.14);
+      }
+.card.top-match-card {
         border: 2px solid rgba(22, 163, 74, 0.88);
         box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12), var(--shadow-soft);
         position: relative;
@@ -1227,7 +1263,9 @@
               <span aria-hidden="true">📝</span>
             </button>
           </div>
+          <div id="welcomeBanner" class="welcome-banner" hidden aria-live="polite"></div>
         </div>
+        <p class="help trust-note trust-note-main" style="margin:10px 0 0 0; text-align:center;">One verified listing per business name to protect legitimate operators.</p>
         <div class="hero">
           <h2>
             Find licensed buyers and sellers for <span>craft-grown and microbusiness</span> cannabis products.
@@ -1354,7 +1392,15 @@
     <div class="backdrop" id="backdrop" role="dialog" aria-modal="true" aria-label="Add listing step 1">
       <div class="modal step-modal">
         <div class="modal-header">
-          <h4 id="modalTitle">Step 1 of 3 • Business Information</h4>
+          <div>
+            <h4 id="modalTitle">Step 1 of 3 • Business Information</h4>
+            <p class="wizard-intro">Start with who you are and how buyers can reach you. You will add products next.</p>
+            <div class="wizard-progress" aria-label="Listing progress">
+              <span class="progress-step active">1. Business</span>
+              <span class="progress-step">2. Selling</span>
+              <span class="progress-step">3. Buying</span>
+            </div>
+          </div>
           <div style="display:flex; gap:10px; align-items:center;">
             <button id="closeBtn" class="btn" type="button">Close</button>
           </div>
@@ -1407,10 +1453,10 @@
           </div>
         </div>
         <div class="modal-footer step-footer">
-          <div class="help" id="adminState">Complete this step, then continue.</div>
+          <div class="help" id="adminState">Complete your business details, then continue to products you sell.</div>
           <div class="step-actions">
             <button id="deleteBtn" class="btn danger" type="button">Delete Listing</button>
-            <button id="step1NextBtn" class="btn primary" type="button">Next: Products You Sell</button>
+            <button id="step1NextBtn" class="btn primary" type="button">Next: What You Sell</button>
           </div>
         </div>
       </div>
@@ -1420,7 +1466,15 @@
     <div class="backdrop" id="productsSellBackdrop" role="dialog" aria-modal="true" aria-label="Add listing step 2">
       <div class="modal step-modal">
         <div class="modal-header">
-          <h4>Step 2 of 3 • Products You Sell</h4>
+          <div>
+            <h4>Step 2 of 3 • Products You Sell</h4>
+            <p class="wizard-intro">Add one product at a time. Keep each entry short and specific so buyers can scan it quickly.</p>
+            <div class="wizard-progress" aria-label="Listing progress">
+              <span class="progress-step">1. Business</span>
+              <span class="progress-step active">2. Selling</span>
+              <span class="progress-step">3. Buying</span>
+            </div>
+          </div>
           <div style="display:flex; gap:10px; align-items:center;">
             <button id="productsSellCloseBtn" class="btn" type="button">Close</button>
           </div>
@@ -1451,10 +1505,10 @@
           </div>
         </div>
         <div class="modal-footer step-footer">
-          <div class="help">Add all the products this business currently has on sale.</div>
+          <div class="help">Next step after this: tell buyers what this business wants to buy.</div>
           <div class="step-actions">
             <button id="backToBusinessBtn" class="btn" type="button">Back</button>
-            <button id="step2NextBtn" class="btn primary" type="button">Next: Products You Buy</button>
+            <button id="step2NextBtn" class="btn primary" type="button">Next: What You Buy</button>
           </div>
         </div>
       </div>
@@ -1464,7 +1518,15 @@
     <div class="backdrop" id="productsBuyBackdrop" role="dialog" aria-modal="true" aria-label="Add listing step 3">
       <div class="modal step-modal">
         <div class="modal-header">
-          <h4>Step 3 of 3 • Products You Buy</h4>
+          <div>
+            <h4>Step 3 of 3 • Products You Buy</h4>
+            <p class="wizard-intro">Finish by adding the products this business wants to purchase. Then save your listing.</p>
+            <div class="wizard-progress" aria-label="Listing progress">
+              <span class="progress-step">1. Business</span>
+              <span class="progress-step">2. Selling</span>
+              <span class="progress-step active">3. Buying</span>
+            </div>
+          </div>
           <div style="display:flex; gap:10px; align-items:center;">
             <button id="productsBuyCloseBtn" class="btn" type="button">Close</button>
           </div>
@@ -1495,10 +1557,10 @@
           </div>
         </div>
         <div class="modal-footer step-footer">
-          <div class="help">Finish by adding what this business wants to buy.</div>
+          <div class="help">Final step: save your listing and review it on the marketplace.</div>
           <div class="step-actions">
             <button id="backToSellBtn" class="btn" type="button">Back</button>
-            <button id="saveBtn" class="btn primary" type="button">Save Listing</button>
+            <button id="saveBtn" class="btn primary" type="button">Finish Listing</button>
           </div>
         </div>
       </div>
@@ -1515,6 +1577,7 @@
     </div>
 
     <div class="modal-body">
+      <p class="wizard-intro">Create your business account first. Next, you can add your listing and start matching with buyers and sellers.</p>
       <div class="form-grid">
         <div id="su_display_field" class="field">
           <label for="su_display">Business Name</label>
@@ -1571,7 +1634,7 @@
       <div class="help" id="detailsState">Open a listing to see contact options.</div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button id="detailsContactBtn" class="btn primary" type="button">Contact Business</button>
-        <button id="detailsRequestBtn" class="btn" type="button">Buy Now</button>
+        <button id="detailsRequestBtn" class="btn" type="button">Send Buy Request</button>
         <button id="detailsEditBtn" class="btn" type="button">Edit Listing</button>
       </div>
     </div>
@@ -2107,7 +2170,7 @@
     toastEl.textContent = msg;
     toastEl.classList.add("show");
     clearTimeout(toastEl.__t);
-    toastEl.__t = setTimeout(() => toastEl.classList.remove("show"), 2600);
+    toastEl.__t = setTimeout(() => toastEl.classList.remove("show"), 5600);
   }
 
   function setButtonBusy(btn, label) {
@@ -2188,6 +2251,37 @@ async function sha256(text) {
   }
   function safeLower(s) {
     return norm(s).toLowerCase();
+  }
+  function normalizeBusinessName(name) {
+    return norm(name)
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      .replace(/[^a-z0-9 ]/g, "")
+      .trim();
+  }
+  function findBusinessByName(name, options = {}) {
+    const target = normalizeBusinessName(name);
+    if (!target) return null;
+    const excludeId = options.excludeId || null;
+    return data.find((item) => {
+      if (!item) return false;
+      if (excludeId && item.id === excludeId) return false;
+      return normalizeBusinessName(item.name) === target;
+    }) || null;
+  }
+  function businessNameTaken(name, options = {}) {
+    return !!findBusinessByName(name, options);
+  }
+  function accountBusinessNameTaken(name, options = {}) {
+    const target = normalizeBusinessName(name);
+    if (!target) return false;
+    const excludeEmail = safeLower(options.excludeEmail || "");
+    const users = loadUsers();
+    return users.some((user) => {
+      if (!user) return false;
+      if (excludeEmail && safeLower(user.email) == excludeEmail) return false;
+      return normalizeBusinessName(user.display || "") === target;
+    });
   }
   function nowIso() {
     return new Date().toISOString();
@@ -2959,8 +3053,9 @@ async function sha256(text) {
       const badge = statusBadge(b.status);
       const el = document.createElement("article");
       const canEdit = !!(currentUserId && b.ownerId === currentUserId);
+      const isOwnListing = canEdit;
       const matchInfo = getMatchInfo(b);
-      el.className = `card${matchInfo.topMatch ? " top-match-card" : ""}`;
+      el.className = `card${matchInfo.topMatch ? " top-match-card" : ""}${isOwnListing ? " your-listing-card" : ""}`;
       el.setAttribute("data-id", b.id);
       el.setAttribute("tabindex", "0");
       el.setAttribute("role", "button");
@@ -3000,8 +3095,7 @@ async function sha256(text) {
         ${cueHtml}
 
         <div class="card-footer">
-          <button class="btn" data-act="view" data-id="${escapeHtml(b.id)}" type="button">View Details</button>
-          <button class="btn primary wide" data-act="buy" data-id="${escapeHtml(b.id)}" type="button">Buy Now</button>
+          <button class="btn primary wide" data-act="buy" data-id="${escapeHtml(b.id)}" type="button">Send Buy Request</button>
         </div>
       `;
       gridEl.appendChild(el);
@@ -3066,7 +3160,7 @@ async function sha256(text) {
     const firstProduct = Array.isArray(b?.sells) ? norm(b.sells.find(Boolean) || "") : "";
     if (buyProduct) buyProduct.value = firstProduct;
 
-    if (buyRequestTitle) buyRequestTitle.textContent = `Buy Now — ${sellerName}`;
+    if (buyRequestTitle) buyRequestTitle.textContent = `Send Buy Request — ${sellerName}`;
     if (buyRequestHelp) {
       buyRequestHelp.textContent = firstProduct
         ? `Send a fast request to ${sellerName}. We prefilled the first product on this listing for you.`
@@ -3166,7 +3260,7 @@ async function sha256(text) {
     ].join("\n");
 
     if (buyRequestState) buyRequestState.textContent = "Buy request ready to send.";
-    toast("Buy request ready — your email draft is open to send.");
+    toast("Buy request ready — next step: send the email draft.");
     window.location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     done();
     closeBuyRequest();
@@ -3343,6 +3437,7 @@ const signupCloseBtn = $("#signupCloseBtn");
 const signupCreateBtn = $("#signupCreateBtn");
 const signupState = $("#signupState");
 const logoutBtn = $("#logoutBtn");
+const welcomeBanner = $("#welcomeBanner");
 const messagesBtn = $("#messagesBtn");
 const detailsBackdrop = $("#detailsBackdrop");
 const detailsCloseBtn = $("#detailsCloseBtn");
@@ -3467,6 +3562,12 @@ async function updateSignupState() {
   if (signupBtn) signupBtn.style.display = isLoggedIn ? "none" : "inline-flex";
   if (signInBtn) signInBtn.innerHTML = isLoggedIn ? 'Account <span aria-hidden="true">👤</span>' : 'Sign In <span aria-hidden="true">🔐</span>';
 
+  if (welcomeBanner) {
+    const displayName = session?.display || session?.user?.user_metadata?.display || session?.user?.email || session?.email || "";
+    welcomeBanner.hidden = !isLoggedIn;
+    welcomeBanner.textContent = isLoggedIn ? `Welcome back, ${displayName}` : "";
+  }
+
   // track active user for messaging presence
   currentUserEmail = session?.user?.email ?? session?.email ?? null;
   if (isLoggedIn) {
@@ -3497,7 +3598,7 @@ async function signIn() {
     });
 
     if (error) { done(); return toast(error.message); }
-    toast("Signed in — your account is ready.");
+    toast("Signed in — next step: search listings or tap Add Listing.");
     await updateSignupState();
     done();
     done();
@@ -3521,7 +3622,7 @@ async function signIn() {
   if (passwordHash !== user.passwordHash) { done(); return toast("Incorrect password"); }
 
   setSession({ email: user.email, display: user.display, license: user.license || "" });
-  toast("Signed in — your account is ready.");
+  toast("Signed in — next step: search listings or tap Add Listing.");
   await updateSignupState();
   done();
   done();
@@ -3539,6 +3640,10 @@ async function createAccount() {
   if (!license) { done(); return toast("Enter your license number"); }
   if (password.length < 8) { done(); return toast("Password must be at least 8 characters"); }
   if (!display) { done(); return toast("Business name is required"); }
+  if (accountBusinessNameTaken(display) || businessNameTaken(display)) {
+    done();
+    return toast("That business name is already in use. Please use your official business name or contact support.");
+  }
 
   if (OCM_LICENSE_API) {
     if (verifiedLicense !== license) {
@@ -3946,6 +4051,12 @@ function isAdminAllowed() {
     const errs = validateBiz(patch);
     if (errs.length) { done(); return toast(errs[0]); }
 
+    const duplicate = findBusinessByName(patch.name, { excludeId: id });
+    if (duplicate) {
+      done();
+      return toast("That business name is already in use. Please use your official business name or contact support.");
+    }
+
     const ownerId = await getCurrentUserId();
     if (!ownerId) {
       done();
@@ -3966,7 +4077,7 @@ function isAdminAllowed() {
       if (updatedIdx === -1) data.unshift(saved);
       else data[updatedIdx] = saved;
 
-      toast("Listing saved — your business is now in the marketplace.");
+      toast("Listing saved — next step: review your card or search for matches.");
       modalTitle.textContent = `Step 1 of 3 • ${saved.name}`;
       queueListingHighlight(saved.id);
       render();
@@ -3995,6 +4106,17 @@ function isAdminAllowed() {
     const businessName = norm(session.display || "");
     const email = norm(session.email || "");
     const license = norm(session.license || "") || "OCM-";
+
+    if (businessName) {
+      const existing = findBusinessByName(businessName);
+      if (existing) {
+        loadForm(existing.id);
+        openAdmin(existing.id);
+        done();
+        toast("That business already has a listing. We opened it for editing instead.");
+        return existing;
+      }
+    }
 
     const b = {
       id: makeId(),
