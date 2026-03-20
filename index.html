@@ -160,7 +160,20 @@
         transform: translateY(-1px);
       }
       .btn:active {
-        transform: translateY(0);
+        transform: translateY(0) scale(0.99);
+      }
+      .btn.busy {
+        opacity: 0.72;
+        pointer-events: none;
+      }
+      .btn.busy::after {
+        content: "";
+        width: 14px;
+        height: 14px;
+        border-radius: 999px;
+        border: 2px solid rgba(17, 24, 39, 0.18);
+        border-top-color: rgba(17, 24, 39, 0.72);
+        animation: spin 0.8s linear infinite;
       }
       .btn.primary {
         border-color: rgba(255, 106, 0, 0.35);
@@ -266,9 +279,95 @@
       .searchwrap input:focus {
         outline: none;
       }
+      .meta-row { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+      #clearSearchBtn { padding:10px 14px; font-size:14px; }
       .searchwrap:has(input:focus) {
         box-shadow: var(--shadow), var(--focus);
         border-color: rgba(255, 106, 0, 0.35);
+      }
+
+      .match-badge { display:none; }
+      .card.top-match-card {
+        border: 2px solid rgba(22, 163, 74, 0.88);
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12), var(--shadow-soft);
+        position: relative;
+        overflow: hidden;
+      }
+      .top-match-ribbon {
+        position: absolute;
+        top: 16px;
+        right: -38px;
+        transform: rotate(45deg);
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        padding: 5px 42px;
+        box-shadow: 0 8px 18px rgba(22, 163, 74, 0.28);
+        z-index: 2;
+        pointer-events: none;
+      }
+      .match-cues {
+        display:flex;
+        flex-wrap:wrap;
+        gap:6px;
+        margin:10px 0 0;
+      }
+      .match-cue {
+        display:inline-flex;
+        align-items:center;
+        padding:4px 8px;
+        border-radius:999px;
+        background:rgba(37,99,235,.08);
+        color:var(--text);
+        font-size:11px;
+        font-weight:600;
+      }
+      mark.match-hit {
+        background:rgba(250,204,21,.35);
+        color:inherit;
+        padding:0 .08em;
+        border-radius:4px;
+      }
+      .details-match-box {
+        margin:0 0 14px;
+        padding:12px;
+        border:1px solid rgba(37,99,235,.18);
+        border-radius:14px;
+        background:rgba(37,99,235,.05);
+      }
+      .details-match-box h5 { margin:0 0 8px; }
+      .details-match-box ul { margin:0; padding-left:18px; color:var(--muted); }
+      .details-match-box li + li { margin-top:4px; }
+      .search-suggestions {
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid rgba(229, 231, 235, 0.95);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        margin: 0 0 10px;
+        overflow: hidden;
+      }
+      .suggestion-item {
+        width: 100%;
+        text-align: left;
+        background: transparent;
+        border: 0;
+        border-bottom: 1px solid rgba(229, 231, 235, 0.85);
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        cursor: pointer;
+        font: inherit;
+      }
+      .suggestion-item:last-child { border-bottom: 0; }
+      .suggestion-item strong { font-size: 14px; color: var(--text); }
+      .suggestion-item span { font-size: 12px; color: var(--muted); }
+      .suggestion-item:hover, .suggestion-item:focus {
+        background: rgba(255, 106, 0, 0.08);
+        outline: none;
       }
 
       .filters {
@@ -332,6 +431,8 @@
         display: flex;
         flex-direction: column;
         min-height: 220px;
+        position: relative;
+        overflow: hidden;
       }
 
       .card-top {
@@ -971,6 +1072,119 @@
         }
       }
 
+    
+      .step-modal {
+        max-width: 720px;
+        max-height: min(88vh, 780px);
+        display: flex;
+        flex-direction: column;
+      }
+      .step-modal .modal-body {
+        flex: 1 1 auto;
+        overflow: auto;
+      }
+      .step-footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .step-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .section-card {
+        border: 1px solid rgba(229,231,235,0.95);
+        border-radius: 18px;
+        padding: 14px;
+        background: rgba(255,255,255,0.96);
+        margin-bottom: 14px;
+      }
+      .section-card h5 {
+        margin: 0 0 6px;
+        font-size: 15px;
+      }
+      .section-card p {
+        margin: 0 0 12px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .product-builder {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 10px;
+        align-items: end;
+      }
+      .product-builder .field { grid-column: span 4; }
+      .product-builder .field.action { grid-column: span 12; }
+      .products-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .product-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 1px solid rgba(229,231,235,0.95);
+        border-radius: 14px;
+        background: rgba(248,250,252,0.9);
+      }
+      .product-row span { min-width: 0; }
+
+      .empty-state {
+        display: grid;
+        gap: 10px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 22px;
+        box-shadow: var(--shadow-soft);
+      }
+
+      .empty-state h3 {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      .empty-state p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .empty-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 4px;
+      }
+      .product-empty {
+        color: var(--muted);
+        font-size: 13px;
+        border: 1px dashed rgba(229,231,235,0.95);
+        border-radius: 14px;
+        padding: 12px;
+        background: rgba(248,250,252,0.75);
+      }
+      @media (max-width: 720px) {
+        .step-modal {
+          width: min(100vw - 16px, 720px);
+          max-height: min(92vh, 860px);
+          border-radius: 18px 18px 0 0;
+          margin-top: auto;
+        }
+        .product-builder .field,
+        .product-builder .field.action { grid-column: span 12; }
+        .step-actions,
+        .step-footer { width: 100%; }
+        .step-actions .btn,
+        .step-footer .btn { flex: 1 1 auto; }
+      }
+
     </style>
 
     <script>
@@ -1062,7 +1276,7 @@
             <input
               id="q"
               type="search"
-              placeholder="Search: business, license ID, item (e.g., flower, edibles, concentrates), category..."
+              placeholder="Search by product, business, or location"
               autocomplete="off"
               spellcheck="false"
             />
@@ -1073,6 +1287,7 @@
               <option value="updated_desc">Sort: Recently updated</option>
             </select>
           </div>
+          <div id="searchSuggestions" class="search-suggestions" hidden aria-label="Search suggestions"></div>
 
           <div class="filters" id="chips" aria-label="Quick filters"></div>
 
@@ -1081,7 +1296,7 @@
               <strong id="count">0</strong> results
               <span id="hint" style="margin-left: 8px;"></span>
             </div>
-
+            <button id="clearSearchBtn" class="btn" type="button">Clear Search</button>
           </div>
         </div>
       </div>
@@ -1135,80 +1350,155 @@
       </aside>
     </main>
 
-    <!-- Admin modal -->
-    <div class="backdrop" id="backdrop" role="dialog" aria-modal="true" aria-label="Listing editor">
-      <div class="modal">
+    <!-- Admin modal step 1 -->
+    <div class="backdrop" id="backdrop" role="dialog" aria-modal="true" aria-label="Add listing step 1">
+      <div class="modal step-modal">
         <div class="modal-header">
-          <h4 id="modalTitle">Listing Editor</h4>
+          <h4 id="modalTitle">Step 1 of 3 • Business Information</h4>
           <div style="display:flex; gap:10px; align-items:center;">
-            <button id="saveBtn" class="btn primary" type="button">Save</button>
             <button id="closeBtn" class="btn" type="button">Close</button>
           </div>
         </div>
         <div class="modal-body">
-          <div class="form-grid">
-            <div class="field">
-              <label for="f_name">Business name</label>
-              <input id="f_name" type="text" placeholder="Acme Recycling LLC" />
-            </div>
-            <div class="field">
-              <label for="f_license">License ID</label>
-              <input id="f_license" type="text" placeholder="OCM-MICR-24-000000" />
-            </div>
-            <div class="field">
-              <label for="f_status">Status</label>
-              <select id="f_status">
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="pending">Pending</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="f_location">Location</label>
-              <input id="f_location" type="text" placeholder="Newark, NJ" />
-            </div>
-            <div class="field full">
-              <label for="f_categories">Categories (comma-separated)</label>
-              <input id="f_categories" type="text" placeholder="Metals, Plastics, Logistics" />
-            </div>
-            <div class="field full">
-              <label for="f_buys">Buys (comma-separated items)</label>
-              <textarea id="f_buys" placeholder="Copper wire, Aluminum cans, Used pallets"></textarea>
-            </div>
-            <div class="field full">
-              <label for="f_sells">Sells (comma-separated items)</label>
-              <textarea id="f_sells" placeholder="Processed scrap, Recycled pellets"></textarea>
-            </div>
-            <div class="field">
-              <label for="f_contactName">Contact name</label>
-              <input id="f_contactName" type="text" placeholder="Jordan Lee" />
-            </div>
-            <div class="field">
-              <label for="f_contactEmail">Contact email</label>
-              <input id="f_contactEmail" type="email" placeholder="jordan@acme.com" />
-            </div>
-            <div class="field full">
-              <label for="f_notes">Notes (internal)</label>
-              <textarea id="f_notes" placeholder="Minimum order, preferred vendors, compliance notes..."></textarea>
+          <div class="section-card">
+            <h5>Business Information</h5>
+            <p>Start with the basics so buyers know who you are.</p>
+            <div class="form-grid">
+              <div class="field">
+                <label for="f_name">Business Name</label>
+                <input id="f_name" type="text" placeholder="Business Name" />
+              </div>
+              <div class="field">
+                <label for="f_license">License Number</label>
+                <input id="f_license" type="text" placeholder="OCM-MICR-24-000000" />
+              </div>
+              <div class="field">
+                <label for="f_status">Status</label>
+                <select id="f_status">
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="pending">Pending</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="f_location">Location</label>
+                <input id="f_location" type="text" placeholder="City, State" />
+              </div>
             </div>
           </div>
-
-          <p class="help">
-            Your listing updates are saved in <strong>localStorage</strong> on this device during this demo.
-            For multi-user + real access control, connect this UI to a real backend.
-          </p>
-
-          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;">
-            <button id="newBtn" class="btn primary" type="button">+ Add another listing</button>
-            <button id="deleteBtn" class="btn danger" type="button">Delete listing</button>
-                      </div>
+          <div class="section-card">
+            <h5>Contact Information</h5>
+            <p>Tell buyers the best person and email to use.</p>
+            <div class="form-grid">
+              <div class="field">
+                <label for="f_contactName">Contact Name</label>
+                <input id="f_contactName" type="text" placeholder="Contact Name" />
+              </div>
+              <div class="field">
+                <label for="f_contactEmail">Email</label>
+                <input id="f_contactEmail" type="email" placeholder="you@company.com" />
+              </div>
+              <input id="f_categories" type="hidden" value="" />
+              <div class="field full" style="display:none;">
+                <label for="f_notes">Notes</label>
+                <textarea id="f_notes"></textarea>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="modal-footer">
-          <div class="help" id="adminState"></div>
-          <div style="display:flex; gap:10px;">
-            <button id="copyLinkBtn" class="btn" type="button" title="Copy share link with current filters">
-              Copy search link
-            </button>
+        <div class="modal-footer step-footer">
+          <div class="help" id="adminState">Complete this step, then continue.</div>
+          <div class="step-actions">
+            <button id="deleteBtn" class="btn danger" type="button">Delete Listing</button>
+            <button id="step1NextBtn" class="btn primary" type="button">Next: Products You Sell</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin modal step 2 -->
+    <div class="backdrop" id="productsSellBackdrop" role="dialog" aria-modal="true" aria-label="Add listing step 2">
+      <div class="modal step-modal">
+        <div class="modal-header">
+          <h4>Step 2 of 3 • Products You Sell</h4>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button id="productsSellCloseBtn" class="btn" type="button">Close</button>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="section-card">
+            <h5>Products You Sell</h5>
+            <p>Add one product at a time using this format: strain name, type, package size.</p>
+            <div class="product-builder">
+              <div class="field">
+                <label for="sellStrain">Strain Name</label>
+                <input id="sellStrain" type="text" placeholder="Sour Diesel" />
+              </div>
+              <div class="field">
+                <label for="sellType">Type</label>
+                <input id="sellType" type="text" placeholder="Prerolls" />
+              </div>
+              <div class="field">
+                <label for="sellPack">Package Size</label>
+                <input id="sellPack" type="text" placeholder="5 pack" />
+              </div>
+              <div class="field action">
+                <button id="addSellProductBtn" class="btn primary" type="button">Add Product You Sell</button>
+              </div>
+            </div>
+            <textarea id="f_sells" style="display:none;"></textarea>
+            <div id="sellProductsList" class="products-list"></div>
+          </div>
+        </div>
+        <div class="modal-footer step-footer">
+          <div class="help">Add all the products this business currently has on sale.</div>
+          <div class="step-actions">
+            <button id="backToBusinessBtn" class="btn" type="button">Back</button>
+            <button id="step2NextBtn" class="btn primary" type="button">Next: Products You Buy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin modal step 3 -->
+    <div class="backdrop" id="productsBuyBackdrop" role="dialog" aria-modal="true" aria-label="Add listing step 3">
+      <div class="modal step-modal">
+        <div class="modal-header">
+          <h4>Step 3 of 3 • Products You Buy</h4>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button id="productsBuyCloseBtn" class="btn" type="button">Close</button>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div class="section-card">
+            <h5>Products You Buy</h5>
+            <p>Add one product at a time using this format: strain name, type, package size.</p>
+            <div class="product-builder">
+              <div class="field">
+                <label for="buyStrainInput">Strain Name</label>
+                <input id="buyStrainInput" type="text" placeholder="Blue Dream" />
+              </div>
+              <div class="field">
+                <label for="buyTypeInput">Type</label>
+                <input id="buyTypeInput" type="text" placeholder="Flower" />
+              </div>
+              <div class="field">
+                <label for="buyPackInput">Package Size</label>
+                <input id="buyPackInput" type="text" placeholder="1 oz" />
+              </div>
+              <div class="field action">
+                <button id="addBuyProductBtn" class="btn primary" type="button">Add Product You Buy</button>
+              </div>
+            </div>
+            <textarea id="f_buys" style="display:none;"></textarea>
+            <div id="buyProductsList" class="products-list"></div>
+          </div>
+        </div>
+        <div class="modal-footer step-footer">
+          <div class="help">Finish by adding what this business wants to buy.</div>
+          <div class="step-actions">
+            <button id="backToSellBtn" class="btn" type="button">Back</button>
+            <button id="saveBtn" class="btn primary" type="button">Save Listing</button>
           </div>
         </div>
       </div>
@@ -1227,24 +1517,24 @@
     <div class="modal-body">
       <div class="form-grid">
         <div id="su_display_field" class="field">
-          <label for="su_display">Display name</label>
-          <input id="su_display" type="text" placeholder="Your name or business name" />
+          <label for="su_display">Business Name</label>
+          <input id="su_display" type="text" placeholder="Business Name" autocomplete="off" />
         </div>
 
         <div class="field">
           <label for="su_password">Password</label>
-          <input id="su_password" type="password" placeholder="At least 8 characters" />
+          <input id="su_password" type="password" placeholder="At least 8 characters" autocomplete="new-password" />
         </div>
 
         <div class="field">
           <label for="su_email">Email</label>
-          <input id="su_email" type="email" placeholder="you@company.com" />
+          <input id="su_email" type="email" placeholder="you@company.com" autocomplete="off" />
           <p class="help" id="authToggle" style="margin-top:6px;"></p>
         </div>
 
         <div class="field">
           <label for="su_license">License number</label>
-          <input id="su_license" type="text" placeholder="OCM license #" />
+          <input id="su_license" type="text" placeholder="OCM license #" autocomplete="off" />
           <button id="verifyLicenseBtn" class="btn" type="button" style="margin-top:8px; width:max-content;">
             Verify license
           </button>
@@ -1302,19 +1592,19 @@
       <div class="form-grid">
         <div class="field">
           <label for="buyCompanyName">Company Name</label>
-          <input id="buyCompanyName" type="text" placeholder="Your company name" />
+          <input id="buyCompanyName" type="text" placeholder="Your company name" autocomplete="off" />
         </div>
         <div class="field">
           <label for="buyLicenseNumber">License Number</label>
-          <input id="buyLicenseNumber" type="text" placeholder="Your license number" />
+          <input id="buyLicenseNumber" type="text" placeholder="Your license number" autocomplete="off" />
         </div>
         <div class="field">
           <label for="buyProduct">Product</label>
-          <input id="buyProduct" type="text" placeholder="What do you want to buy?" />
+          <input id="buyProduct" type="text" placeholder="What do you want to buy?" autocomplete="off" />
         </div>
         <div class="field">
           <label for="buyQuantity">Quantity</label>
-          <input id="buyQuantity" type="text" placeholder="Example: 10 lbs or 500 units" />
+          <input id="buyQuantity" type="text" placeholder="Example: 10 lbs or 500 units" autocomplete="off" />
         </div>
         <div class="field">
           <label for="buyNeedByDate">Need By Date</label>
@@ -1450,8 +1740,8 @@
     return /^[A-Za-z0-9\- ]{5,30}$/.test(normalized);
   }
 
-  const STORAGE_KEY = "licensed_business_exchange_v4";
-  // v4 storage keys intentionally start fresh from the known-good v3 base.
+  const STORAGE_KEY = "licensed_business_exchange_v5";
+  // Fresh listing data key for the expanded demo set used in scroll/highlight testing.
   const MESSAGES_KEY = "lbe_messages_v4";
   const PRESENCE_KEY = "lbe_presence_v4";
   const ADMIN_UNLOCK_KEY = "lbe_admin_unlocked_v4";
@@ -1810,12 +2100,42 @@
   const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
   const toastEl = $("#toast");
+  let pendingHighlightId = null;
+
   function toast(msg) {
     if (!toastEl) return alert(msg);
     toastEl.textContent = msg;
     toastEl.classList.add("show");
     clearTimeout(toastEl.__t);
-    toastEl.__t = setTimeout(() => toastEl.classList.remove("show"), 1800);
+    toastEl.__t = setTimeout(() => toastEl.classList.remove("show"), 2600);
+  }
+
+  function setButtonBusy(btn, label) {
+    if (!btn) return () => {};
+    const previous = btn.dataset.originalText || btn.textContent;
+    btn.dataset.originalText = previous;
+    btn.classList.add("busy");
+    btn.disabled = true;
+    if (label) btn.textContent = label;
+    return () => {
+      btn.classList.remove("busy");
+      btn.disabled = false;
+      btn.textContent = btn.dataset.originalText || previous;
+    };
+  }
+
+  function queueListingHighlight(id) {
+    pendingHighlightId = id || null;
+  }
+
+  function highlightPendingListing() {
+    if (!pendingHighlightId) return;
+    const card = document.querySelector(`.card[data-id="${CSS.escape(pendingHighlightId)}"]`);
+    if (!card) return;
+    card.classList.add("card-flash");
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => card.classList.remove("card-flash"), 1700);
+    pendingHighlightId = null;
   }
 // --- Local account demo (localStorage) ---
 const USERS_KEY = "lbe_users_v4";
@@ -1946,6 +2266,104 @@ async function sha256(text) {
       contact: { name: "Taylor Knox", email: "support@everbrightrepair.com" },
       notes: "Currently paused intake (seasonal).",
       updatedAt: "2025-12-12T16:00:00.000Z",
+    },
+    {
+      id: "biz_006",
+      ownerId: "public",
+      name: "Hudson Valley Craft House",
+      licenseId: "OCM-MICR-24-000101",
+      status: "active",
+      location: "Poughkeepsie, NY",
+      categories: ["Flower", "Edibles"],
+      buys: ["Blue Dream Flower 1 oz"],
+      sells: ["Sour Diesel Prerolls 5 pack", "Berry Chews 10 pack"],
+      contact: { name: "Avery Cole", email: "orders@hudsoncraft.co" },
+      notes: "Fast turnaround on reorder requests.",
+      updatedAt: "2026-03-01T10:00:00.000Z",
+    },
+    {
+      id: "biz_007",
+      ownerId: "public",
+      name: "Capital District Supply",
+      licenseId: "OCM-DIST-24-000214",
+      status: "active",
+      location: "Albany, NY",
+      categories: ["Prerolls", "Vapes"],
+      buys: ["Wedding Cake Vape Cart 1 g"],
+      sells: ["Lemon Haze Prerolls 5 pack"],
+      contact: { name: "Jordan Ellis", email: "sales@capitaldistrictsupply.com" },
+      notes: "Morning delivery windows available.",
+      updatedAt: "2026-03-03T08:30:00.000Z",
+    },
+    {
+      id: "biz_008",
+      ownerId: "public",
+      name: "Finger Lakes Flower Co",
+      licenseId: "OCM-CP-24-000322",
+      status: "active",
+      location: "Geneva, NY",
+      categories: ["Flower"],
+      buys: ["OG Kush Flower 1 oz"],
+      sells: ["Blue Dream Flower 1 oz", "OG Kush Flower 1 oz"],
+      contact: { name: "Morgan Lee", email: "hello@flflowerco.com" },
+      notes: "Fresh batches posted every Friday.",
+      updatedAt: "2026-03-05T14:15:00.000Z",
+    },
+    {
+      id: "biz_009",
+      ownerId: "public",
+      name: "Queens Wholesale Garden",
+      licenseId: "OCM-WH-24-000411",
+      status: "active",
+      location: "Queens, NY",
+      categories: ["Edibles", "Concentrates"],
+      buys: ["Live Rosin 1 g"],
+      sells: ["Mango Gummies 10 pack", "Live Rosin 1 g"],
+      contact: { name: "Casey Moore", email: "trade@qwgarden.com" },
+      notes: "Looking for repeat retail buyers.",
+      updatedAt: "2026-03-07T11:45:00.000Z",
+    },
+    {
+      id: "biz_010",
+      ownerId: "public",
+      name: "Brooklyn Micro Labs",
+      licenseId: "OCM-MICR-24-000512",
+      status: "active",
+      location: "Brooklyn, NY",
+      categories: ["Vapes", "Concentrates"],
+      buys: ["Trim Bulk 5 lb"],
+      sells: ["Gelato Vape Cart 1 g"],
+      contact: { name: "Riley Shah", email: "riley@bklymicrolabs.com" },
+      notes: "Best for small-batch storefronts.",
+      updatedAt: "2026-03-08T16:25:00.000Z",
+    },
+    {
+      id: "biz_011",
+      ownerId: "public",
+      name: "North Country Cannabis Hub",
+      licenseId: "OCM-DIST-24-000601",
+      status: "active",
+      location: "Watertown, NY",
+      categories: ["Flower", "Prerolls", "Edibles"],
+      buys: ["Sour Diesel Prerolls 5 pack"],
+      sells: ["Northern Lights Flower 1 oz", "Sour Diesel Prerolls 5 pack"],
+      contact: { name: "Jamie Fox", email: "buyers@northcountryhub.com" },
+      notes: "Regional hub for upstate retailers.",
+      updatedAt: "2026-03-09T13:05:00.000Z",
+    },
+    {
+      id: "biz_012",
+      ownerId: "public",
+      name: "Rochester Retail Exchange",
+      licenseId: "OCM-RET-24-000742",
+      status: "active",
+      location: "Rochester, NY",
+      categories: ["Flower", "Edibles"],
+      buys: ["Mango Gummies 10 pack", "Blue Dream Flower 1 oz"],
+      sells: ["House Prepack Flower 3.5 g"],
+      contact: { name: "Drew Hart", email: "orders@rocxchange.com" },
+      notes: "Frequently buys from craft producers.",
+      updatedAt: "2026-03-10T09:50:00.000Z",
     },
   ];
 
@@ -2125,10 +2543,48 @@ async function sha256(text) {
     return true;
   }
 
+  function normalizeSearchText(value) {
+    return String(value ?? "")
+      .toLowerCase()
+      .replace(/[\u2010-\u2015]/g, "-")
+      .replace(/&/g, " and ")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim()
+      .replace(/\s+/g, " ");
+  }
+
+  function expandSearchAliases(value) {
+    const base = normalizeSearchText(value);
+    const extras = new Set([base]);
+    const aliasGroups = [
+      ["preroll", "prerolls", "pre roll", "pre rolls", "pre-roll", "pre-rolls"],
+      ["edible", "edibles", "gummy", "gummies", "chew", "chews"],
+      ["vape", "vapes", "vape cart", "vape carts", "cartridge", "cartridges"],
+      ["concentrate", "concentrates", "extract", "extracts"],
+      ["flower", "bulk flower", "bud", "buds"],
+    ];
+
+    for (const group of aliasGroups) {
+      if (group.some((term) => base.includes(normalizeSearchText(term)))) {
+        group.forEach((term) => extras.add(normalizeSearchText(term)));
+      }
+    }
+
+    return Array.from(extras).filter(Boolean);
+  }
+
   function matchesChip(b, chip) {
     if (!chip || chip === "All") return true;
-    const cats = (b.categories ?? []).map(norm);
-    return cats.some((c) => c.toLowerCase() === chip.toLowerCase());
+    const targets = expandSearchAliases(chip);
+    const pool = [
+      ...(b.categories ?? []),
+      ...(b.buys ?? []),
+      ...(b.sells ?? []),
+      b.name,
+      b.location,
+    ].flatMap(expandSearchAliases).filter(Boolean);
+
+    return targets.some((target) => pool.some((value) => value.includes(target)));
   }
 
   function searchableText(b) {
@@ -2144,22 +2600,50 @@ async function sha256(text) {
       b.contact?.email,
       b.notes,
     ];
-    return safeLower(parts.filter(Boolean).join(" • "));
+    return normalizeSearchText(parts.filter(Boolean).join(" • "));
+  }
+
+  function matchesSearchQuery(b, q) {
+    if (!q) return true;
+    const haystack = searchableText(b);
+    const tokens = Array.from(new Set(
+      expandSearchAliases(q)
+        .flatMap((part) => part.split(" "))
+        .map((part) => part.trim())
+        .filter(Boolean)
+    ));
+
+    return tokens.every((token) => haystack.includes(token));
   }
 
   function scoreRelevance(b, q) {
     if (!q) return 0;
-    const s = searchableText(b);
-    const qq = safeLower(q);
+    const normalizedQuery = normalizeSearchText(q);
+    const aliases = expandSearchAliases(q);
+    const tokens = aliases.flatMap((part) => part.split(" ")).filter(Boolean);
 
     let score = 0;
-    if (safeLower(b.name).includes(qq)) score += 40;
-    if (safeLower(b.licenseId).includes(qq)) score += 24;
-    if (safeLower(b.location).includes(qq)) score += 14;
+    const name = normalizeSearchText(b.name);
+    const license = normalizeSearchText(b.licenseId);
+    const location = normalizeSearchText(b.location);
+    const fieldValues = [...(b.categories ?? []), ...(b.buys ?? []), ...(b.sells ?? [])]
+      .map(normalizeSearchText)
+      .filter(Boolean);
+    const haystack = searchableText(b);
 
-    const listFields = [...(b.categories ?? []), ...(b.buys ?? []), ...(b.sells ?? [])].map(safeLower);
-    for (const v of listFields) if (v.includes(qq)) score += 10;
-    if (s.includes(qq)) score += 6;
+    if (name.includes(normalizedQuery)) score += 50;
+    if (license.includes(normalizedQuery)) score += 28;
+    if (location.includes(normalizedQuery)) score += 22;
+
+    for (const alias of aliases) {
+      if (name.includes(alias)) score += 20;
+      if (location.includes(alias)) score += 10;
+      for (const value of fieldValues) if (value.includes(alias)) score += 12;
+    }
+
+    for (const token of tokens) {
+      if (haystack.includes(token)) score += 4;
+    }
 
     return score;
   }
@@ -2169,7 +2653,7 @@ async function sha256(text) {
     let out = list
       .filter((b) => matchesTab(b, state.tab))
       .filter((b) => matchesChip(b, state.chip))
-      .filter((b) => (!q ? true : searchableText(b).includes(safeLower(q))));
+      .filter((b) => matchesSearchQuery(b, q));
 
     if (state.sort === "name_asc") out.sort((a, b) => a.name.localeCompare(b.name));
     else if (state.sort === "name_desc") out.sort((a, b) => b.name.localeCompare(a.name));
@@ -2177,6 +2661,73 @@ async function sha256(text) {
     else out.sort((a, b) => scoreRelevance(b, q) - scoreRelevance(a, q));
 
     return out;
+  }
+
+  function getSearchSuggestions(q, list) {
+    const query = normalizeSearchText(q);
+    if (query.length < 2) return [];
+
+    const normalizedTokens = query.split(" ").filter(Boolean);
+    const seen = new Set();
+    const suggestions = [];
+
+    for (const b of list) {
+      const candidateFields = [
+        { label: b.name, meta: "Business" },
+        { label: b.location, meta: "Location" },
+        ...((b.sells ?? []).map((value) => ({ label: value, meta: "On Sale" }))),
+        ...((b.buys ?? []).map((value) => ({ label: value, meta: "I'm Buying" }))),
+      ];
+
+      for (const field of candidateFields) {
+        const norm = normalizeSearchText(field.label);
+        if (!norm) continue;
+        if (normalizedTokens.every((token) => norm.includes(token))) {
+          const key = `${field.meta}::${norm}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          suggestions.push({ label: field.label, meta: field.meta, query: field.label });
+          if (suggestions.length >= 6) return suggestions;
+        }
+      }
+    }
+
+    return suggestions;
+  }
+
+  function renderSearchSuggestions() {
+    const wrap = $("#searchSuggestions");
+    if (!wrap) return;
+    const q = state.q.trim();
+    const suggestions = getSearchSuggestions(q, data);
+
+    if (!q || suggestions.length === 0) {
+      wrap.hidden = true;
+      wrap.innerHTML = "";
+      return;
+    }
+
+    wrap.hidden = false;
+    wrap.innerHTML = suggestions
+      .map((item, idx) => `
+        <button class="suggestion-item" type="button" data-suggestion-index="${idx}">
+          <strong>${escapeHtml(item.label)}</strong>
+          <span>${escapeHtml(item.meta)}</span>
+        </button>
+      `)
+      .join("");
+
+    wrap.querySelectorAll("[data-suggestion-index]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const picked = suggestions[Number(btn.getAttribute("data-suggestion-index"))];
+        if (!picked) return;
+        state.q = picked.query;
+        const qInput = $("#q");
+        if (qInput) qInput.value = picked.query;
+        syncUrlFromState();
+        render();
+      });
+    });
   }
 
   function escapeHtml(s) {
@@ -2188,9 +2739,92 @@ async function sha256(text) {
       .replaceAll("'", "&#039;");
   }
 
+
+  function escapeRegExp(value) {
+    return String(value ?? "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function activeSearchTerms() {
+    const terms = new Set();
+    const raw = state.q.trim();
+    if (raw) {
+      expandSearchAliases(raw).forEach((part) => {
+        String(part).split(/\s+/).forEach((token) => {
+          const clean = token.trim();
+          if (clean && clean.length >= 2) terms.add(clean);
+        });
+      });
+    }
+    if (state.chip && state.chip !== "All") {
+      expandSearchAliases(state.chip).forEach((part) => {
+        String(part).split(/\s+/).forEach((token) => {
+          const clean = token.trim();
+          if (clean && clean.length >= 2) terms.add(clean);
+        });
+      });
+    }
+    return Array.from(terms).sort((a, b) => b.length - a.length);
+  }
+
+  function highlightMatchText(value) {
+    const source = String(value ?? "");
+    if (!source) return "";
+    const terms = activeSearchTerms();
+    if (!terms.length) return escapeHtml(source);
+
+    let out = escapeHtml(source);
+    for (const term of terms) {
+      const re = new RegExp(`(${escapeRegExp(term)})`, "ig");
+      out = out.replace(re, '<mark class="match-hit">$1</mark>');
+    }
+    return out;
+  }
+
+  function getMatchInfo(b) {
+    const cues = [];
+    const q = state.q.trim();
+    const chip = state.chip;
+    const name = normalizeSearchText(b.name);
+    const location = normalizeSearchText(b.location);
+    const sells = (b.sells ?? []).map(normalizeSearchText);
+    const buys = (b.buys ?? []).map(normalizeSearchText);
+    const categories = (b.categories ?? []).map(normalizeSearchText);
+
+    if (q) {
+      const aliases = expandSearchAliases(q);
+      if (aliases.some((alias) => alias && name.includes(alias))) cues.push(`Business name match`);
+      if (aliases.some((alias) => alias && location.includes(alias))) cues.push(`Location match`);
+      if (aliases.some((alias) => alias && sells.some((item) => item.includes(alias)))) cues.push(`Selling what you searched for`);
+      if (aliases.some((alias) => alias && buys.some((item) => item.includes(alias)))) cues.push(`Also buying your search`);
+      if (aliases.some((alias) => alias && categories.some((item) => item.includes(alias)))) cues.push(`Category match`);
+    }
+
+    if (chip && chip !== "All") {
+      const chipAliases = expandSearchAliases(chip);
+      if (chipAliases.some((alias) => alias && sells.some((item) => item.includes(alias)))) cues.push(`${chip} on sale`);
+      else if (chipAliases.some((alias) => alias && buys.some((item) => item.includes(alias)))) cues.push(`${chip} wanted`);
+    }
+
+    const unique = Array.from(new Set(cues)).slice(0, 3);
+    const score = scoreRelevance(b, q) + (chip && chip !== "All" && matchesChip(b, chip) ? 8 : 0);
+    const hasContext = !!(q || (chip && chip !== "All"));
+    return {
+      cues: unique,
+      topMatch: hasContext && score >= 40,
+      hasContext,
+    };
+  }
+
   function renderMeta(list) {
     $("#count").textContent = String(list.length);
     const hint = $("#hint");
+    if (!list.length) {
+      hint.textContent = state.q
+        ? 'Try a different product, business name, or location.'
+        : 'No listings match this view yet.';
+      return;
+    }
+
     hint.textContent =
       state.tab === "buyers"
         ? "Showing businesses that buy items."
@@ -2208,12 +2842,11 @@ async function sha256(text) {
   }
 
   function renderChips() {
-    const cats = allCategories(data);
-    const chips = ["All", ...cats];
+    const quickFilters = ["All", "Flower", "Prerolls", "Edibles", "Vapes", "Concentrates"];
     const wrap = $("#chips");
     wrap.innerHTML = "";
 
-    for (const c of chips) {
+    for (const c of quickFilters) {
       const el = document.createElement("div");
       el.className = "chip" + (state.chip === c ? " active" : "");
       el.textContent = c;
@@ -2293,29 +2926,62 @@ async function sha256(text) {
   function renderCards(list) {
     gridEl.innerHTML = "";
 
+    if (!list.length) {
+      const empty = document.createElement("section");
+      empty.className = "empty-state";
+
+      const title = data.length
+        ? (state.q ? "No matches yet" : "No listings in this view yet")
+        : "No listings yet";
+      const message = data.length
+        ? (state.q
+            ? "Try another search term or clear filters to see more businesses."
+            : "Change tabs or filters, or add a listing to populate this view.")
+        : "Be the first business to add a listing so buyers and sellers can find each other.";
+
+      empty.innerHTML = `
+        <h3>${title}</h3>
+        <p>${message}</p>
+        <div class="empty-actions">
+          <button class="btn primary" type="button" data-empty-action="add">Add Listing</button>
+          ${state.q || state.chip !== "All" || state.tab !== "all" ? '<button class="btn" type="button" data-empty-action="clear">Clear Search</button>' : ''}
+        </div>
+      `;
+
+      empty.querySelector('[data-empty-action="add"]')?.addEventListener('click', () => adminBtn?.click());
+      empty.querySelector('[data-empty-action="clear"]')?.addEventListener('click', clearSearchAndFilters);
+
+      gridEl.appendChild(empty);
+      return;
+    }
+
     for (const b of list) {
       const badge = statusBadge(b.status);
       const el = document.createElement("article");
       const canEdit = !!(currentUserId && b.ownerId === currentUserId);
-      el.className = "card";
+      const matchInfo = getMatchInfo(b);
+      el.className = `card${matchInfo.topMatch ? " top-match-card" : ""}`;
       el.setAttribute("data-id", b.id);
       el.setAttribute("tabindex", "0");
       el.setAttribute("role", "button");
       el.setAttribute("aria-label", `View details for ${b.name}`);
 
       const sells = (b.sells ?? []).filter(Boolean);
-      const sellPreview = sells.length ? sells.slice(0, 3).join(", ") : "No products listed yet";
-      const extraSellCount = sells.length > 3 ? ` +${sells.length - 3} more` : "";
+      const sellPreview = sells.length ? `${sells[0]}${sells.length > 1 ? ' ...' : ''}` : "No products listed yet";
       const buys = (b.buys ?? []).filter(Boolean);
-      const buysPreview = buys.length ? buys.slice(0, 2).join(", ") : "Not specified";
+      const buysPreview = buys.length ? `${buys[0]}${buys.length > 1 ? ' ...' : ''}` : "Not specified";
+      const cueHtml = matchInfo.cues.length
+        ? `<div class="match-cues">${matchInfo.cues.map((cue) => `<span class="match-cue">${escapeHtml(cue)}</span>`).join("")}</div>`
+        : "";
 
       el.innerHTML = `
         <div class="card-top">
           <div>
-            <h3>${escapeHtml(b.name)}</h3>
+            <h3>${highlightMatchText(b.name)}</h3>
             <div class="card-meta">
               <span class="badge ${badge.cls}">${badge.label}</span>
-              <span>${escapeHtml(b.location || "Location not listed")}</span>
+              <span>${highlightMatchText(b.location || "Location not listed")}</span>
+              ${matchInfo.topMatch ? '<div class="top-match-ribbon">Top Match</div>' : ''}
             </div>
           </div>
           ${canEdit ? `<button class="iconbtn" data-act="edit" data-id="${escapeHtml(b.id)}" title="Edit listing" aria-label="Edit listing for ${escapeHtml(b.name)}" type="button">${iconSvg("edit")}</button>` : ""}
@@ -2323,13 +2989,15 @@ async function sha256(text) {
 
         <div class="card-line card-summary">
           <div class="card-line-label">On Sale</div>
-          <div class="card-line-value">${escapeHtml(sellPreview)}${escapeHtml(extraSellCount)}</div>
+          <div class="card-line-value">${highlightMatchText(sellPreview)}</div>
         </div>
 
         <div class="card-line compact">
           <div class="card-line-label">I'm Buying</div>
-          <div class="card-line-value ${buys.length ? "" : "muted"}">${escapeHtml(buysPreview)}</div>
+          <div class="card-line-value ${buys.length ? "" : "muted"}">${highlightMatchText(buysPreview)}</div>
         </div>
+
+        ${cueHtml}
 
         <div class="card-footer">
           <button class="btn" data-act="view" data-id="${escapeHtml(b.id)}" type="button">View Details</button>
@@ -2339,6 +3007,7 @@ async function sha256(text) {
       gridEl.appendChild(el);
     }
   }
+
 
 
   function openEmailAction(b, mode = "contact") {
@@ -2389,44 +3058,55 @@ async function sha256(text) {
       toast("Listing not found");
       return;
     }
+    resetBuyRequestFields();
+    populateBuyRequestFromSession();
     selectedBuyRequestId = id;
-    if (buyRequestTitle) buyRequestTitle.textContent = `Buy Request — ${b.name}`;
+
+    const sellerName = b.name || "this seller";
+    const firstProduct = Array.isArray(b?.sells) ? norm(b.sells.find(Boolean) || "") : "";
+    if (buyProduct) buyProduct.value = firstProduct;
+
+    if (buyRequestTitle) buyRequestTitle.textContent = `Buy Now — ${sellerName}`;
     if (buyRequestHelp) {
-      buyRequestHelp.textContent = "Fill out this short form and your request will open ready to send to the seller.";
+      buyRequestHelp.textContent = firstProduct
+        ? `Send a fast request to ${sellerName}. We prefilled the first product on this listing for you.`
+        : `Send a fast request to ${sellerName}. Fill out the short form below and your request will open ready to send.`;
     }
     if (buyRequestState) {
-      buyRequestState.textContent = "This will open your email app with the completed buy request.";
-    }
-    if (buyProduct && !buyProduct.value) {
-      const firstSell = Array.isArray(b.sells) && b.sells.length ? b.sells[0] : "";
-      buyProduct.value = firstSell || "";
-    }
-    if (buyCompanyName && !buyCompanyName.value) {
-      const session = getSession();
-      buyCompanyName.value = session?.display || "";
-    }
-    if (buyLicenseNumber && !buyLicenseNumber.value) {
-      const users = loadUsers();
-      const session = getSession();
-      const user = users.find((u) => u.email === session?.email);
-      buyLicenseNumber.value = user?.license || "";
+      buyRequestState.textContent = firstProduct
+        ? `Requesting: ${firstProduct}`
+        : `Your request will open in your email app ready to send to ${sellerName}.`;
     }
     if (buyRequestBackdrop) buyRequestBackdrop.classList.add("open");
+
+    const nextFocus = !norm(buyProduct?.value)
+      ? buyProduct
+      : !norm(buyQuantity?.value)
+        ? buyQuantity
+        : buyNeedByDate;
+    window.requestAnimationFrame(() => nextFocus?.focus());
   }
 
   function closeBuyRequest() {
     if (buyRequestBackdrop) buyRequestBackdrop.classList.remove("open");
+    resetBuyRequestFields();
+    if (buyRequestTitle) buyRequestTitle.textContent = "Buy Request";
+    if (buyRequestHelp) buyRequestHelp.textContent = "Fill out this short form and your request will open ready to send to the seller.";
+    if (buyRequestState) buyRequestState.textContent = "This will open your email app with the completed buy request.";
     selectedBuyRequestId = null;
   }
 
   function submitBuyRequest() {
+    const done = setButtonBusy(buyRequestSubmitBtn, "Preparing...");
     const b = data.find((x) => x.id === selectedBuyRequestId);
     if (!b) {
+      done();
       toast("Please choose a seller first");
       return;
     }
     const to = norm(b?.contact?.email);
     if (!to) {
+      done();
       toast("No seller email is listed for this business");
       return;
     }
@@ -2437,8 +3117,34 @@ async function sha256(text) {
     const quantity = norm(buyQuantity?.value);
     const needByDate = norm(buyNeedByDate?.value);
 
-    if (!companyName || !licenseNumber || !product || !quantity || !needByDate) {
-      toast("Please complete all buy request fields");
+    if (!companyName) {
+      done();
+      toast("Please enter your company name");
+      buyCompanyName?.focus();
+      return;
+    }
+    if (!licenseNumber) {
+      done();
+      toast("Please enter your license number");
+      buyLicenseNumber?.focus();
+      return;
+    }
+    if (!product) {
+      done();
+      toast("Please enter the product you want to buy");
+      buyProduct?.focus();
+      return;
+    }
+    if (!quantity) {
+      done();
+      toast("Please enter quantity");
+      buyQuantity?.focus();
+      return;
+    }
+    if (!needByDate) {
+      done();
+      toast("Please choose a need-by date");
+      buyNeedByDate?.focus();
       return;
     }
 
@@ -2459,7 +3165,10 @@ async function sha256(text) {
       "Thank you."
     ].join("\n");
 
+    if (buyRequestState) buyRequestState.textContent = "Buy request ready to send.";
+    toast("Buy request ready — your email draft is open to send.");
     window.location.href = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    done();
     closeBuyRequest();
   }
 
@@ -2467,17 +3176,27 @@ async function sha256(text) {
   function renderDetailsContent(b) {
     const badge = statusBadge(b.status);
     const cats = (b.categories ?? []).length ? (b.categories ?? []).map((c) => `<span class="tag cat">${escapeHtml(c)}</span>`).join("") : '<span class="small">None listed</span>';
-    const buys = (b.buys ?? []).length ? (b.buys ?? []).map((x) => `<span class="tag buy">${escapeHtml(x)}</span>`).join("") : '<span class="small">None listed</span>';
-    const sells = (b.sells ?? []).length ? (b.sells ?? []).map((x) => `<span class="tag sell">${escapeHtml(x)}</span>`).join("") : '<span class="small">None listed</span>';
+    const buys = (b.buys ?? []).length ? (b.buys ?? []).map((x) => `<span class="tag buy">${highlightMatchText(x)}</span>`).join("") : '<span class="small">None listed</span>';
+    const sells = (b.sells ?? []).length ? (b.sells ?? []).map((x) => `<span class="tag sell">${highlightMatchText(x)}</span>`).join("") : '<span class="small">None listed</span>';
+    const matchInfo = getMatchInfo(b);
+    const matchBox = matchInfo.hasContext
+      ? `
+        <div class="details-match-box">
+          <h5>Why this result matches</h5>
+          ${matchInfo.cues.length ? `<ul>${matchInfo.cues.map((cue) => `<li>${escapeHtml(cue)}</li>`).join("")}</ul>` : '<div class="small">This listing matches your current search or quick filter.</div>'}
+        </div>
+      `
+      : "";
 
     detailsTitle.textContent = b.name;
     detailsContent.innerHTML = `
+      ${matchBox}
       <div class="details-grid">
         <div class="details-block">
           <div class="small">
             <span class="badge ${badge.cls}">${badge.label}</span>
             <span style="margin-left:8px;"><strong>${escapeHtml(b.licenseId || "No license listed")}</strong></span>
-            <span style="margin-left:8px;">• ${escapeHtml(b.location || "Location not listed")}</span>
+            <span style="margin-left:8px;">• ${highlightMatchText(b.location || "Location not listed")}</span>
           </div>
           <p style="margin:10px 0 0; color: var(--muted);">${escapeHtml(b.notes || "Open this listing to review products, contact details, and next steps.")}</p>
         </div>
@@ -2500,14 +3219,17 @@ async function sha256(text) {
         </div>
       </div>
     `;
-    detailsState.textContent = `View ${b.name} details, contact the seller, or send a buy request.`;
+    detailsState.textContent = matchInfo.hasContext
+      ? `View ${b.name} details and review why it matches your current search.`
+      : `View ${b.name} details, contact the seller, or send a buy request.`;
     const canEdit = !!(currentUserId && b.ownerId === currentUserId);
     detailsEditBtn.style.display = canEdit ? "inline-flex" : "none";
   }
 
+
   function openDetails(id) {
     const b = data.find((x) => x.id === id);
-    if (!b) return;
+    if (!b) { done(); return; }
     selectedDetailsId = id;
     renderDetailsContent(b);
     detailsBackdrop.classList.add("open");
@@ -2540,6 +3262,7 @@ async function sha256(text) {
       if (act === "buy") {
         e.stopPropagation();
         openBuyRequest(b.id);
+        toast(`Buy request opened for ${b.name}.`);
         return;
       }
       return;
@@ -2549,7 +3272,7 @@ async function sha256(text) {
     if (!card || !gridEl.contains(card)) return;
 
     const id = card.getAttribute("data-id");
-    if (!id) return;
+    if (!id) { done(); return; }
     openDetails(id);
   }
 
@@ -2597,13 +3320,21 @@ async function sha256(text) {
   const adminBtn = $("#adminBtn");
   const closeBtn = $("#closeBtn");
   const saveBtn = $("#saveBtn");
-  const newBtn = $("#newBtn");
   const deleteBtn = $("#deleteBtn");
-  const importBtn = $("#importBtn");
-  const importFile = $("#importFile");
   const adminState = $("#adminState");
   const modalTitle = $("#modalTitle");
-  const copyLinkBtn = $("#copyLinkBtn");
+  const step1NextBtn = $("#step1NextBtn");
+  const productsSellBackdrop = $("#productsSellBackdrop");
+  const productsBuyBackdrop = $("#productsBuyBackdrop");
+  const productsSellCloseBtn = $("#productsSellCloseBtn");
+  const productsBuyCloseBtn = $("#productsBuyCloseBtn");
+  const backToBusinessBtn = $("#backToBusinessBtn");
+  const backToSellBtn = $("#backToSellBtn");
+  const step2NextBtn = $("#step2NextBtn");
+  const addSellProductBtn = $("#addSellProductBtn");
+  const addBuyProductBtn = $("#addBuyProductBtn");
+  const sellProductsList = $("#sellProductsList");
+  const buyProductsList = $("#buyProductsList");
 // --- Create account / login modal wiring ---
 const signupBtn = $("#signupBtn");
 const signInBtn = $("#signInBtn");
@@ -2647,6 +3378,32 @@ let authMode = "signin"; // "signin" or "signup"
 let currentUserId = null;
 let selectedDetailsId = null;
 
+function resetSignupFields() {
+  const emailEl = $("#su_email");
+  const passwordEl = $("#su_password");
+  const licenseEl = $("#su_license");
+  const displayEl = $("#su_display");
+  if (emailEl) emailEl.value = "";
+  if (passwordEl) passwordEl.value = "";
+  if (licenseEl) licenseEl.value = "";
+  if (displayEl) displayEl.value = "";
+}
+
+function resetBuyRequestFields() {
+  if (buyCompanyName) buyCompanyName.value = "";
+  if (buyLicenseNumber) buyLicenseNumber.value = "";
+  if (buyProduct) buyProduct.value = "";
+  if (buyQuantity) buyQuantity.value = "";
+  if (buyNeedByDate) buyNeedByDate.value = "";
+}
+
+function populateBuyRequestFromSession() {
+  const session = getSession();
+  if (!session) return;
+  if (buyCompanyName) buyCompanyName.value = session.display || "";
+  if (buyLicenseNumber) buyLicenseNumber.value = session.license || "";
+}
+
 function setAuthMode(mode) {
   authMode = mode;
   const isSignup = mode === "signup";
@@ -2676,9 +3433,9 @@ function setAuthMode(mode) {
 }
 
 function openSignup(mode = "signup") {
+  resetSignupFields();
   signupBackdrop.classList.add("open");
   setAuthMode(mode);
-  if (suLicenseInput) suLicenseInput.value = "";
   const statusEl = $("#licenseStatus");
   if (statusEl) statusEl.textContent = !!OCM_LICENSE_API
     ? 'Click "Verify license" to confirm your license.'
@@ -2688,6 +3445,7 @@ function openSignup(mode = "signup") {
 }
 function closeSignup() {
   signupBackdrop.classList.remove("open");
+  resetSignupFields();
 }
 
 
@@ -2725,11 +3483,12 @@ async function updateSignupState() {
 }
 
 async function signIn() {
+  const done = setButtonBusy(signupCreateBtn, "Signing in...");
   const email = norm($("#su_email").value).toLowerCase();
   const password = String($("#su_password").value || "");
 
-  if (!isValidEmail(email)) return toast("Enter a valid email");
-  if (password.length < 8) return toast("Password must be at least 8 characters");
+  if (!isValidEmail(email)) { done(); return toast("Enter a valid email"); }
+  if (password.length < 8) { done(); return toast("Password must be at least 8 characters"); }
 
   if (isSupabaseConfigured()) {
     const { data, error } = await supabaseClient.auth.signInWithPassword({
@@ -2737,9 +3496,11 @@ async function signIn() {
       password,
     });
 
-    if (error) return toast(error.message);
-    toast("Signed in");
+    if (error) { done(); return toast(error.message); }
+    toast("Signed in — your account is ready.");
     await updateSignupState();
+    done();
+    done();
     closeSignup();
     return;
   }
@@ -2752,36 +3513,41 @@ async function signIn() {
     if (statusEl) statusEl.textContent = !!OCM_LICENSE_API
       ? 'Finish joining the marketplace, then verify your license.'
       : 'No account was found for that email. Finish joining the marketplace to create one.';
-    return toast("No account found. Please click Join to create your account.");
+    done();
+    return toast("No account found yet. Click Join to create your account.");
   }
 
   const passwordHash = await sha256(password);
-  if (passwordHash !== user.passwordHash) return toast("Incorrect password");
+  if (passwordHash !== user.passwordHash) { done(); return toast("Incorrect password"); }
 
-  setSession({ email: user.email, display: user.display });
-  toast("Signed in");
+  setSession({ email: user.email, display: user.display, license: user.license || "" });
+  toast("Signed in — your account is ready.");
   await updateSignupState();
+  done();
+  done();
   closeSignup();
 }
 
 async function createAccount() {
+  const done = setButtonBusy(signupCreateBtn, "Joining...");
   const email = norm($("#su_email").value).toLowerCase();
   const password = String($("#su_password").value || "");
   const license = norm($("#su_license").value);
   const display = norm($("#su_display").value);
 
-  if (!isValidEmail(email)) return toast("Enter a valid email");
-  if (!license) return toast("Enter your license number");
-  if (password.length < 8) return toast("Password must be at least 8 characters");
-  if (!display) return toast("Display name is required");
+  if (!isValidEmail(email)) { done(); return toast("Enter a valid email"); }
+  if (!license) { done(); return toast("Enter your license number"); }
+  if (password.length < 8) { done(); return toast("Password must be at least 8 characters"); }
+  if (!display) { done(); return toast("Business name is required"); }
 
   if (OCM_LICENSE_API) {
     if (verifiedLicense !== license) {
+      done();
       return toast("Please click Verify license before creating your account");
     }
 
     const licenseValid = await verifyLicense(license);
-    if (!licenseValid) return toast("Unable to verify license. Please check your license number.");
+    if (!licenseValid) { done(); return toast("Unable to verify license. Please check your license number."); }
     verifiedLicense = license;
   }
 
@@ -2792,8 +3558,8 @@ async function createAccount() {
       options: { data: { display, license } },
     });
 
-    if (error) return toast(error.message);
-    toast("Account created — check your email to confirm (if enabled).");
+    if (error) { done(); return toast(error.message); }
+    toast("Account created — next step: tap Add Listing to post your business.");
     await updateSignupState();
     closeSignup();
     return;
@@ -2801,7 +3567,7 @@ async function createAccount() {
 
   // Fallback: localStorage demo accounts (no real auth)
   const users = loadUsers();
-  if (users.some((u) => u.email === email)) return toast("Account already exists");
+  if (users.some((u) => u.email === email)) { done(); return toast("Account already exists"); }
 
   const passwordHash = await sha256(password);
 
@@ -2815,9 +3581,9 @@ async function createAccount() {
   });
 
   saveUsers(users);
-  setSession({ email, display });
+  setSession({ email, display, license });
   await updateSignupState();
-  toast(OCM_LICENSE_API ? "Account created" : "Account created — license review will happen once live verification is connected.");
+  toast(OCM_LICENSE_API ? "Account created — next step: tap Add Listing." : "Account created — next step: tap Add Listing. License review will happen once live verification is connected.");
   closeSignup();
 }
 
@@ -2834,12 +3600,14 @@ async function logout() {
     clearSession();
   }
   await updateSignupState();
+  resetSignupFields();
+  resetBuyRequestFields();
   toast("Logged out");
 }
 
 // events
-signupBtn.addEventListener("click", () => openSignup("signup"));
-if (signInBtn) signInBtn.addEventListener("click", () => openSignup("signin"));
+signupBtn.addEventListener("click", () => { openSignup("signup"); toast("Join form opened."); });
+if (signInBtn) signInBtn.addEventListener("click", () => { openSignup("signin"); toast("Sign in form opened."); });
 signupCloseBtn.addEventListener("click", closeSignup);
 signupBackdrop.addEventListener("click", (e) => {
   if (e.target === signupBackdrop) closeSignup();
@@ -2866,7 +3634,7 @@ if (detailsContactBtn) detailsContactBtn.addEventListener("click", () => {
 });
 if (detailsRequestBtn) detailsRequestBtn.addEventListener("click", () => {
   const b = data.find((x) => x.id === selectedDetailsId);
-  if (b) openBuyRequest(b.id);
+  if (b) { openBuyRequest(b.id); toast(`Buy request opened for ${b.name}.`); }
 });
 if (buyRequestCloseBtn) buyRequestCloseBtn.addEventListener("click", closeBuyRequest);
 if (buyRequestBackdrop) {
@@ -2950,7 +3718,8 @@ document.addEventListener("keydown", (e) => {
   if (signupBackdrop?.classList.contains("open")) closeSignup();
   if (detailsBackdrop?.classList.contains("open")) closeDetails();
   if (messagesBackdrop?.classList.contains("open")) closeMessages();
-  if (backdrop?.classList.contains("open")) closeAdmin();
+  if (buyRequestBackdrop?.classList.contains("open")) closeBuyRequest();
+  if (productsBuyBackdrop?.classList.contains("open") || productsSellBackdrop?.classList.contains("open") || backdrop?.classList.contains("open")) closeAdmin();
 });
 
 // init state once
@@ -2962,6 +3731,24 @@ function isAdminAllowed() {
 
   function ensureAdminUnlocked() {
     return true;
+  }
+
+  function openBusinessStep() {
+    backdrop.classList.add("open");
+    productsSellBackdrop.classList.remove("open");
+    productsBuyBackdrop.classList.remove("open");
+  }
+
+  function openSellStep() {
+    backdrop.classList.remove("open");
+    productsSellBackdrop.classList.add("open");
+    productsBuyBackdrop.classList.remove("open");
+  }
+
+  function openBuyStep() {
+    backdrop.classList.remove("open");
+    productsSellBackdrop.classList.remove("open");
+    productsBuyBackdrop.classList.add("open");
   }
 
   function openAdmin(preferredId = null) {
@@ -2977,25 +3764,95 @@ function isAdminAllowed() {
         ? state.selectedId
         : data[0]?.id ?? null;
 
-    backdrop.classList.add("open");
+    openBusinessStep();
 
     if (targetId) loadForm(targetId);
     else {
       writeForm(null);
-      modalTitle.textContent = "Listing Editor";
+      modalTitle.textContent = "Step 1 of 3 • Business Information";
       updateAdminState();
     }
   }
 
   function closeAdmin() {
     backdrop.classList.remove("open");
+    productsSellBackdrop.classList.remove("open");
+    productsBuyBackdrop.classList.remove("open");
   }
 
   function updateAdminState() {
     const sel = data.find((x) => x.id === state.selectedId);
-    adminState.textContent = isAdminAllowed()
-      ? `Editing listing: ${sel ? sel.name : "None selected"}`
-       : "Listing editor ready";
+    adminState.textContent = sel ? `Editing listing: ${sel.name}` : "Complete this step, then continue.";
+  }
+
+  function getListFieldValue(id) {
+    const raw = norm($(id).value);
+    if (!raw) return [];
+    if (raw.includes("\n")) {
+      return raw
+        .split(/\r?\n/)
+        .map((x) => x.trim())
+        .filter(Boolean);
+    }
+    // Keep a single product entry intact as one line item.
+    return [raw];
+  }
+
+  function setListFieldValue(id, items) {
+    $(id).value = (items || []).filter(Boolean).join("\n");
+  }
+
+  function renderProductList(container, fieldId, kind) {
+    const items = getListFieldValue(fieldId);
+    container.innerHTML = "";
+    if (!items.length) {
+      const empty = document.createElement("div");
+      empty.className = "product-empty";
+      empty.textContent = kind === "sell" ? "No products added yet for Products You Sell." : "No products added yet for Products You Buy.";
+      container.appendChild(empty);
+      return;
+    }
+    items.forEach((item, index) => {
+      const row = document.createElement("div");
+      row.className = "product-row";
+      row.innerHTML = `<span>${escapeHtml(item)}</span><button class="btn" type="button" data-remove-${kind}="${index}">Remove</button>`;
+      container.appendChild(row);
+    });
+  }
+
+  function renderProductLists() {
+    renderProductList(sellProductsList, "#f_sells", "sell");
+    renderProductList(buyProductsList, "#f_buys", "buy");
+  }
+
+  function addProductFromInputs(kind) {
+    const strainId = kind === "sell" ? "#sellStrain" : "#buyStrainInput";
+    const typeId = kind === "sell" ? "#sellType" : "#buyTypeInput";
+    const packId = kind === "sell" ? "#sellPack" : "#buyPackInput";
+    const fieldId = kind === "sell" ? "#f_sells" : "#f_buys";
+    const strain = norm($(strainId).value);
+    const type = norm($(typeId).value);
+    const pack = norm($(packId).value);
+    if (!strain || !type || !pack) {
+      toast("Enter strain name, type, and package size to create one product line item.");
+      return;
+    }
+    const items = getListFieldValue(fieldId);
+    items.push(`${strain} ${type} ${pack}`);
+    setListFieldValue(fieldId, items);
+    $(strainId).value = "";
+    $(typeId).value = "";
+    $(packId).value = "";
+    renderProductLists();
+    $(strainId).focus();
+  }
+
+  function removeProduct(kind, index) {
+    const fieldId = kind === "sell" ? "#f_sells" : "#f_buys";
+    const items = getListFieldValue(fieldId);
+    items.splice(index, 1);
+    setListFieldValue(fieldId, items);
+    renderProductLists();
   }
 
   function readForm() {
@@ -3005,8 +3862,8 @@ function isAdminAllowed() {
       status: $("#f_status").value,
       location: norm($("#f_location").value),
       categories: splitList($("#f_categories").value),
-      buys: splitList($("#f_buys").value),
-      sells: splitList($("#f_sells").value),
+      buys: getListFieldValue("#f_buys"),
+      sells: getListFieldValue("#f_sells"),
       contact: {
         name: norm($("#f_contactName").value),
         email: norm($("#f_contactEmail").value),
@@ -3015,51 +3872,83 @@ function isAdminAllowed() {
     };
   }
 
+  function getListingPrefillFromSession() {
+    const session = getSession();
+    if (!session) return null;
+    return {
+      name: session.display || "",
+      licenseId: session.license || "",
+      status: "active",
+      location: "",
+      categories: [],
+      buys: [],
+      sells: [],
+      contact: {
+        name: session.display || "",
+        email: session.email || "",
+      },
+      notes: "",
+    };
+  }
+
   function writeForm(b) {
-    $("#f_name").value = b?.name ?? "";
-    $("#f_license").value = b?.licenseId ?? "";
-    $("#f_status").value = b?.status ?? "active";
-    $("#f_location").value = b?.location ?? "";
-    $("#f_categories").value = (b?.categories ?? []).join(", ");
-    $("#f_buys").value = (b?.buys ?? []).join(", ");
-    $("#f_sells").value = (b?.sells ?? []).join(", ");
-    $("#f_contactName").value = b?.contact?.name ?? "";
-    $("#f_contactEmail").value = b?.contact?.email ?? "";
-    $("#f_notes").value = b?.notes ?? "";
+    const prefill = b || getListingPrefillFromSession();
+    $("#f_name").value = prefill?.name ?? "";
+    $("#f_license").value = prefill?.licenseId ?? "";
+    $("#f_status").value = prefill?.status ?? "active";
+    $("#f_location").value = prefill?.location ?? "";
+    $("#f_categories").value = (prefill?.categories ?? []).join(", ");
+    setListFieldValue("#f_buys", prefill?.buys ?? []);
+    setListFieldValue("#f_sells", prefill?.sells ?? []);
+    $("#f_contactName").value = prefill?.contact?.name ?? "";
+    $("#f_contactEmail").value = prefill?.contact?.email ?? "";
+    $("#f_notes").value = prefill?.notes ?? "";
+    renderProductLists();
   }
 
   function loadForm(id) {
     state.selectedId = id;
     const b = data.find((x) => x.id === id);
     writeForm(b);
-    modalTitle.textContent = b ? `Edit Listing • ${b.name}` : "Listing Editor";
+    modalTitle.textContent = b ? `Step 1 of 3 • ${b.name}` : "Step 1 of 3 • Business Information";
     updateAdminState();
   }
 
   function validateBiz(b) {
     const errs = [];
     if (!b.name) errs.push("Business name required");
-    if (!b.licenseId) errs.push("License ID required");
+    if (!b.licenseId) errs.push("License number required");
     if (!b.location) errs.push("Location required");
     if (!b.contact.email) errs.push("Contact email required");
     return errs;
   }
 
+  function validateBusinessStep() {
+    const errs = validateBiz(readForm());
+    if (errs.length) {
+      toast(errs[0]);
+      return false;
+    }
+    return true;
+  }
+
   async function saveCurrent() {
     if (!ensureAdminUnlocked()) return;
+    const done = setButtonBusy(saveBtn, "Saving...");
 
     const id = state.selectedId;
-    if (!id) return toast("No business selected");
+    if (!id) { done(); return toast("No business selected"); }
 
     const idx = data.findIndex((x) => x.id === id);
-    if (idx === -1) return toast("Not found");
+    if (idx === -1) { done(); return toast("Not found"); }
 
     const patch = readForm();
     const errs = validateBiz(patch);
-    if (errs.length) return toast(errs[0]);
+    if (errs.length) { done(); return toast(errs[0]); }
 
     const ownerId = await getCurrentUserId();
     if (!ownerId) {
+      done();
       toast("Please sign in to save listings.");
       return;
     }
@@ -3077,35 +3966,47 @@ function isAdminAllowed() {
       if (updatedIdx === -1) data.unshift(saved);
       else data[updatedIdx] = saved;
 
-      toast("Saved");
-      modalTitle.textContent = `Edit Listing • ${saved.name}`;
+      toast("Listing saved — your business is now in the marketplace.");
+      modalTitle.textContent = `Step 1 of 3 • ${saved.name}`;
+      queueListingHighlight(saved.id);
       render();
       updateAdminState();
+      done();
+      closeAdmin();
     } catch (e) {
+      done();
       console.error(e);
+      toast("Unable to save listing right now.");
     }
   }
 
   async function createNew() {
     if (!ensureAdminUnlocked()) return;
+    const done = setButtonBusy(adminBtn, "Opening...");
 
     const ownerId = await getCurrentUserId();
     if (!ownerId) {
+      done();
       toast("Please sign in to create listings.");
       return;
     }
 
+    const session = getSession() || {};
+    const businessName = norm(session.display || "");
+    const email = norm(session.email || "");
+    const license = norm(session.license || "") || "OCM-";
+
     const b = {
       id: makeId(),
       ownerId,
-      name: "",
-      licenseId: "OCM-",
+      name: businessName,
+      licenseId: license,
       status: "pending",
       location: "",
       categories: [],
       buys: [],
       sells: [],
-      contact: { name: "", email: "" },
+      contact: { name: businessName, email },
       notes: "",
       updatedAt: nowIso(),
     };
@@ -3113,21 +4014,29 @@ function isAdminAllowed() {
     try {
       const saved = await upsertListing(b);
       loadForm(saved.id);
+      queueListingHighlight(saved.id);
       render();
-      toast("Created");
+      done();
+      toast("Step 1 saved — next, add your business details.");
+      return saved;
     } catch (e) {
+      done();
       console.error(e);
+      toast("Unable to start a new listing right now.");
+      return null;
     }
   }
 
   async function deleteCurrent() {
     if (!ensureAdminUnlocked()) return;
+    const done = setButtonBusy(deleteBtn, "Deleting...");
 
     const id = state.selectedId;
     if (!id) return;
 
     const ownerId = await getCurrentUserId();
     if (!ownerId) {
+      done();
       toast("Please sign in to delete listings.");
       return;
     }
@@ -3135,7 +4044,7 @@ function isAdminAllowed() {
     const b = data.find((x) => x.id === id);
     if (!b) return;
 
-    if (!confirm(`Delete "${b.name}"?`)) return;
+    if (!confirm(`Delete "${b.name}"?`)) { done(); return; }
 
     await deleteListing(id, ownerId);
 
@@ -3147,61 +4056,9 @@ function isAdminAllowed() {
     else writeForm(null);
 
     render();
-    toast("Deleted");
-  }
-
-  function exportJson() {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "licensed-business-directory.json";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }
-
-  function resetLocal() {
-    if (!confirm("Reset local edits and restore the default seed dataset?")) return;
-    localStorage.removeItem(STORAGE_KEY);
-    data = structuredClone(seedData);
-    toast("Reset complete");
-    render();
-  }
-
-  function importJsonFile(file) {
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const parsed = JSON.parse(String(reader.result ?? "[]"));
-        if (!Array.isArray(parsed)) throw new Error("JSON must be an array");
-
-        const cleaned = parsed.map((x) => ({
-          id: norm(x.id) || makeId(),
-          name: norm(x.name),
-          licenseId: norm(x.licenseId),
-          status: norm(x.status) || "pending",
-          location: norm(x.location),
-          categories: Array.isArray(x.categories) ? x.categories.map(norm).filter(Boolean) : [],
-          buys: Array.isArray(x.buys) ? x.buys.map(norm).filter(Boolean) : [],
-          sells: Array.isArray(x.sells) ? x.sells.map(norm).filter(Boolean) : [],
-          contact: { name: norm(x.contact?.name), email: norm(x.contact?.email) },
-          notes: norm(x.notes),
-          updatedAt: norm(x.updatedAt) || nowIso(),
-        }));
-
-        data = cleaned;
-        saveData(data);
-        toast("Imported");
-        render();
-        if (data[0]?.id) loadForm(data[0].id);
-      } catch (e) {
-        console.error(e);
-        toast("Import failed");
-      }
-    };
-    reader.readAsText(file);
+    done();
+    closeAdmin();
+    toast("Listing deleted.");
   }
 
   function copyShareLink() {
@@ -3212,11 +4069,26 @@ function isAdminAllowed() {
     );
   }
 
+  function clearSearchAndFilters() {
+    state.q = "";
+    state.chip = "All";
+    state.tab = "all";
+    state.sort = "relevance";
+    const q = $("#q");
+    if (q) q.value = "";
+    const sort = $("#sort");
+    if (sort) sort.value = "relevance";
+    syncUrlFromState();
+    render();
+  }
+
   function render() {
     renderChips();
+    renderSearchSuggestions();
     const filtered = applyFilters(data);
     renderMeta(filtered);
     renderCards(filtered);
+    highlightPendingListing();
     safeInitAds();
     setActiveTabs();
   }
@@ -3235,44 +4107,64 @@ function isAdminAllowed() {
     syncUrlFromState();
     render();
   });
+  $("#q").addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      clearSearchAndFilters();
+    }
+  });
 
   $("#sort").addEventListener("change", (e) => {
     state.sort = e.target.value;
     syncUrlFromState();
     render();
   });
+  $("#clearSearchBtn")?.addEventListener("click", clearSearchAndFilters);
 
   adminBtn.addEventListener("click", async () => {
     const ownerId = await getCurrentUserId();
     if (!ownerId) {
-      toast("Please join the marketplace or sign in to add a listing.");
+      toast("Please join or sign in to add a listing.");
       openSignup("signup");
       return;
     }
-    openAdmin();
-    await createNew();
+    toast("Opening Add Listing.");
+    const saved = await createNew();
+    if (saved?.id) openAdmin(saved.id);
   });
   closeBtn.addEventListener("click", closeAdmin);
+  productsSellCloseBtn.addEventListener("click", closeAdmin);
+  productsBuyCloseBtn.addEventListener("click", closeAdmin);
   backdrop.addEventListener("click", (e) => {
     if (e.target === backdrop) closeAdmin();
   });
-
-  saveBtn.addEventListener("click", saveCurrent);
-  newBtn.addEventListener("click", createNew);
-  deleteBtn.addEventListener("click", deleteCurrent);
-
-  if (importBtn && importFile) importBtn.addEventListener("click", () => importFile.click());
-  if (importFile) importFile.addEventListener("change", () => {
-    const f = importFile.files?.[0];
-    if (f) importJsonFile(f);
-    importFile.value = "";
+  productsSellBackdrop.addEventListener("click", (e) => {
+    if (e.target === productsSellBackdrop) closeAdmin();
+  });
+  productsBuyBackdrop.addEventListener("click", (e) => {
+    if (e.target === productsBuyBackdrop) closeAdmin();
   });
 
-  const exportBtn = $("#exportBtn");
-  const resetBtn = $("#resetBtn");
-  if (exportBtn) exportBtn.addEventListener("click", exportJson);
-  if (resetBtn) resetBtn.addEventListener("click", resetLocal);
-  copyLinkBtn.addEventListener("click", copyShareLink);
+  step1NextBtn.addEventListener("click", () => {
+    if (!validateBusinessStep()) return;
+    openSellStep();
+  });
+  backToBusinessBtn.addEventListener("click", openBusinessStep);
+  step2NextBtn.addEventListener("click", () => openBuyStep());
+  backToSellBtn.addEventListener("click", openSellStep);
+  saveBtn.addEventListener("click", saveCurrent);
+  deleteBtn.addEventListener("click", deleteCurrent);
+  addSellProductBtn.addEventListener("click", () => addProductFromInputs("sell"));
+  addBuyProductBtn.addEventListener("click", () => addProductFromInputs("buy"));
+  sellProductsList.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-remove-sell]");
+    if (!btn) return;
+    removeProduct("sell", Number(btn.getAttribute("data-remove-sell")));
+  });
+  buyProductsList.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-remove-buy]");
+    if (!btn) return;
+    removeProduct("buy", Number(btn.getAttribute("data-remove-buy")));
+  });
 
   // Init
   (async function init() {
