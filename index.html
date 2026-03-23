@@ -354,6 +354,7 @@
       .match-cue {
         display:inline-flex;
         align-items:center;
+        gap:6px;
         padding:4px 8px;
         border-radius:999px;
         background:rgba(37,99,235,.08);
@@ -361,6 +362,21 @@
         font-size:11px;
         font-weight:600;
       }
+      .match-cue::before {
+        content:"✓";
+        color:#16a34a;
+        font-weight:800;
+      }
+      .decision-note {
+        margin-top:10px;
+        padding:8px 10px;
+        border-radius:12px;
+        background:rgba(22,163,74,.08);
+        color:var(--text);
+        font-size:12px;
+        font-weight:700;
+      }
+      .decision-note strong { color:#166534; }
       mark.match-hit {
         background:rgba(250,204,21,.35);
         color:inherit;
@@ -605,8 +621,14 @@
       }
 
       .card-footer .btn.wide {
-        flex: 1 1 170px;
+        flex: 0 1 auto;
         justify-content: center;
+        align-self: center;
+        width: auto;
+        min-width: 220px;
+        max-width: min(100%, 320px);
+        min-height: 52px;
+        padding: 14px 22px;
       }
 
       .mini-actions {
@@ -972,10 +994,12 @@
           align-items: stretch;
           gap: 10px;
         }
-        .card-footer .btn.wide,
         .card-footer .btn {
-          width: 100%;
           justify-content: center;
+        }
+        .card-footer .btn.wide {
+          width: min(100%, 320px);
+          margin-inline: auto;
         }
         .mini-actions {
           margin-left: 0;
@@ -1247,7 +1271,12 @@
 
     </style>
 
-    <script>
+  
+    <datalist id="productStrainSuggestions"></datalist>
+    <datalist id="productTypeSuggestions"></datalist>
+    <datalist id="productPackSuggestions"></datalist>
+
+  <script>
   // Load AdSense only on a real web origin, not when opening the file locally.
   if (/^https?:$/i.test(location.protocol)) {
     const s = document.createElement("script");
@@ -1510,15 +1539,15 @@
             <div class="product-builder">
               <div class="field">
                 <label for="sellStrain">Strain Name</label>
-                <input id="sellStrain" type="text" placeholder="Sour Diesel" />
+                <input id="sellStrain" type="text" placeholder="Sour Diesel" list="productStrainSuggestions" autocomplete="on" />
               </div>
               <div class="field">
                 <label for="sellType">Type</label>
-                <input id="sellType" type="text" placeholder="Prerolls" />
+                <input id="sellType" type="text" placeholder="Prerolls" list="productTypeSuggestions" autocomplete="on" />
               </div>
               <div class="field">
                 <label for="sellPack">Package Size</label>
-                <input id="sellPack" type="text" placeholder="5 pack" />
+                <input id="sellPack" type="text" placeholder="5 pack" list="productPackSuggestions" autocomplete="on" />
               </div>
               <div class="field action">
                 <button id="addSellProductBtn" class="btn primary" type="button">Add Product You Sell</button>
@@ -1562,15 +1591,15 @@
             <div class="product-builder">
               <div class="field">
                 <label for="buyStrainInput">Strain Name</label>
-                <input id="buyStrainInput" type="text" placeholder="Blue Dream" />
+                <input id="buyStrainInput" type="text" placeholder="Blue Dream" list="productStrainSuggestions" autocomplete="on" />
               </div>
               <div class="field">
                 <label for="buyTypeInput">Type</label>
-                <input id="buyTypeInput" type="text" placeholder="Flower" />
+                <input id="buyTypeInput" type="text" placeholder="Flower" list="productTypeSuggestions" autocomplete="on" />
               </div>
               <div class="field">
                 <label for="buyPackInput">Package Size</label>
-                <input id="buyPackInput" type="text" placeholder="1 oz" />
+                <input id="buyPackInput" type="text" placeholder="1 oz" list="productPackSuggestions" autocomplete="on" />
               </div>
               <div class="field action">
                 <button id="addBuyProductBtn" class="btn primary" type="button">Add Product You Buy</button>
@@ -1657,8 +1686,8 @@
     <div class="modal-footer">
       <div class="help" id="detailsState">Open a listing to see contact options.</div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button id="detailsContactBtn" class="btn primary" type="button">Contact Business</button>
-        <button id="detailsRequestBtn" class="btn" type="button">Send Buy Request</button>
+        <button id="detailsContactBtn" class="btn" type="button">Contact Business</button>
+        <button id="detailsRequestBtn" class="btn primary" type="button">Send Buy Request</button>
         <button id="detailsEditBtn" class="btn" type="button">Edit Listing</button>
       </div>
     </div>
@@ -2307,6 +2336,50 @@ async function sha256(text) {
       return normalizeBusinessName(user.display || "") === target;
     });
   }
+
+  function normalizeLicenseValue(value) {
+    return norm(value).toUpperCase().replace(/\s+/g, "");
+  }
+  function normalizeAddressValue(value) {
+    return norm(value)
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      .replace(/[^a-z0-9 ]/g, "")
+      .trim();
+  }
+  function findListingByLicense(licenseId, options = {}) {
+    const target = normalizeLicenseValue(licenseId);
+    if (!target) return null;
+    const excludeId = options.excludeId || null;
+    return data.find((item) => {
+      if (!item) return false;
+      if (excludeId && item.id === excludeId) return false;
+      return normalizeLicenseValue(item.licenseId) === target;
+    }) || null;
+  }
+  function findListingByAddress(location, options = {}) {
+    const target = normalizeAddressValue(location);
+    if (!target) return null;
+    const excludeId = options.excludeId || null;
+    const ownerId = options.ownerId || null;
+    return data.find((item) => {
+      if (!item) return false;
+      if (excludeId && item.id === excludeId) return false;
+      if (ownerId && item.ownerId !== ownerId) return false;
+      return normalizeAddressValue(item.location) === target;
+    }) || null;
+  }
+  function findBusinessOwnedBySomeoneElse(name, ownerId, options = {}) {
+    const target = normalizeBusinessName(name);
+    if (!target) return null;
+    const excludeId = options.excludeId || null;
+    return data.find((item) => {
+      if (!item) return false;
+      if (excludeId && item.id === excludeId) return false;
+      if (item.ownerId === ownerId) return false;
+      return normalizeBusinessName(item.name) === target;
+    }) || null;
+  }
   function nowIso() {
     return new Date().toISOString();
   }
@@ -2641,6 +2714,134 @@ async function sha256(text) {
     selectedId: null,
   };
 
+  const VIEW_PREFS_KEY = "licensed_exchange_view_prefs_v1";
+  const LISTING_DRAFT_KEY = "licensed_exchange_listing_draft_v1";
+  const PRODUCT_HISTORY_KEY = "licensed_exchange_product_history_v1";
+
+  function loadProductHistory() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(PRODUCT_HISTORY_KEY) || "null");
+      if (!parsed || typeof parsed !== "object") throw new Error("invalid");
+      return {
+        strain: Array.isArray(parsed.strain) ? parsed.strain.filter(Boolean) : [],
+        type: Array.isArray(parsed.type) ? parsed.type.filter(Boolean) : [],
+        pack: Array.isArray(parsed.pack) ? parsed.pack.filter(Boolean) : [],
+      };
+    } catch {
+      return { strain: [], type: [], pack: [] };
+    }
+  }
+
+  function saveProductHistory(history) {
+    try {
+      localStorage.setItem(PRODUCT_HISTORY_KEY, JSON.stringify(history));
+    } catch {}
+  }
+
+  function pushHistoryValue(list, value) {
+    const cleaned = norm(value);
+    if (!cleaned) return list || [];
+    const current = Array.isArray(list) ? list.filter(Boolean) : [];
+    const withoutDup = current.filter((item) => norm(item).toLowerCase() !== cleaned.toLowerCase());
+    return [cleaned, ...withoutDup].slice(0, 12);
+  }
+
+  function renderProductSuggestionLists() {
+    const history = loadProductHistory();
+    const map = [
+      ["#productStrainSuggestions", history.strain],
+      ["#productTypeSuggestions", history.type],
+      ["#productPackSuggestions", history.pack],
+    ];
+    map.forEach(([id, values]) => {
+      const el = $(id);
+      if (!el) return;
+      el.innerHTML = (values || []).map((value) => `<option value="${escapeHtml(value)}"></option>`).join("");
+    });
+  }
+
+  function rememberProductBuilderValues(strain, type, pack) {
+    const history = loadProductHistory();
+    history.strain = pushHistoryValue(history.strain, strain);
+    history.type = pushHistoryValue(history.type, type);
+    history.pack = pushHistoryValue(history.pack, pack);
+    saveProductHistory(history);
+    renderProductSuggestionLists();
+  }
+
+  function loadViewPrefs() {
+    try {
+      return JSON.parse(localStorage.getItem(VIEW_PREFS_KEY) || "null") || {};
+    } catch {
+      return {};
+    }
+  }
+
+  function saveViewPrefs() {
+    try {
+      localStorage.setItem(
+        VIEW_PREFS_KEY,
+        JSON.stringify({
+          tab: state.tab || "all",
+          q: state.q || "",
+          chip: state.chip || "All",
+          sort: state.sort || "relevance",
+        })
+      );
+    } catch {}
+  }
+
+  function loadListingDraft() {
+    try {
+      return JSON.parse(localStorage.getItem(LISTING_DRAFT_KEY) || "null");
+    } catch {
+      return null;
+    }
+  }
+
+  function clearListingDraft() {
+    try {
+      localStorage.removeItem(LISTING_DRAFT_KEY);
+    } catch {}
+  }
+
+  function saveListingDraft(step = null) {
+    const nameEl = $("#f_name");
+    if (!nameEl) return;
+    try {
+      const current = loadListingDraft() || {};
+      localStorage.setItem(
+        LISTING_DRAFT_KEY,
+        JSON.stringify({
+          ...current,
+          ...(step ? { step } : {}),
+          name: norm($("#f_name")?.value),
+          licenseId: norm($("#f_license")?.value),
+          status: $("#f_status")?.value || "active",
+          location: norm($("#f_location")?.value),
+          categories: splitList($("#f_categories")?.value || ""),
+          buys: getListFieldValue("#f_buys"),
+          sells: getListFieldValue("#f_sells"),
+          contact: {
+            name: norm($("#f_contactName")?.value),
+            email: norm($("#f_contactEmail")?.value),
+          },
+          notes: norm($("#f_notes")?.value),
+          sellDraft: {
+            strain: norm($("#sellStrain")?.value),
+            type: norm($("#sellType")?.value),
+            pack: norm($("#sellPack")?.value),
+          },
+          buyDraft: {
+            strain: norm($("#buyStrainInput")?.value),
+            type: norm($("#buyTypeInput")?.value),
+            pack: norm($("#buyPackInput")?.value),
+          },
+        })
+      );
+    } catch {}
+  }
+
   function allCategories(list) {
     return uniq(list.flatMap((b) => (Array.isArray(b.categories) ? b.categories : []))).sort((a, b) =>
       a.localeCompare(b)
@@ -2794,7 +2995,7 @@ async function sha256(text) {
         { label: b.name, meta: "Business" },
         { label: b.location, meta: "Location" },
         ...((b.sells ?? []).map((value) => ({ label: value, meta: "On Sale" }))),
-        ...((b.buys ?? []).map((value) => ({ label: value, meta: "I'm Buying" }))),
+        ...((b.buys ?? []).map((value) => ({ label: value, meta: "Looking For" }))),
       ];
 
       for (const field of candidateFields) {
@@ -2898,6 +3099,25 @@ async function sha256(text) {
     return out;
   }
 
+  function getPrimaryProductMatch(b) {
+    const aliases = activeSearchTerms();
+    if (!aliases.length) return null;
+
+    for (const value of (b.sells ?? [])) {
+      const norm = normalizeSearchText(value);
+      if (aliases.some((alias) => norm.includes(normalizeSearchText(alias)))) {
+        return { label: value, kind: "On Sale" };
+      }
+    }
+    for (const value of (b.buys ?? [])) {
+      const norm = normalizeSearchText(value);
+      if (aliases.some((alias) => norm.includes(normalizeSearchText(alias)))) {
+        return { label: value, kind: "Looking For" };
+      }
+    }
+    return null;
+  }
+
   function getMatchInfo(b) {
     const cues = [];
     const q = state.q.trim();
@@ -2913,7 +3133,7 @@ async function sha256(text) {
       if (aliases.some((alias) => alias && name.includes(alias))) cues.push(`Business name match`);
       if (aliases.some((alias) => alias && location.includes(alias))) cues.push(`Location match`);
       if (aliases.some((alias) => alias && sells.some((item) => item.includes(alias)))) cues.push(`Selling what you searched for`);
-      if (aliases.some((alias) => alias && buys.some((item) => item.includes(alias)))) cues.push(`Also buying your search`);
+      if (aliases.some((alias) => alias && buys.some((item) => item.includes(alias)))) cues.push(`Looking for what you searched`);
       if (aliases.some((alias) => alias && categories.some((item) => item.includes(alias)))) cues.push(`Category match`);
     }
 
@@ -2930,6 +3150,7 @@ async function sha256(text) {
       cues: unique,
       topMatch: hasContext && score >= 40,
       hasContext,
+      primaryProductMatch: hasContext ? getPrimaryProductMatch(b) : null,
     };
   }
 
@@ -3092,6 +3313,9 @@ async function sha256(text) {
       const cueHtml = matchInfo.cues.length
         ? `<div class="match-cues">${matchInfo.cues.map((cue) => `<span class="match-cue">${escapeHtml(cue)}</span>`).join("")}</div>`
         : "";
+      const decisionNote = matchInfo.primaryProductMatch
+        ? `<div class="decision-note"><strong>${escapeHtml(matchInfo.primaryProductMatch.kind)} match:</strong> ${highlightMatchText(matchInfo.primaryProductMatch.label)}</div>`
+        : "";
 
       el.innerHTML = `
         <div class="card-top">
@@ -3112,11 +3336,12 @@ async function sha256(text) {
         </div>
 
         <div class="card-line compact">
-          <div class="card-line-label">I'm Buying</div>
+          <div class="card-line-label">Looking For</div>
           <div class="card-line-value ${buys.length ? "" : "muted"}">${highlightMatchText(buysPreview)}</div>
         </div>
 
         ${cueHtml}
+        ${decisionNote}
 
         <div class="card-footer">
           <button class="btn primary wide" data-act="buy" data-id="${escapeHtml(b.id)}" type="button">Send Buy Request</button>
@@ -3307,8 +3532,13 @@ async function sha256(text) {
       : "";
 
     detailsTitle.textContent = b.name;
+    const decisionNote = matchInfo.primaryProductMatch
+      ? `<div class="decision-note"><strong>Best product match:</strong> ${highlightMatchText(matchInfo.primaryProductMatch.label)}</div>`
+      : "";
+
     detailsContent.innerHTML = `
       ${matchBox}
+      ${decisionNote}
       <div class="details-grid">
         <div class="details-block">
           <div class="small">
@@ -3319,21 +3549,21 @@ async function sha256(text) {
           <p style="margin:10px 0 0; color: var(--muted);">${escapeHtml(b.notes || "Open this listing to review products, contact details, and next steps.")}</p>
         </div>
         <div class="details-block">
-          <h5>Categories</h5>
-          <div class="details-list">${cats}</div>
-        </div>
-        <div class="details-block">
-          <h5>Looking to buy</h5>
-          <div class="details-list">${buys}</div>
-        </div>
-        <div class="details-block">
-          <h5>Currently selling</h5>
+          <h5>On Sale</h5>
           <div class="details-list">${sells}</div>
+        </div>
+        <div class="details-block">
+          <h5>Looking For</h5>
+          <div class="details-list">${buys}</div>
         </div>
         <div class="details-block">
           <h5>Contact</h5>
           <div><strong>${escapeHtml(b.contact?.name || "Contact")}</strong></div>
           <div style="margin-top:6px; color: var(--muted);">${escapeHtml(b.contact?.email || "No email listed")}</div>
+        </div>
+        <div class="details-block">
+          <h5>Categories</h5>
+          <div class="details-list">${cats}</div>
         </div>
       </div>
     `;
@@ -3409,10 +3639,11 @@ async function sha256(text) {
 
   function syncStateFromUrl() {
     const u = new URL(location.href);
-    state.tab = u.searchParams.get("tab") || "all";
-    state.q = u.searchParams.get("q") || "";
-    state.chip = u.searchParams.get("cat") || "All";
-    state.sort = u.searchParams.get("sort") || "relevance";
+    const saved = loadViewPrefs();
+    state.tab = u.searchParams.get("tab") || saved.tab || "all";
+    state.q = u.searchParams.get("q") || saved.q || "";
+    state.chip = u.searchParams.get("cat") || saved.chip || "All";
+    state.sort = u.searchParams.get("sort") || saved.sort || "relevance";
     $("#q").value = state.q;
     $("#sort").value = state.sort;
   }
@@ -3431,6 +3662,7 @@ async function sha256(text) {
     else u.searchParams.delete("sort");
 
     history.replaceState({}, "", u.toString());
+    saveViewPrefs();
   }
 
   // Admin modal
@@ -3866,18 +4098,21 @@ function isAdminAllowed() {
     backdrop.classList.add("open");
     productsSellBackdrop.classList.remove("open");
     productsBuyBackdrop.classList.remove("open");
+    saveListingDraft("business");
   }
 
   function openSellStep() {
     backdrop.classList.remove("open");
     productsSellBackdrop.classList.add("open");
     productsBuyBackdrop.classList.remove("open");
+    saveListingDraft("sell");
   }
 
   function openBuyStep() {
     backdrop.classList.remove("open");
     productsSellBackdrop.classList.remove("open");
     productsBuyBackdrop.classList.add("open");
+    saveListingDraft("buy");
   }
 
   function openAdmin(preferredId = null) {
@@ -3891,15 +4126,20 @@ function isAdminAllowed() {
         ? preferredId
         : state.selectedId && data.some((x) => x.id === state.selectedId)
         ? state.selectedId
-        : data[0]?.id ?? null;
+        : null;
 
     openBusinessStep();
 
-    if (targetId) loadForm(targetId);
-    else {
-      writeForm(null);
+    if (targetId) {
+      loadForm(targetId);
+    } else {
+      const draft = loadListingDraft();
+      writeForm(draft || getListingPrefillFromSession() || null);
       modalTitle.textContent = "Step 1 of 3 • Business Information";
       updateAdminState();
+      if (draft?.step === "sell") openSellStep();
+      else if (draft?.step === "buy") openBuyStep();
+      else openBusinessStep();
     }
   }
 
@@ -3911,7 +4151,12 @@ function isAdminAllowed() {
 
   function updateAdminState() {
     const sel = data.find((x) => x.id === state.selectedId);
-    adminState.textContent = sel ? `Editing listing: ${sel.name}` : "Complete this step, then continue.";
+    const currentName = norm($("#f_name")?.value);
+    adminState.textContent = sel
+      ? `Editing location: ${sel.name}${sel.location ? ` • ${sel.location}` : ""}`
+      : currentName
+      ? `Adding another location for ${currentName}`
+      : "Complete this step, then continue.";
   }
 
   function getListFieldValue(id) {
@@ -3969,10 +4214,12 @@ function isAdminAllowed() {
     const items = getListFieldValue(fieldId);
     items.push(`${strain} ${type} ${pack}`);
     setListFieldValue(fieldId, items);
-    $(strainId).value = "";
-    $(typeId).value = "";
-    $(packId).value = "";
+    rememberProductBuilderValues(strain, type, pack);
+    $(strainId).value = strain;
+    $(typeId).value = type;
+    $(packId).value = pack;
     renderProductLists();
+    saveListingDraft(kind === "sell" ? "sell" : "buy");
     $(strainId).focus();
   }
 
@@ -3982,6 +4229,7 @@ function isAdminAllowed() {
     items.splice(index, 1);
     setListFieldValue(fieldId, items);
     renderProductLists();
+    saveListingDraft(kind === "sell" ? "sell" : "buy");
   }
 
   function readForm() {
@@ -4020,6 +4268,15 @@ function isAdminAllowed() {
     };
   }
 
+  function restoreProductBuilderDrafts(prefill) {
+    $("#sellStrain").value = prefill?.sellDraft?.strain ?? "";
+    $("#sellType").value = prefill?.sellDraft?.type ?? "";
+    $("#sellPack").value = prefill?.sellDraft?.pack ?? "";
+    $("#buyStrainInput").value = prefill?.buyDraft?.strain ?? "";
+    $("#buyTypeInput").value = prefill?.buyDraft?.type ?? "";
+    $("#buyPackInput").value = prefill?.buyDraft?.pack ?? "";
+  }
+
   function writeForm(b) {
     const prefill = b || getListingPrefillFromSession();
     $("#f_name").value = prefill?.name ?? "";
@@ -4032,7 +4289,9 @@ function isAdminAllowed() {
     $("#f_contactName").value = prefill?.contact?.name ?? "";
     $("#f_contactEmail").value = prefill?.contact?.email ?? "";
     $("#f_notes").value = prefill?.notes ?? "";
+    restoreProductBuilderDrafts(prefill);
     renderProductLists();
+    renderProductSuggestionLists();
   }
 
   function loadForm(id) {
@@ -4065,21 +4324,12 @@ function isAdminAllowed() {
     if (!ensureAdminUnlocked()) return;
     const done = setButtonBusy(saveBtn, "Saving...");
 
-    const id = state.selectedId;
-    if (!id) { done(); return toast("No business selected"); }
-
+    const id = state.selectedId || makeId();
     const idx = data.findIndex((x) => x.id === id);
-    if (idx === -1) { done(); return toast("Not found"); }
 
     const patch = readForm();
     const errs = validateBiz(patch);
     if (errs.length) { done(); return toast(errs[0]); }
-
-    const duplicate = findBusinessByName(patch.name, { excludeId: id });
-    if (duplicate) {
-      done();
-      return toast("That business name is already in use. Please use your official business name or contact support.");
-    }
 
     const ownerId = await getCurrentUserId();
     if (!ownerId) {
@@ -4088,9 +4338,29 @@ function isAdminAllowed() {
       return;
     }
 
+    const duplicateBusiness = findBusinessOwnedBySomeoneElse(patch.name, ownerId, { excludeId: id });
+    if (duplicateBusiness) {
+      done();
+      return toast("That business name already belongs to another account.");
+    }
+
+    const duplicateLicense = findListingByLicense(patch.licenseId, { excludeId: id });
+    if (duplicateLicense) {
+      done();
+      return toast("That license number is already in use for another location.");
+    }
+
+    const duplicateAddress = findListingByAddress(patch.location, { excludeId: id, ownerId });
+    if (duplicateAddress) {
+      done();
+      return toast("That address is already in use for another location.");
+    }
+
+    const baseRecord = idx === -1 ? { id, ownerId, contact: {}, createdAt: nowIso() } : data[idx];
     const updated = {
-      ...data[idx],
+      ...baseRecord,
       ...patch,
+      id,
       ownerId,
       updatedAt: nowIso(),
     };
@@ -4101,9 +4371,11 @@ function isAdminAllowed() {
       if (updatedIdx === -1) data.unshift(saved);
       else data[updatedIdx] = saved;
 
-      toast("Listing saved — next step: review your card or search for matches.");
+      state.selectedId = saved.id;
+      toast("Location saved — next step: review your card or search for matches.");
       modalTitle.textContent = `Step 1 of 3 • ${saved.name}`;
       queueListingHighlight(saved.id);
+      clearListingDraft();
       render();
       updateAdminState();
       done();
@@ -4131,46 +4403,41 @@ function isAdminAllowed() {
     const email = norm(session.email || "");
     const license = norm(session.license || "") || "OCM-";
 
-    if (businessName) {
-      const existing = findBusinessByName(businessName);
-      if (existing) {
-        loadForm(existing.id);
-        openAdmin(existing.id);
-        done();
-        toast("That business already has a listing. We opened it for editing instead.");
-        return existing;
-      }
+    const ownedByAnother = businessName ? findBusinessOwnedBySomeoneElse(businessName, ownerId) : null;
+    if (ownedByAnother) {
+      done();
+      toast("That business name already belongs to another account.");
+      return null;
     }
 
+    const draft = loadListingDraft() || {};
     const b = {
       id: makeId(),
       ownerId,
-      name: businessName,
-      licenseId: license,
-      status: "pending",
-      location: "",
-      categories: [],
-      buys: [],
-      sells: [],
-      contact: { name: businessName, email },
-      notes: "",
+      name: draft.name || businessName,
+      licenseId: draft.licenseId || license,
+      status: draft.status || "pending",
+      location: draft.location || "",
+      categories: Array.isArray(draft.categories) ? draft.categories : [],
+      buys: Array.isArray(draft.buys) ? draft.buys : [],
+      sells: Array.isArray(draft.sells) ? draft.sells : [],
+      contact: {
+        name: draft.contact?.name || businessName,
+        email: draft.contact?.email || email,
+      },
+      notes: draft.notes || "",
       updatedAt: nowIso(),
     };
 
-    try {
-      const saved = await upsertListing(b);
-      loadForm(saved.id);
-      queueListingHighlight(saved.id);
-      render();
-      done();
-      toast("Step 1 saved — next, add your business details.");
-      return saved;
-    } catch (e) {
-      done();
-      console.error(e);
-      toast("Unable to start a new listing right now.");
-      return null;
-    }
+    state.selectedId = b.id;
+    writeForm(b);
+    modalTitle.textContent = `Step 1 of 3 • ${businessName || "Business Information"}`;
+    updateAdminState();
+    openBusinessStep();
+    saveListingDraft("business");
+    done();
+    toast("Add another location — step 1 of 3 is ready.");
+    return b;
   }
 
   async function deleteCurrent() {
@@ -4178,7 +4445,7 @@ function isAdminAllowed() {
     const done = setButtonBusy(deleteBtn, "Deleting...");
 
     const id = state.selectedId;
-    if (!id) return;
+    if (!id) { done(); return; }
 
     const ownerId = await getCurrentUserId();
     if (!ownerId) {
@@ -4188,7 +4455,14 @@ function isAdminAllowed() {
     }
 
     const b = data.find((x) => x.id === id);
-    if (!b) return;
+    if (!b) {
+      state.selectedId = null;
+      clearListingDraft();
+      done();
+      closeAdmin();
+      toast("Unsaved location discarded.");
+      return;
+    }
 
     if (!confirm(`Delete "${b.name}"?`)) { done(); return; }
 
@@ -4201,6 +4475,7 @@ function isAdminAllowed() {
     if (next) loadForm(next);
     else writeForm(null);
 
+    clearListingDraft();
     render();
     done();
     closeAdmin();
@@ -4266,6 +4541,32 @@ function isAdminAllowed() {
   });
   $("#clearSearchBtn")?.addEventListener("click", clearSearchAndFilters);
 
+  const draftFieldIds = [
+    "#f_name",
+    "#f_license",
+    "#f_status",
+    "#f_location",
+    "#f_categories",
+    "#f_contactName",
+    "#f_contactEmail",
+    "#f_notes",
+    "#f_buys",
+    "#f_sells",
+    "#sellStrain",
+    "#sellType",
+    "#sellPack",
+    "#buyStrainInput",
+    "#buyTypeInput",
+    "#buyPackInput",
+  ];
+
+  draftFieldIds.forEach((selector) => {
+    const el = $(selector);
+    if (!el) return;
+    const evt = el.tagName === "SELECT" ? "change" : "input";
+    el.addEventListener(evt, () => saveListingDraft());
+  });
+
   adminBtn.addEventListener("click", async () => {
     const ownerId = await getCurrentUserId();
     if (!ownerId) {
@@ -4274,8 +4575,7 @@ function isAdminAllowed() {
       return;
     }
     toast("Opening Add Listing.");
-    const saved = await createNew();
-    if (saved?.id) openAdmin(saved.id);
+    await createNew();
   });
   closeBtn.addEventListener("click", closeAdmin);
   productsSellCloseBtn.addEventListener("click", closeAdmin);
