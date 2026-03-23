@@ -1379,8 +1379,26 @@
           <div id="welcomeBanner" class="welcome-banner" hidden aria-live="polite"></div>
         </div>
         <div class="hero">
+          <section id="homepageIntro" class="homepage-intro">
+            <h2>Get started in three simple steps.</h2>
+            <div class="intro-steps">
+              <div class="intro-step">
+                <span class="intro-step-num">1</span>
+                <div><strong>Step 1: Join</strong><span>Create your business account with your official business name, email, and license number.</span></div>
+              </div>
+              <div class="intro-step">
+                <span class="intro-step-num">2</span>
+                <div><strong>Step 2: Add your listing</strong><span>Add your business location and the products you sell and buy.</span></div>
+              </div>
+              <div class="intro-step">
+                <span class="intro-step-num">3</span>
+                <div><strong>Step 3: Start connecting</strong><span>After your first listing is live, browse matches and send buy requests.</span></div>
+              </div>
+            </div>
+          </section>
 
-          <!-- Header Leaderboard Ad -->
+          <div id="appShell" class="app-shell" hidden>
+            <!-- Header Leaderboard Ad -->
 <!-- TopPage_Main -->
 <ins class="adsbygoogle"
      style="display:block"
@@ -1441,6 +1459,7 @@
               <span id="hint" style="margin-left: 8px;"></span>
             </div>
             <button id="clearSearchBtn" class="btn" type="button">Clear Search</button>
+          </div>
           </div>
         </div>
       </div>
@@ -3750,7 +3769,6 @@ const welcomeBanner = $("#welcomeBanner");
 const homepageIntro = $("#homepageIntro");
 const appShell = $("#appShell");
 const appMainWrap = $("#appMainWrap");
-const browseListingsBtn = $("#browseListingsBtn");
 const messagesBtn = $("#messagesBtn");
 const detailsBackdrop = $("#detailsBackdrop");
 const detailsCloseBtn = $("#detailsCloseBtn");
@@ -3863,6 +3881,11 @@ async function getAuthSession() {
   return data?.session || null;
 }
 
+function userHasLiveListing() {
+  if (!currentUserId) return false;
+  return data.some((item) => item.ownerId === currentUserId);
+}
+
 function setLandingState(showApp) {
   if (homepageIntro) homepageIntro.hidden = !!showApp;
   if (appShell) appShell.hidden = !showApp;
@@ -3886,7 +3909,7 @@ async function updateSignupState() {
     welcomeBanner.hidden = !isLoggedIn;
     welcomeBanner.textContent = isLoggedIn ? `Welcome back, ${displayName}` : "";
   }
-  setLandingState(isLoggedIn);
+  setLandingState(isLoggedIn && userHasLiveListing());
 
   // track active user for messaging presence
   currentUserEmail = session?.user?.email ?? session?.email ?? null;
@@ -3918,7 +3941,7 @@ async function signIn() {
     });
 
     if (error) { done(); return toast(error.message); }
-    toast("Signed in — next step: search listings or tap Add Listing.");
+    toast("Signed in — next step: add your first listing.");
     await updateSignupState();
     done();
     done();
@@ -3942,7 +3965,7 @@ async function signIn() {
   if (passwordHash !== user.passwordHash) { done(); return toast("Incorrect password"); }
 
   setSession({ email: user.email, display: user.display, license: user.license || "" });
-  toast("Signed in — next step: search listings or tap Add Listing.");
+  toast("Signed in — next step: add your first listing.");
   await updateSignupState();
   done();
   done();
@@ -4033,7 +4056,6 @@ async function logout() {
 // events
 signupBtn.addEventListener("click", () => { openSignup("signup"); toast("Join form opened."); });
 if (signInBtn) signInBtn.addEventListener("click", () => { openSignup("signin"); toast("Sign in form opened."); });
-if (browseListingsBtn) browseListingsBtn.addEventListener("click", () => { setLandingState(true); toast("Browsing listings."); });
 signupCloseBtn.addEventListener("click", closeSignup);
 signupBackdrop.addEventListener("click", (e) => {
   if (e.target === signupBackdrop) closeSignup();
@@ -4441,6 +4463,7 @@ function isAdminAllowed() {
       modalTitle.textContent = `Step 1 of 3 • ${saved.name}`;
       queueListingHighlight(saved.id);
       clearListingDraft();
+      setLandingState(true);
       render();
       updateAdminState();
       done();
