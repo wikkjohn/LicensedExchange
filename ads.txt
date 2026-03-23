@@ -1,0 +1,10 @@
+# ads.txt for LicensedExchange
+# This file authorizes ad sellers to serve ads on your domain.
+# Replace pub-0000000000000000 with YOUR real AdSense publisher ID (pub-XXXXXXXXXXXXXXXX).
+# Find it in AdSense: Sites (or Account > Settings > Account information), then look for your Publisher ID.
+
+google.com, pub-7794813397476471, DIRECT, f08c47fec0942fa0
+
+# OPTIONAL: If you add other authorized sellers later, list them below (one per line).
+# Format:
+# domain, seller_account_id, DIRECT|RESELLER, certification_authority_id
