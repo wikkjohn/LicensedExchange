@@ -669,6 +669,155 @@
       font-size: .74rem; font-weight: 700;
     }
 
+
+    /* ── Guided Dashboard Onboarding ── */
+    .dashboard-welcome {
+      background: linear-gradient(135deg, #f3fbf6 0%, #ffffff 100%);
+      border: 1px solid #d9ebe0;
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 16px;
+    }
+    .dashboard-welcome-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .dashboard-welcome h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .dashboard-welcome p {
+      font-size: .86rem;
+      color: var(--muted);
+    }
+    .progress-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: var(--green);
+      color: var(--white);
+      font-size: .8rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #e8f0eb;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green) 0%, var(--green-light) 100%);
+      border-radius: 999px;
+      transition: width .25s ease;
+    }
+    .onboarding-card {
+      background: var(--white);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .onboarding-card h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .onboarding-card p {
+      font-size: .84rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .onboarding-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .onboarding-step {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-top: 1px solid var(--border);
+    }
+    .onboarding-step:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+    .onboarding-step:last-child {
+      padding-bottom: 0;
+    }
+    .onboarding-step-main {
+      display: flex;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+    .onboarding-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #eef7f1;
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .9rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .onboarding-step.done .onboarding-icon {
+      background: var(--green);
+      color: var(--white);
+    }
+    .onboarding-step-title {
+      font-size: .9rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .onboarding-step-meta {
+      font-size: .8rem;
+      color: var(--muted);
+    }
+    .onboarding-status {
+      font-size: .76rem;
+      font-weight: 800;
+      border-radius: 999px;
+      padding: 6px 10px;
+      white-space: nowrap;
+      align-self: center;
+    }
+    .onboarding-status.done {
+      background: #ecfdf5;
+      color: var(--green);
+    }
+    .onboarding-status.todo {
+      background: #fff7ed;
+      color: #c2410c;
+    }
+    .dashboard-quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .dashboard-quick-actions .btn {
+      width: 100%;
+    }
+
     /* ── Auth Tabs ── */
     .auth-tabs {
       display: flex; margin-bottom: 20px;
@@ -809,7 +958,7 @@
     <div class="search-bar">
       <input
         type="search"
-        placeholder="🔍  Search businesses or strains…"
+        placeholder="🔍  Search by business name, location, product, or license type"
         id="searchInput"
         oninput="filterCards()"
       />
@@ -830,7 +979,6 @@
   <section>
     <div class="section-header">
       <h2>Featured Businesses</h2>
-      <a href="#" class="see-all">See all</a>
     </div>
     <div class="listings-grid" id="listingsGrid"></div>
   </section>
@@ -1004,6 +1152,30 @@
       </div>
     </div>
     <div id="dashUser" class="hidden">
+      <div class="dashboard-welcome" id="dashboardWelcomeCard">
+        <div class="dashboard-welcome-top">
+          <div>
+            <h3 id="dashboardWelcomeTitle">Welcome to your dashboard</h3>
+            <p id="dashboardWelcomeText">Complete the next few steps to turn your account into a live trading profile.</p>
+          </div>
+          <div class="progress-pill" id="dashboardProgressPill">0% complete</div>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="dashboardProgressFill" style="width:0%;"></div>
+        </div>
+        <div class="dashboard-quick-actions">
+          <button class="btn btn-primary" onclick="openModal('listingModal')">Add Listing</button>
+          <button class="btn btn-ghost" onclick="goToBrowseAndFocusSearch()">Browse Matches</button>
+        </div>
+      </div>
+
+      <div class="onboarding-card" id="dashboardOnboardingCard">
+        <h3>Next steps</h3>
+        <p id="dashboardOnboardingIntro">Start with these simple actions so your dashboard feels complete and useful right away.</p>
+        <div class="onboarding-list" id="dashboardOnboardingSteps"></div>
+        <button class="btn btn-secondary btn-full" id="dashboardPrimaryNextStepBtn" onclick="handlePrimaryNextStep()">Complete next step</button>
+      </div>
+
       <div class="dashboard-stats">
         <button class="dash-stat" type="button" onclick="scrollToDashboardSection('dashboard-active-listings')"><div class="num" id="dashActiveListingsCount">0</div><div class="lbl">Active Listings</div></button>
         <button class="dash-stat" type="button" onclick="scrollToDashboardSection('dashboard-messages')"><div class="num" id="dashMessagesCount">0</div><div class="lbl">Messages</div></button>
@@ -1761,6 +1933,66 @@ function getPrimaryBusiness() {
   return getUserListings()[0] || null;
 }
 
+function getSecondaryListings() {
+  return getUserListings().slice(1);
+}
+
+function listingHasRealDetails(biz) {
+  if (!biz) return false;
+  const placeholderTokens = ['coming soon', 'product details', 'matchmaking'];
+  const products = [...(biz.sells || []), ...(biz.buys || [])].join(' ').toLowerCase();
+  return products && !placeholderTokens.some(token => products.includes(token));
+}
+
+function hasCompleteBusinessProfile() {
+  const profile = currentUser.profile;
+  return !!(profile && profile.businessName && profile.email && profile.city && profile.state);
+}
+
+function getOnboardingSteps() {
+  return [
+    {
+      key: 'profile',
+      done: hasCompleteBusinessProfile(),
+      icon: '1',
+      title: 'Complete your business profile',
+      meta: 'Make sure your business name, email, city, and license type are ready.',
+      actionLabel: 'Edit profile',
+      action: () => {
+        const primary = getPrimaryBusiness();
+        if (primary) openBusinessEditModal(primary.id);
+      }
+    },
+    {
+      key: 'listing',
+      done: getSecondaryListings().length > 0,
+      icon: '2',
+      title: 'Post your first active listing',
+      meta: 'Add a real buying or selling listing so partners can contact you.',
+      actionLabel: 'Add listing',
+      action: () => openModal('listingModal')
+    },
+    {
+      key: 'message',
+      done: currentUser.messages.length > 0,
+      icon: '3',
+      title: 'Start a conversation',
+      meta: 'Message a business so your dashboard becomes active and useful.',
+      actionLabel: 'Browse businesses',
+      action: () => goToBrowseAndFocusSearch()
+    },
+    {
+      key: 'save',
+      done: currentUser.savedPartnerIds.length > 0,
+      icon: '4',
+      title: 'Save a partner',
+      meta: 'Save a promising business so you can come back to it faster.',
+      actionLabel: 'Find partners',
+      action: () => goToBrowseAndFocusSearch()
+    }
+  ];
+}
+
 function buildProfileFromInputs() {
   const businessName = document.getElementById('signupBusinessName').value.trim() || 'Your Business';
   const email = document.getElementById('signupEmail').value.trim() || 'you@business.com';
@@ -1906,12 +2138,23 @@ function getFilteredData() {
     data = data.filter(b => b.type === currentFilter);
   }
   if (q) {
-    data = data.filter(b =>
-      b.name.toLowerCase().includes(q) ||
-      b.location.toLowerCase().includes(q) ||
-      b.sells.some(p => p.toLowerCase().includes(q)) ||
-      b.buys.some(p => p.toLowerCase().includes(q))
-    );
+    data = data.filter(b => {
+      const searchableText = [
+        b.name,
+        b.location,
+        b.type,
+        ...(b.sells || []),
+        ...(b.buys || []),
+        ...(b.tags || []),
+        b.featuredOffer || '',
+        b.wantLabel || '',
+        b.description || ''
+      ]
+        .join(' ')
+        .toLowerCase();
+
+      return searchableText.includes(q);
+    });
   }
   return data;
 }
@@ -1925,6 +2168,70 @@ function setFilter(f, el) {
 
 function filterCards() {
   renderCards(getFilteredData());
+}
+
+function goToBrowseAndFocusSearch() {
+  switchView('browse');
+  setTimeout(() => {
+    const anchor = document.getElementById('listingsAnchor');
+    const input = document.getElementById('searchInput');
+    if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (input) input.focus();
+  }, 60);
+}
+
+function handlePrimaryNextStep() {
+  const nextStep = getOnboardingSteps().find(step => !step.done);
+  if (nextStep && typeof nextStep.action === 'function') {
+    nextStep.action();
+    return;
+  }
+  scrollToDashboardSection('dashboard-rating');
+}
+
+function renderDashboardGuidance() {
+  const title = document.getElementById('dashboardWelcomeTitle');
+  const text = document.getElementById('dashboardWelcomeText');
+  const pill = document.getElementById('dashboardProgressPill');
+  const fill = document.getElementById('dashboardProgressFill');
+  const intro = document.getElementById('dashboardOnboardingIntro');
+  const stepsContainer = document.getElementById('dashboardOnboardingSteps');
+  const nextBtn = document.getElementById('dashboardPrimaryNextStepBtn');
+  if (!title || !text || !pill || !fill || !intro || !stepsContainer || !nextBtn) return;
+
+  const firstName = ((currentUser.profile?.contactName || currentUser.profile?.businessName || 'there').split(' ')[0]) || 'there';
+  const steps = getOnboardingSteps();
+  const doneCount = steps.filter(step => step.done).length;
+  const percent = Math.round((doneCount / steps.length) * 100);
+  const nextStep = steps.find(step => !step.done);
+
+  title.textContent = percent === 100
+    ? `${firstName}, your dashboard is fully set up`
+    : `${firstName}, here’s your next best step`;
+  text.textContent = percent === 100
+    ? 'Nice work. Your profile, listing flow, and partner activity are all in place.'
+    : 'Complete these steps in order to make your account easier to discover and easier to use.';
+  pill.textContent = `${percent}% complete`;
+  fill.style.width = `${percent}%`;
+
+  intro.textContent = nextStep
+    ? `Start with “${nextStep.title}” to keep moving toward a fully active account.`
+    : 'Everything important is set up. Now focus on replies, saved partners, and repeat trades.';
+
+  stepsContainer.innerHTML = steps.map(step => `
+    <div class="onboarding-step ${step.done ? 'done' : ''}">
+      <div class="onboarding-step-main">
+        <div class="onboarding-icon">${step.done ? '✓' : escapeHtml(step.icon)}</div>
+        <div>
+          <div class="onboarding-step-title">${escapeHtml(step.title)}</div>
+          <div class="onboarding-step-meta">${escapeHtml(step.meta)}</div>
+        </div>
+      </div>
+      <div class="onboarding-status ${step.done ? 'done' : 'todo'}">${step.done ? 'Done' : 'Next'}</div>
+    </div>
+  `).join('');
+
+  nextBtn.textContent = nextStep ? nextStep.actionLabel : 'View your rating';
 }
 
 function switchView(v) {
@@ -1999,7 +2306,7 @@ function fakeAuth(mode = 'signup') {
   syncAccountDataToForms();
   renderAllOwnerViews();
   switchView('dashboard');
-  showToast(mode === 'signup' ? '🎉 New account created. Your dashboard is ready.' : '✅ Logged in.');
+  showToast(mode === 'signup' ? '🎉 Account created. Next, add your first active listing.' : '✅ Logged in.');
 }
 
 function clearAuthForms() {
@@ -2152,10 +2459,13 @@ function renderMyBusinessCard() {
 function renderMyListings() {
   const grid = document.getElementById('myListingsGrid');
   if (!grid) return;
-  grid.innerHTML = getUserListings().length
-    ? getUserListings().map(biz => renderPremiumCard(biz, 'listing')).join('')
-    : `<div style="padding:20px;text-align:center;color:var(--muted);grid-column:1/-1;">
-         No listings yet. Use Add New Listing to post one.
+  const listings = getSecondaryListings();
+  grid.innerHTML = listings.length
+    ? listings.map(biz => renderPremiumCard(biz, 'listing')).join('')
+    : `<div class="dashboard-section-card" style="grid-column:1/-1;margin:0;">
+         <h3 style="margin-bottom:8px;">Post your first active listing</h3>
+         <p style="font-size:.84rem;color:var(--muted);margin-bottom:14px;">Your main business profile is live. Add a separate buying or selling listing so partners know exactly what you need.</p>
+         <button class="btn btn-primary" onclick="openModal('listingModal')">Add First Listing</button>
        </div>`;
 }
 
@@ -2304,7 +2614,7 @@ function renderDashboardMessages() {
           <button class="btn btn-ghost" onclick="openChatByPartnerId(${msg.partnerId})">Open</button>
         </div>
       `).join('')
-    : `<div class="mini-row"><div><strong>No messages yet</strong><div class="mini-meta">Your conversations will appear here.</div></div></div>`;
+    : `<div class="mini-row"><div><strong>No messages yet</strong><div class="mini-meta">Message a business from Browse and your conversation will appear here.</div></div><button class="btn btn-ghost" onclick="goToBrowseAndFocusSearch()">Browse</button></div>`;
 }
 
 function renderSavedPartners() {
@@ -2323,7 +2633,7 @@ function renderSavedPartners() {
           <button class="btn btn-ghost" onclick="openBizModal(${biz.id})">View</button>
         </div>
       `).join('')
-    : `<div class="mini-row"><div><strong>No saved partners yet</strong><div class="mini-meta">Tap Save on a business card to add one.</div></div></div>`;
+    : `<div class="mini-row"><div><strong>No saved partners yet</strong><div class="mini-meta">Save a business from Browse so you can come back to it quickly.</div></div><button class="btn btn-ghost" onclick="goToBrowseAndFocusSearch()">Browse</button></div>`;
 }
 
 function renderRatingSection() {
@@ -2344,7 +2654,7 @@ function renderRatingSection() {
 }
 
 function updateDashboardCounts() {
-  const activeListingsCount = getUserListings().length;
+  const activeListingsCount = getSecondaryListings().length;
   const messagesCount = currentUser.messages.length;
   const savedPartnersCount = currentUser.savedPartnerIds.length;
   const ratingDisplay = getRatingDisplay();
@@ -2371,6 +2681,7 @@ function renderAllOwnerViews() {
   renderDashboardMessages();
   renderSavedPartners();
   renderRatingSection();
+  renderDashboardGuidance();
   updateDashboardCounts();
 }
 
@@ -2485,6 +2796,7 @@ function sendMessage() {
   }
   renderConversationList();
   renderDashboardMessages();
+  renderDashboardGuidance();
   updateDashboardCounts();
 
   setTimeout(() => {
@@ -2501,6 +2813,7 @@ function sendMessage() {
       convo.unread = true;
       renderConversationList();
       renderDashboardMessages();
+      renderDashboardGuidance();
       updateDashboardCounts();
     }
   }, 1200);
@@ -2517,6 +2830,7 @@ function saveBiz(id) {
   if (!currentUser.savedPartnerIds.includes(id)) {
     currentUser.savedPartnerIds.unshift(id);
     renderSavedPartners();
+    renderDashboardGuidance();
     updateDashboardCounts();
   }
   showToast(`🔖 ${biz.name} saved to your partners.`);
@@ -2536,6 +2850,7 @@ renderConversationList();
 renderDashboardMessages();
 renderSavedPartners();
 renderRatingSection();
+renderDashboardGuidance();
 updateDashboardCounts();
 </script>
 
