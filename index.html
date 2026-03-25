@@ -1190,17 +1190,17 @@
       <div class="section-header" style="margin-top:20px;"><h2>Your Main Business Card</h2></div>
       <div class="listings-grid" id="myBusinessCardGrid"></div>
       <div class="section-header" id="dashboard-active-listings" style="margin-top:20px;"><h2>Active Listings</h2></div>
-      <div class="listings-grid" id="myListingsGrid"></div>
+      <div class="listings-grid" id="myListingsGrid" class="swipe-track"></div>
       <div class="dashboard-section-card" id="dashboard-messages" style="margin-top:20px;">
-        <h3>Messages</h3>
-        <div class="mini-list" id="dashboardMessagesList"></div>
+        <div class="heading-lg">Messages</div>
+        <div class="mini-list" id="dashboardMessagesList" class="swipe-track"></div>
       </div>
       <div class="dashboard-section-card" id="dashboard-saved-partners">
-        <h3>Saved Partners</h3>
-        <div class="mini-list" id="dashboardSavedPartnersList"></div>
+        <div class="heading-lg">Saved Partners</div>
+        <div class="mini-list" id="dashboardSavedPartnersList" class="swipe-track"></div>
       </div>
       <div class="dashboard-section-card" id="dashboard-rating">
-        <h3>Your Rating</h3>
+        <div class="heading-lg">Your Rating</div>
         <div id="dashboardRatingSummary" style="font-size:2rem;font-weight:800;color:var(--green);margin-bottom:8px;">0.0⭐</div>
         <p id="dashboardRatingMeta" style="font-size:.85rem;color:var(--muted);margin-bottom:12px;">Based on 0 completed trades with licensed partners.</p>
         <div class="mini-list" id="dashboardRatingHighlights"></div>
@@ -1859,7 +1859,7 @@ function renderCardActions(biz, mode = 'browse') {
     `;
   }
   return `
-    <button class="btn btn-primary" onclick="event.stopPropagation();contactBiz(${biz.id})">Message</button>
+    <button class="btn btn-primary" onclick="event.stopPropagation();contactBiz(${biz.id})">Message now</button>
     <button class="btn btn-ghost" onclick="event.stopPropagation();saveBiz(${biz.id})">Save</button>
   `;
 }
@@ -2154,7 +2154,7 @@ function getFilteredData() {
         .toLowerCase();
 
       return searchableText.includes(q);
-    });
+    }) + `${listingState === 'inactive' ? '<div class="inactive-badge">⏸ Needs more detail to feel active</div>' : ''}</div>`;
   }
   return data;
 }
@@ -2211,7 +2211,8 @@ function renderDashboardGuidance() {
   text.textContent = percent === 100
     ? 'Nice work. Your profile, listing flow, and partner activity are all in place.'
     : 'Complete these steps in order to make your account easier to discover and easier to use.';
-  pill.textContent = `${percent}% complete`;
+  const segment = getUserBehaviorSegment();
+  pill.textContent = `${percent}% complete · ${segment.label}`;
   fill.style.width = `${percent}%`;
 
   intro.textContent = nextStep
@@ -2235,10 +2236,15 @@ function renderDashboardGuidance() {
 }
 
 function switchView(v) {
+  const root = document.body;
+  root.classList.add('view-transitioning');
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.remove('active'));
-  document.getElementById('view-' + v).classList.add('active');
-  document.getElementById('nav-' + v).classList.add('active');
+  window.setTimeout(() => {
+    document.getElementById('view-' + v).classList.add('active');
+    document.getElementById('nav-' + v).classList.add('active');
+    window.setTimeout(() => root.classList.remove('view-transitioning'), 180);
+  }, 70);
 }
 
 function scrollToListings() {
@@ -2289,6 +2295,65 @@ function renderNavActions() {
   `;
 }
 
+
+function openFlowHandoff(config) {
+  const title = document.getElementById('flowHandoffTitle');
+  const copy = document.getElementById('flowHandoffCopy');
+  const actions = document.getElementById('flowHandoffActions');
+  if (!title || !copy || !actions) return;
+
+  title.textContent = config?.title || 'Next step ready';
+  copy.textContent = config?.copy || 'Keep moving with the next best action.';
+  actions.innerHTML = (config?.actions || []).map(action => `
+    <button class="btn ${action.kind === 'ghost' ? 'btn-ghost' : 'btn-primary'}" onclick="${action.onclick}">${escapeHtml(action.label)}</button>
+  `).join('');
+  openModal('flowHandoffModal');
+}
+
+function openFlowAfterSignup() {
+  openFlowHandoff({
+    title: 'Your account is ready',
+    copy: 'Nice start. Add your first active listing so businesses can understand what you offer or need right now.',
+    actions: [
+      { label: 'Add first listing', kind: 'primary', onclick: "closeModal('flowHandoffModal'); openModal('listingModal');" },
+      { label: 'Browse businesses', kind: 'ghost', onclick: "closeModal('flowHandoffModal'); switchView('browse'); window.scrollTo({top:0,behavior:'smooth'});" }
+    ]
+  });
+}
+
+function openFlowAfterListingPublished() {
+  openFlowHandoff({
+    title: 'Your listing is live',
+    copy: 'Great — now turn that listing into momentum by checking strong matches or sending one first message.',
+    actions: [
+      { label: 'View recommended matches', kind: 'primary', onclick: "closeModal('flowHandoffModal'); switchView('dashboard'); scrollIntoViewById('recommendedMatchesSection');" },
+      { label: 'Send first message', kind: 'ghost', onclick: "closeModal('flowHandoffModal'); switchView('dashboard'); if (typeof messageFirstRecommendedMatch === 'function') messageFirstRecommendedMatch();" }
+    ]
+  });
+}
+
+function openFlowAfterPartnerSaved(id) {
+  openFlowHandoff({
+    title: 'Partner saved',
+    copy: 'Nice move. The strongest next step is usually a quick first message while the match is still fresh.',
+    actions: [
+      { label: 'Message them now', kind: 'primary', onclick: "closeModal('flowHandoffModal'); if (typeof openGuidedMessageComposer === 'function') openGuidedMessageComposer(" + id + "); else contactBiz(" + id + ");" },
+      { label: 'Keep browsing', kind: 'ghost', onclick: "closeModal('flowHandoffModal'); switchView('browse');" }
+    ]
+  });
+}
+
+function openFlowAfterMessageSent() {
+  openFlowHandoff({
+    title: 'Conversation started',
+    copy: 'Great — now either follow up inside Messages or reach out to one more strong match while you have momentum.',
+    actions: [
+      { label: 'Check messages', kind: 'primary', onclick: "closeModal('flowHandoffModal'); switchView('dashboard'); scrollIntoViewById('messagesSection');" },
+      { label: 'Message another match', kind: 'ghost', onclick: "closeModal('flowHandoffModal'); switchView('dashboard'); if (typeof messageFirstRecommendedMatch === 'function') messageFirstRecommendedMatch();" }
+    ]
+  });
+}
+
 function fakeAuth(mode = 'signup') {
   isLoggedIn = true;
   if (mode === 'signup') {
@@ -2307,6 +2372,8 @@ function fakeAuth(mode = 'signup') {
   renderAllOwnerViews();
   switchView('dashboard');
   showToast(mode === 'signup' ? '🎉 Account created. Next, add your first active listing.' : '✅ Logged in.');
+  if (mode !== 'signup') { setTimeout(() => showUxToast('Welcome back', 'Here’s what needs your attention now.'), 220); }
+  if (mode === 'signup') { setTimeout(() => openFlowAfterSignup(), 180); }
 }
 
 function clearAuthForms() {
@@ -2341,7 +2408,25 @@ function logout() {
   switchView('browse');
   filterCards();
   updateDashboardCounts();
-  showToast('👋 You have been logged out.');
+  renderCelebrationMoments();
+  renderCelebrationMoments();
+  renderLiveMarketplaceFeed();
+  renderLiveMarketplaceFeed();
+  renderCelebrationMoments();
+  renderOutcomeBoard();
+  renderOutcomeBoard();
+  renderLiveMarketplaceFeed();
+  renderLifecycleBanner();
+  renderNotificationCenter();
+  renderLifecycleBanner();
+  renderOutcomeBoard();
+  renderPersonalizationBanner();
+  renderSmartPriorities();
+  renderPersonalizationBanner();
+  renderDashboardNextStepBanner();
+  renderNotificationCenter();
+  renderSmartPriorities();
+showToast('👋 You have been logged out.');
 }
 
 function goListingStep(step) {
@@ -2442,9 +2527,36 @@ function submitListing() {
   closeModal('listingModal');
   resetListingForm();
   renderAllOwnerViews();
+  switchView('dashboard');
   showToast('🎉 Listing published successfully.');
+  setTimeout(() => openFlowAfterListingPublished(), 180);
 }
 
+
+function renderStateCard({ kind = 'empty', icon = '•', title = '', copy = '', actions = [] }) {
+  return `
+    <div class="state-card state-${kind}">
+      <div class="state-row">
+        <div class="state-icon icon-badge">${icon}</div>
+        <div>
+          <div class="heading-lg">${escapeHtml(title)}</div>
+          <div class="text-subtle">${escapeHtml(copy)}</div>
+        </div>
+      </div>
+      ${actions.length ? `<div class="state-actions">${
+        actions.map(action => `<button class="btn ${action.kind === 'ghost' ? 'btn-ghost' : 'btn-primary'}" onclick="${action.onclick}">${escapeHtml(action.label)}</button>`).join('')
+      }</div>` : ''}
+    </div>
+  `;
+}
+
+function getListingActivityState(listing) {
+  const sells = Array.isArray(listing?.sells) ? listing.sells : [];
+  const buys = Array.isArray(listing?.buys) ? listing.buys : [];
+  const hasRealSupply = sells.some(item => !/coming soon/i.test(String(item)));
+  const hasRealDemand = buys.some(item => !/opportunities/i.test(String(item)));
+  return hasRealSupply || hasRealDemand ? 'active' : 'inactive';
+}
 function renderMyBusinessCard() {
   const grid = document.getElementById('myBusinessCardGrid');
   if (!grid) return;
@@ -2457,6 +2569,7 @@ function renderMyBusinessCard() {
 }
 
 function renderMyListings() {
+  const __ml = document.getElementById('myListingsGrid'); if (__ml && !__ml.dataset.warmed) { renderSimpleSkeleton('myListingsGrid', 2); __ml.dataset.warmed = '1'; }
   const grid = document.getElementById('myListingsGrid');
   if (!grid) return;
   const listings = getSecondaryListings();
@@ -2587,7 +2700,7 @@ function renderConversationList() {
   }
 
   container.innerHTML = currentUser.messages.map(msg => `
-    <div class="convo-item" onclick="openChatByPartnerId(${msg.partnerId})">
+    <div class="convo-item" onclick="withLoadingState(this, () => openChatByPartnerId(${msg.partnerId}))">
       <div class="convo-avatar">${escapeHtml((msg.partnerName || '?').charAt(0).toUpperCase())}</div>
       <div class="convo-meta">
         <div class="convo-name">${escapeHtml(msg.partnerName)}</div>
@@ -2601,23 +2714,966 @@ function renderConversationList() {
   `).join('');
 }
 
+
+function getCardNextStepHint(biz) {
+  const reason = biz?.matchReason || biz?.reason || '';
+  if (reason) return 'Good fit → Reach out';
+  return 'Best next step: Message';
+}
+
+
+
+
+
+function getRealishTimeLabel(index = 0) {
+  const labels = ['Active 5 min ago', 'Active 12 min ago', 'Active 28 min ago', 'Active 1 hour ago', 'Active today'];
+  return labels[index % labels.length];
+}
+
+function buildLiveMarketplaceEvents() {
+  const events = [];
+  const all = typeof getAllVisibleListings === 'function' ? getAllVisibleListings() : [];
+  const nonOwner = all.filter(b => !b.isOwner);
+  const newest = nonOwner.slice(-3).reverse();
+
+  newest.forEach((biz, idx) => {
+    events.push({
+      title: `${biz.name} added or refreshed a listing`,
+      copy: `${formatTypeLabel(biz.type)} · ${biz.location}`,
+      time: getRealishTimeLabel(idx)
+    });
+  });
+
+  const todayJoinCount = Math.min(2 + (nonOwner.length % 3), 4);
+  events.push({
+    title: `${todayJoinCount} businesses joined today`,
+    copy: 'New activity improves match quality and marketplace momentum.',
+    time: 'Today'
+  });
+
+  const savedCount = Array.isArray(currentUser?.savedPartnerIds) ? currentUser.savedPartnerIds.length : 0;
+  if (savedCount > 0) {
+    events.push({
+      title: 'Saved partner activity updated',
+      copy: 'A business you saved looks active again and may be worth a follow-up.',
+      time: 'Just now'
+    });
+  }
+
+  const unread = Array.isArray(currentUser?.messages) ? currentUser.messages.filter(m => m.unread).length : 0;
+  if (unread > 0) {
+    events.push({
+      title: `${unread} conversation${unread === 1 ? '' : 's'} active right now`,
+      copy: 'The marketplace has live conversation momentum waiting for your reply.',
+      time: 'Now'
+    });
+  }
+
+  return events.slice(0, 4);
+}
+
+function renderLiveMarketplaceFeed() {
+  const mount = document.getElementById('liveMarketplaceFeedMount');
+  if (!mount) return;
+  if (!currentUser) {
+    mount.innerHTML = '';
+    return;
+  }
+  const events = buildLiveMarketplaceEvents();
+  if (!events.length) {
+    mount.innerHTML = '';
+    return;
+  }
+
+  mount.innerHTML = `
+    <section class="dashboard-section section-shell">
+      <div class="heading-lg">Marketplace Activity</div>
+      <p class="text-subtle">Small live signals that make the marketplace feel active right now.</p>
+      <div class="live-feed">
+        ${events.map(event => `
+          <div class="live-activity-card">
+            <div class="live-activity-main">
+              <div class="live-pulse"></div>
+              <div>
+                <div class="live-title">${escapeHtml(event.title)}</div>
+                <div class="live-copy">${escapeHtml(event.copy)}</div>
+              </div>
+            </div>
+            <div class="live-time">${escapeHtml(event.time)}</div>
+          </div>
+        `).join('')}
+      </div>
+    </section>
+  `;
+}
+
+
+function getCelebrationMoments() {
+  if (!currentUser) return [];
+  const messages = Array.isArray(currentUser.messages) ? currentUser.messages : [];
+  const savedCount = Array.isArray(currentUser.savedPartnerIds) ? currentUser.savedPartnerIds.length : 0;
+  const strongMatches = (typeof getPrioritizedMatches === 'function' ? getPrioritizedMatches(3) : []).length;
+  const listings = typeof getUserListings === 'function' ? getUserListings() : [];
+  const moments = [];
+
+  if (messages.length >= 1) {
+    moments.push({
+      key: 'first_conversation',
+      kicker: '🎉 Momentum unlocked',
+      title: messages.length === 1 ? 'First conversation started!' : `${messages.length} conversations started`,
+      copy: messages.length === 1
+        ? 'That first message matters. You are now building real marketplace momentum.'
+        : 'You are building outreach momentum across multiple relationships.',
+      actions: [
+        { label: 'Open messages', kind: 'primary', onclick: "scrollIntoViewById('messagesSection')" },
+        { label: 'Start another', kind: 'ghost', onclick: "messageFirstRecommendedMatch()" }
+      ]
+    });
+  }
+
+  if (strongMatches >= 1) {
+    moments.push({
+      key: 'strong_match',
+      kicker: '🔥 Opportunity unlocked',
+      title: strongMatches === 1 ? 'You just unlocked your first strong match' : `${strongMatches} strong matches unlocked`,
+      copy: 'The system is surfacing promising opportunities so you can move faster with more confidence.',
+      actions: [
+        { label: 'View top matches', kind: 'primary', onclick: "scrollIntoViewById('recommendedMatchesSection')" },
+        { label: 'Message top match', kind: 'ghost', onclick: "messageFirstRecommendedMatch()" }
+      ]
+    });
+  }
+
+  if (savedCount >= 2) {
+    moments.push({
+      key: 'network_growth',
+      kicker: '🚀 Network growth',
+      title: savedCount >= 4 ? 'Your network is growing fast' : 'Your network is starting to grow',
+      copy: `You now have ${savedCount} saved partner${savedCount === 1 ? '' : 's'} you can revisit and convert into real opportunities.`,
+      actions: [
+        { label: 'Open saved partners', kind: 'primary', onclick: "scrollIntoViewById('savedPartnersSection')" },
+        { label: 'Follow up now', kind: 'ghost', onclick: "messageMostRecentSavedPartner()" }
+      ]
+    });
+  }
+
+  if (listings.length >= 2) {
+    moments.push({
+      key: 'listing_growth',
+      kicker: '📈 Listing progress',
+      title: 'Your marketplace presence is expanding',
+      copy: `You now have ${listings.length} active listings helping other businesses understand what you offer or need.`,
+      actions: [
+        { label: 'View listings', kind: 'primary', onclick: "scrollIntoViewById('dashboard-active-listings')" },
+        { label: 'Add another listing', kind: 'ghost', onclick: "openModal('listingModal')" }
+      ]
+    });
+  }
+
+  return moments.slice(0, 2);
+}
+
+function renderCelebrationMoments() {
+  const mount = document.getElementById('celebrationMomentsMount');
+  if (!mount) return;
+  if (!currentUser) {
+    mount.innerHTML = '';
+    return;
+  }
+  const moments = getCelebrationMoments();
+  if (!moments.length) {
+    mount.innerHTML = '';
+    return;
+  }
+
+  mount.innerHTML = moments.map(moment => `
+    <div class="celebration-banner celebration-burst">
+      <div class="celebration-kicker">${escapeHtml(moment.kicker)}</div>
+      <div class="celebration-title">${escapeHtml(moment.title)}</div>
+      <div class="celebration-copy">${escapeHtml(moment.copy)}</div>
+      <div class="celebration-actions">
+        ${moment.actions.map(action => `<button class="btn ${action.kind === 'ghost' ? 'btn-ghost' : 'btn-primary'}" onclick="${action.onclick}">${escapeHtml(action.label)}</button>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+function getOutcomeMetrics() {
+  if (!currentUser) return null;
+
+  const messages = Array.isArray(currentUser.messages) ? currentUser.messages : [];
+  const conversationsStarted = messages.length;
+  const repliesReceived = messages.filter(m => m.unread).length;
+  const strongOpportunities = (typeof getPrioritizedMatches === 'function' ? getPrioritizedMatches(3) : []).length;
+  const networkGrowth = Array.isArray(currentUser.savedPartnerIds) ? currentUser.savedPartnerIds.length : 0;
+  const listings = typeof getUserListings === 'function' ? getUserListings() : [];
+  const activeListings = listings.length;
+
+  return {
+    conversationsStarted,
+    repliesReceived,
+    strongOpportunities,
+    networkGrowth,
+    activeListings
+  };
+}
+
+function getOutcomeHeadline(metrics) {
+  if (!metrics) return {
+    kicker: '🏆 Progress',
+    title: 'Your marketplace progress',
+    copy: 'Small actions stack up into real business momentum over time.'
+  };
+
+  if (metrics.repliesReceived > 0) {
+    return {
+      kicker: '🏆 Momentum is building',
+      title: `You have ${metrics.repliesReceived} ${metrics.repliesReceived === 1 ? 'reply' : 'replies'} received`,
+      copy: 'That means your outreach is working. Keep moving while conversations are active.'
+    };
+  }
+
+  if (metrics.conversationsStarted > 0) {
+    return {
+      kicker: '🏆 Your outreach is live',
+      title: `${metrics.conversationsStarted} conversation${metrics.conversationsStarted === 1 ? '' : 's'} started`,
+      copy: 'You already have relationship momentum. The next unlock is getting more replies and saving more strong fits.'
+    };
+  }
+
+  if (metrics.strongOpportunities > 0) {
+    return {
+      kicker: '🏆 Opportunity is visible',
+      title: `${metrics.strongOpportunities} strong opportunit${metrics.strongOpportunities === 1 ? 'y' : 'ies'} ready`,
+      copy: 'The system is already finding promising paths. Start one message to turn opportunity into progress.'
+    };
+  }
+
+  return {
+    kicker: '🏆 Progress starts small',
+    title: 'Your network is ready to grow',
+    copy: 'Every saved partner, listing, and conversation makes the marketplace more useful for you.'
+  };
+}
+
+function renderOutcomeBoard() {
+  const mount = document.getElementById('outcomeBoardMount');
+  if (!mount) return;
+  if (!currentUser) {
+    mount.innerHTML = '';
+    return;
+  }
+
+  const metrics = getOutcomeMetrics();
+  const headline = getOutcomeHeadline(metrics);
+
+  mount.innerHTML = `
+    <div class="outcome-board">
+      <div class="outcome-kicker">${escapeHtml(headline.kicker)}</div>
+      <div class="outcome-title">${escapeHtml(headline.title)}</div>
+      <div class="outcome-copy">${escapeHtml(headline.copy)}</div>
+
+      <div class="outcome-metrics">
+        <div class="outcome-metric">
+          <div class="outcome-number">${metrics.conversationsStarted}</div>
+          <div class="outcome-label">Conversations started</div>
+        </div>
+        <div class="outcome-metric">
+          <div class="outcome-number">${metrics.strongOpportunities}</div>
+          <div class="outcome-label">Strong opportunities</div>
+        </div>
+        <div class="outcome-metric">
+          <div class="outcome-number">${metrics.repliesReceived}</div>
+          <div class="outcome-label">Replies received</div>
+        </div>
+        <div class="outcome-metric">
+          <div class="outcome-number">${metrics.networkGrowth}</div>
+          <div class="outcome-label">Saved partners in your network</div>
+        </div>
+      </div>
+
+      <div class="outcome-growth">
+        ${metrics.conversationsStarted || metrics.repliesReceived || metrics.networkGrowth
+          ? `Your network is growing. You now have ${metrics.activeListings} active listing${metrics.activeListings === 1 ? '' : 's'} helping new businesses understand your needs and offers.`
+          : 'Start one conversation or save one partner to create visible progress on your dashboard.'}
+      </div>
+    </div>
+  `;
+}
+function getLifecycleSummary() {
+  if (!currentUser) return null;
+  const messages = Array.isArray(currentUser.messages) ? currentUser.messages : [];
+  const unread = messages.filter(m => m.unread);
+  const savedCount = Array.isArray(currentUser.savedPartnerIds) ? currentUser.savedPartnerIds.length : 0;
+  const matches = typeof getPrioritizedMatches === 'function' ? getPrioritizedMatches(3) : [];
+  const profileName = currentUser?.profile?.businessName || currentUser?.profile?.contactName || 'there';
+
+  if (unread.length > 0) {
+    return {
+      kicker: '🔔 Re-engage now',
+      title: `You have ${unread.length} unanswered message${unread.length === 1 ? '' : 's'}`,
+      copy: 'Fast replies build trust and make your marketplace feel active for both sides.',
+      actions: [
+        { label: 'Open messages', kind: 'primary', onclick: "scrollIntoViewById('messagesSection')" },
+        { label: 'Reply now', kind: 'ghost', onclick: unread[0] ? `openChatByPartnerId(${unread[0].partnerId})` : "scrollIntoViewById('messagesSection')" }
+      ]
+    };
+  }
+
+  if (savedCount > 0) {
+    return {
+      kicker: '👋 Welcome back',
+      title: `Welcome back — your saved partners are ready`,
+      copy: 'You already found promising businesses. The best next move is a quick follow-up while the fit is still fresh.',
+      actions: [
+        { label: 'Open saved partners', kind: 'primary', onclick: "scrollIntoViewById('savedPartnersSection')" },
+        { label: 'Message saved partner', kind: 'ghost', onclick: "messageMostRecentSavedPartner()" }
+      ]
+    };
+  }
+
+  if (matches.length > 0) {
+    return {
+      kicker: '✨ Welcome back',
+      title: `Welcome back — here’s what changed`,
+      copy: `You have ${matches.length} prioritized match${matches.length === 1 ? '' : 'es'} worth checking right now.`,
+      actions: [
+        { label: 'View top matches', kind: 'primary', onclick: "scrollIntoViewById('recommendedMatchesSection')" },
+        { label: 'Message top match', kind: 'ghost', onclick: "messageFirstRecommendedMatch()" }
+      ]
+    };
+  }
+
+  return {
+    kicker: '🌱 Keep building momentum',
+    title: `Welcome back, ${profileName}`,
+    copy: 'Add one listing or start one conversation to keep your dashboard active and useful.',
+    actions: [
+      { label: 'Add listing', kind: 'primary', onclick: "openModal('listingModal')" },
+      { label: 'Browse businesses', kind: 'ghost', onclick: "switchView('browse'); window.scrollTo({top:0,behavior:'smooth'})" }
+    ]
+  };
+}
+
+function getLightNotifications() {
+  if (!currentUser) return [];
+  const notes = [];
+  const messages = Array.isArray(currentUser.messages) ? currentUser.messages : [];
+  const unread = messages.filter(m => m.unread);
+  const matches = typeof getPrioritizedMatches === 'function' ? getPrioritizedMatches(2) : [];
+  const savedCount = Array.isArray(currentUser.savedPartnerIds) ? currentUser.savedPartnerIds.length : 0;
+
+  if (unread.length) {
+    notes.push({
+      title: `${unread.length} unanswered message${unread.length === 1 ? '' : 's'}`,
+      copy: 'Replying soon is the fastest way to move a conversation forward.',
+      meta: 'Needs attention now',
+      action: unread[0] ? `openChatByPartnerId(${unread[0].partnerId})` : "scrollIntoViewById('messagesSection')"
+    });
+  }
+  if (matches.length) {
+    notes.push({
+      title: `${matches[0].biz.name} is a strong match right now`,
+      copy: matches[0].reason || 'Recommended based on your current profile and listings.',
+      meta: 'Prioritized for you',
+      action: `openBizModal(${matches[0].biz.id})`
+    });
+  }
+  if (savedCount) {
+    notes.push({
+      title: 'Saved partners are ready for follow-up',
+      copy: 'A short message can turn a saved fit into a real conversation.',
+      meta: 'Re-engagement prompt',
+      action: "scrollIntoViewById('savedPartnersSection')"
+    });
+  }
+  return notes.slice(0,3);
+}
+
+function renderLifecycleBanner() {
+  const mount = document.getElementById('lifecycleBannerMount');
+  if (!mount) return;
+  if (!currentUser) {
+    mount.innerHTML = '';
+    return;
+  }
+  const plan = getLifecycleSummary();
+  mount.innerHTML = `
+    <div class="lifecycle-banner">
+      <div class="lifecycle-kicker">${escapeHtml(plan.kicker)}</div>
+      <div class="lifecycle-title">${escapeHtml(plan.title)}</div>
+      <div class="lifecycle-copy">${escapeHtml(plan.copy)}</div>
+      <div class="lifecycle-actions">
+        ${plan.actions.map(a => `<button class="btn ${a.kind === 'ghost' ? 'btn-ghost' : 'btn-primary'}" onclick="${a.onclick}">${escapeHtml(a.label)}</button>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderNotificationCenter() {
+  const mount = document.getElementById('notificationCenterMount');
+  if (!mount) return;
+  if (!currentUser) {
+    mount.innerHTML = '';
+    return;
+  }
+  const notes = getLightNotifications();
+  if (!notes.length) {
+    mount.innerHTML = renderStateCard({
+      kind: 'empty',
+      icon: '🔔',
+      title: 'No new notifications',
+      copy: 'As activity grows, helpful reminders and updates will show here.'
+    });
+    return;
+  }
+  mount.innerHTML = notes.map(note => `
+    <div class="notification-card">
+      <div style="display:flex;gap:10px;min-width:0;">
+        <div class="notification-dot"></div>
+        <div class="notification-main">
+          <div class="notification-title">${escapeHtml(note.title)}</div>
+          <div class="notification-copy">${escapeHtml(note.copy)}</div>
+          <div class="notification-meta">${escapeHtml(note.meta)}</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost" onclick="${note.action}">Open</button>
+    </div>
+  `).join('');
+}
+function getUserBehaviorSegment() {
+  if (!currentUser) return { key: 'guest', label: 'Guest', icon: '👋' };
+
+  const steps = typeof getOnboardingSteps === 'function' ? getOnboardingSteps() : [];
+  const doneCount = steps.filter(step => step.done).length;
+  const hasMessages = Array.isArray(currentUser.messages) && currentUser.messages.length > 0;
+  const hasUnread = Array.isArray(currentUser.messages) && currentUser.messages.some(msg => msg.unread);
+  const hasSaved = Array.isArray(currentUser.savedPartnerIds) && currentUser.savedPartnerIds.length > 0;
+  const listings = typeof getUserListings === 'function' ? getUserListings() : [];
+  const listingCount = listings.length;
+  const hasProfile = !!(currentUser.profile?.businessName || currentUser.profile?.contactName);
+  const isNew = doneCount <= 1 || (!hasMessages && !hasSaved && listingCount <= 1);
+
+  if (isNew) return { key: 'new', label: 'New user', icon: '🌱' };
+  if (hasUnread || hasMessages || hasSaved) return { key: 'active', label: 'Active user', icon: '⚡' };
+  if (hasProfile && listingCount > 0) return { key: 'inactive', label: 'Needs re-engagement', icon: '🔄' };
+  return { key: 'new', label: 'New user', icon: '🌱' };
+}
+
+function getPersonalizedDashboardPlan() {
+  const segment = getUserBehaviorSegment();
+  const matches = typeof getPrioritizedMatches === 'function' ? getPrioritizedMatches(3) : [];
+  const unread = Array.isArray(currentUser?.messages) ? currentUser.messages.filter(m => m.unread) : [];
+  const saved = Array.isArray(currentUser?.savedPartnerIds) ? currentUser.savedPartnerIds.length : 0;
+  const firstMatch = matches.length ? matches[0] : null;
+
+  if (segment.key === 'new') {
+    return {
+      kicker: `${segment.icon} ${segment.label}`,
+      title: 'Start with one fast win',
+      copy: 'Complete your profile, add one clear listing, and send one first message. That is the shortest path to value on this platform.',
+      actions: [
+        { label: 'Add listing', kind: 'primary', onclick: "openModal('listingModal')" },
+        { label: 'Browse businesses', kind: 'ghost', onclick: "switchView('browse'); window.scrollTo({top:0,behavior:'smooth'})" }
+      ]
+    };
+  }
+
+  if (segment.key === 'active') {
+    return {
+      kicker: `${segment.icon} ${segment.label}`,
+      title: unread.length ? `You have ${unread.length} conversation${unread.length === 1 ? '' : 's'} to move forward` : 'Keep momentum with your strongest opportunities',
+      copy: unread.length
+        ? 'Replying quickly is the best way to build trust and turn interest into real business.'
+        : 'Your best matches and active conversations are now the highest-value parts of the dashboard.',
+      actions: unread.length
+        ? [
+            { label: 'Open messages', kind: 'primary', onclick: "scrollIntoViewById('messagesSection')" },
+            { label: 'View matches', kind: 'ghost', onclick: "scrollIntoViewById('recommendedMatchesSection')" }
+          ]
+        : [
+            { label: 'View top match', kind: 'primary', onclick: firstMatch ? `openBizModal(${firstMatch.biz.id})` : "scrollIntoViewById('recommendedMatchesSection')" },
+            { label: 'Message now', kind: 'ghost', onclick: firstMatch ? `contactBiz(${firstMatch.biz.id})` : "scrollIntoViewById('messagesSection')" }
+          ]
+    };
+  }
+
+  return {
+    kicker: `${segment.icon} ${segment.label}`,
+    title: saved ? 'Re-engage with saved partners and good fits' : 'Jump back in with your best current opportunities',
+    copy: saved
+      ? 'You already saved promising partners. A quick follow-up message is the best next move.'
+      : 'The easiest way to regain momentum is to message one prioritized match today.',
+    actions: saved
+      ? [
+          { label: 'Open saved partners', kind: 'primary', onclick: "scrollIntoViewById('savedPartnersSection')" },
+          { label: 'Message saved partner', kind: 'ghost', onclick: "messageMostRecentSavedPartner()" }
+        ]
+      : [
+          { label: 'Browse matches', kind: 'primary', onclick: "scrollIntoViewById('recommendedMatchesSection')" },
+          { label: 'Send first message', kind: 'ghost', onclick: "messageFirstRecommendedMatch()" }
+        ]
+  };
+}
+
+function personalizeRecommendedMatches(matches) {
+  const segment = getUserBehaviorSegment();
+  return matches.map((item, index) => {
+    let personalizedReason = item.reason || 'Good fit for your profile';
+    if (segment.key === 'new') {
+      personalizedReason = index === 0 ? 'Good first outreach choice' : personalizedReason;
+    } else if (segment.key === 'active') {
+      personalizedReason = index === 0 ? 'Best match to keep momentum' : personalizedReason;
+    } else if (segment.key === 'inactive') {
+      personalizedReason = index === 0 ? 'Strong re-engagement opportunity' : personalizedReason;
+    }
+    return { ...item, personalizedReason };
+  });
+}
+
+function getPersonalizedMessagePrompt(biz) {
+  const segment = getUserBehaviorSegment();
+  const myBusiness = currentUser?.profile?.businessName || currentUser?.profile?.contactName || 'our business';
+  const businessName = biz?.name || 'your business';
+
+  if (segment.key === 'new') {
+    return `Hi ${businessName}, this is ${myBusiness}. We are new on the platform and would love to introduce ourselves and learn more about whether there may be a good fit to connect.`;
+  }
+  if (segment.key === 'active') {
+    return `Hi ${businessName}, this is ${myBusiness}. We think there may be a strong fit based on our current activity and would love to explore next steps together.`;
+  }
+  return `Hi ${businessName}, this is ${myBusiness}. We wanted to reconnect and see whether there may be a good opportunity to work together right now.`;
+}
+
+function renderPersonalizationBanner() {
+  const mount = document.getElementById('personalizationBannerMount');
+  if (!mount || !currentUser) return;
+  const plan = getPersonalizedDashboardPlan();
+  mount.innerHTML = `
+    <div class="personalization-banner stack-12">
+      <div class="personalization-kicker">${escapeHtml(plan.kicker)}</div>
+      <div class="heading-xl">${escapeHtml(plan.title)}</div>
+      <div class="text-subtle">${escapeHtml(plan.copy)}</div>
+      <div class="personalization-actions">
+        ${plan.actions.map(action => `<button class="btn ${action.kind === 'ghost' ? 'btn-ghost' : 'btn-primary'}" onclick="${action.onclick}">${escapeHtml(action.label)}</button>`).join('')}
+      </div>
+    </div>
+  `;
+}
+function getDashboardNextStepSummary() {
+  const matchCount = (Array.isArray(window.recommendedMatchesCache) ? window.recommendedMatchesCache.length : 0) || 0;
+  const unreadCount = (Array.isArray(window.conversations) ? window.conversations.filter(c => c.unread).length : 0) || 0;
+  const savedCount = Array.isArray(window.savedPartners) ? window.savedPartners.length : 0;
+
+  if (unreadCount > 0) {
+    return {
+      title: `You have ${unreadCount} conversation${unreadCount === 1 ? '' : 's'} needing attention`,
+      copy: 'Replying quickly helps keep momentum and builds trust with potential partners.',
+      primaryLabel: 'Open messages',
+      primaryAction: 'scrollIntoViewById("messagesSection")',
+      secondaryLabel: 'Browse matches',
+      secondaryAction: 'scrollIntoViewById("recommendedMatchesSection")'
+    };
+  }
+
+  if (matchCount > 0) {
+    return {
+      title: `You have ${matchCount} strong match${matchCount === 1 ? '' : 'es'} → Reach out`,
+      copy: 'Recommended matches are the fastest path to a new connection.',
+      primaryLabel: 'View matches',
+      primaryAction: 'scrollIntoViewById("recommendedMatchesSection")',
+      secondaryLabel: 'Message a match',
+      secondaryAction: 'messageFirstRecommendedMatch()'
+    };
+  }
+
+  if (savedCount > 0) {
+    return {
+      title: 'Saved partners are ready for follow-up',
+      copy: 'A quick message is usually the best next step after saving a good fit.',
+      primaryLabel: 'Message saved partner',
+      primaryAction: 'messageMostRecentSavedPartner()',
+      secondaryLabel: 'Open saved partners',
+      secondaryAction: 'scrollIntoViewById("savedPartnersSection")'
+    };
+  }
+
+  return {
+    title: 'Browse businesses and start one conversation',
+    copy: 'The fastest way to see value is to reach out to one strong fit.',
+    primaryLabel: 'Browse businesses',
+    primaryAction: "setView('browse')",
+    secondaryLabel: 'Open dashboard messages',
+    secondaryAction: 'scrollIntoViewById("messagesSection")'
+  };
+}
+
+function scrollIntoViewById(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function messageFirstRecommendedMatch() {
+  const first = Array.isArray(window.recommendedMatchesCache) && window.recommendedMatchesCache.length ? window.recommendedMatchesCache[0] : null;
+  if (first && first.id) {
+    if (typeof openGuidedMessageComposer === 'function') return openGuidedMessageComposer(first.id);
+    if (typeof contactBiz === 'function') return contactBiz(first.id);
+  }
+}
+
+
+
+
+function inferTransactionsCompleted(biz) {
+  const reviews = Number(biz?.reviews || 0);
+  const rating = Number(biz?.rating || 0);
+  if (reviews >= 12) return reviews;
+  if (reviews >= 6) return reviews + 2;
+  if (rating >= 4.5) return Math.max(3, reviews + 1);
+  return reviews;
+}
+
+function inferActiveAgoLabel(biz) {
+  const rating = Number(biz?.rating || 0);
+  const verified = !!biz?.verified;
+  const hasRealSupply = Array.isArray(biz?.sells) && biz.sells.some(item => !/coming soon/i.test(String(item)));
+  const hasRealDemand = Array.isArray(biz?.buys) && biz.buys.some(item => !/opportunities/i.test(String(item)));
+  if (verified && rating >= 4.5 && hasRealSupply) return 'Active 2 hours ago';
+  if (verified && (hasRealSupply || hasRealDemand)) return 'Active 2 hours ago';
+  if (hasRealSupply || hasRealDemand) return 'Active this week';
+  return 'Recently active';
+}
+
+function inferResponseSpeedLabel(biz) {
+  const verified = !!biz?.verified;
+  const reviews = Number(biz?.reviews || 0);
+  const rating = Number(biz?.rating || 0);
+  if (verified && rating >= 4.5) return 'Typically responds in 30 mins';
+  if (verified || reviews >= 5) return 'Typically responds in under 2 hours';
+  return 'Usually responds this day';
+}
+
+function inferTrustedByCount(biz) {
+  const reviews = Number(biz?.reviews || 0);
+  const base = reviews >= 1 ? reviews : (biz?.verified ? 4 : 2);
+  return Math.max(base, Math.round(base * 1.5));
+}
+
+function getCredibilitySignals(biz) {
+  if (!biz) return [];
+  const transactions = inferTransactionsCompleted(biz);
+  const activeAgo = inferActiveAgoLabel(biz);
+  const responseSpeed = inferResponseSpeedLabel(biz);
+  const trustedBy = inferTrustedByCount(biz);
+
+  const signals = [];
+  if (transactions > 0) {
+    signals.push({ kind: 'proof', label: `🤝 ${transactions} transactions completed` });
+  }
+  signals.push({ kind: 'time', label: `🕒 ${activeAgo}` });
+  signals.push({ kind: 'speed', label: `⚡ ${responseSpeed}` });
+  if (trustedBy > 0) {
+    signals.push({ kind: 'trust', label: `🛡 Trusted by ${trustedBy} businesses` });
+  }
+  return signals.slice(0, 3);
+}
+
+function getCredibilitySummary(biz) {
+  const signals = getCredibilitySignals(biz);
+  if (!signals.length) return 'This business shows practical proof signals that help reduce hesitation.';
+  if (signals.some(s => s.label.includes('transactions completed'))) {
+    return 'Past activity suggests this business is established && worth serious consideration.';
+  }
+  if (signals.some(s => s.label.includes('Trusted by'))) {
+    return 'Trust proof helps this business feel more credible at first glance.';
+  }
+  return 'These real-world proof signals make the next step feel safer && more justified.';
+}
+
+function renderCredibilityRow(biz) {
+  const signals = getCredibilitySignals(biz);
+  if (!signals.length) return '';
+  return `
+    <div class="credibility-row">
+      ${signals.map(signal => `<span class="credibility-pill ${signal.kind}">${escapeHtml(signal.label)}</span>`).join('')}
+    </div>
+    <div class="credibility-summary">${escapeHtml(getCredibilitySummary(biz))}</div>
+  `;
+}
+function getConfidenceSignals(biz) {
+  const signals = [];
+  if (!biz) return signals;
+
+  const rating = Number(biz.rating || 0);
+  const reviews = Number(biz.reviews || 0);
+  const sells = Array.isArray(biz.sells) ? biz.sells : [];
+  const buys = Array.isArray(biz.buys) ? biz.buys : [];
+  const hasRealSupply = sells.some(item => !/coming soon/i.test(String(item)));
+  const hasRealDemand = buys.some(item => !/opportunities/i.test(String(item)));
+  const activity = hasRealSupply || hasRealDemand;
+
+  if (biz.verified) {
+    signals.push({ kind: 'trust', label: '🟢 License confidence' });
+  }
+  if (activity) {
+    signals.push({ kind: 'active', label: '⚡ Active this week' });
+  }
+  if (rating >= 4.5 || reviews >= 8) {
+    signals.push({ kind: 'trust', label: `🤝 ${Math.max(reviews, 1)} successful connections` });
+  }
+  if (biz.matchReason && /best|convert|align|fit/i.test(String(biz.matchReason))) {
+    signals.push({ kind: 'hot', label: '🔥 High response likelihood' });
+  }
+  if (!signals.some(s => s.label.includes('High response likelihood')) && (biz.verified || rating >= 4.2)) {
+    signals.push({ kind: 'fast', label: '🟢 Responds quickly' });
+  }
+
+  return signals.slice(0, 3);
+}
+
+function getConfidenceSummary(biz) {
+  const signals = getConfidenceSignals(biz);
+  if (!signals.length) return 'Worth a closer look based on your current profile and marketplace activity.';
+  const top = signals[0].label.replace(/^[^\s]+\s/, '');
+  if (/response likelihood/i.test(top)) return 'Strong outreach candidate right now.';
+  if (/active this week/i.test(top)) return 'Looks current and worth contacting now.';
+  if (/successful connections/i.test(top)) return 'Shows trust signals that reduce hesitation.';
+  if (/responds quickly/i.test(top)) return 'Good option when you want a faster next step.';
+  return 'Confidence signals suggest this business is worth your time.';
+}
+
+function renderConfidenceRow(biz) {
+  const signals = getConfidenceSignals(biz);
+  if (!signals.length) return '';
+  return `
+    <div class="confidence-row">
+      ${signals.map(signal => `<span class="confidence-badge ${signal.kind}">${escapeHtml(signal.label)}</span>`).join('')}
+    </div>
+    <div class="confidence-summary">${escapeHtml(getConfidenceSummary(biz))}</div>
+  `;
+}
+function scoreMatchOpportunity(biz) {
+  if (!currentUser || !biz) return { score: 0, labels: [], reason: 'Worth a look' };
+  const profile = currentUser.profile || {};
+  const myListings = typeof getUserListings === 'function' ? getUserListings() : [];
+  const myPrimary = typeof getPrimaryBusiness === 'function' ? getPrimaryBusiness() : null;
+  const myLocation = (profile.city && profile.state) ? locationFromParts(profile.city, profile.state) : (myPrimary?.location || '');
+  const myType = (profile.type || myPrimary?.type || '').toLowerCase();
+
+  let score = 0
+  const reasons = []
+  const labels = []
+
+  if (myLocation && biz.location && myLocation.toLowerCase() === biz.location.toLowerCase()) {
+    score += 4
+    reasons.push('Same location')
+  } else if (profile.state && biz.location && biz.location.toLowerCase().includes(String(profile.state).toLowerCase())) {
+    score += 2
+    reasons.push('Same state')
+  }
+
+  const typeFits = {
+    retailer: ['processor','microbusiness','distributor','lab','grower','cultivator'],
+    processor: ['retailer','lab','grower','cultivator','distributor'],
+    lab: ['processor','retailer','grower','cultivator','microbusiness'],
+    distributor: ['retailer','processor','microbusiness'],
+    microbusiness: ['retailer','processor','lab','distributor'],
+    grower: ['processor','lab','retailer','microbusiness'],
+    cultivator: ['processor','lab','retailer','microbusiness']
+  }
+  if (myType && biz.type && (typeFits[myType] || []).includes(String(biz.type).toLowerCase())) {
+    score += 4
+    reasons.push('Good license fit')
+  }
+
+  const userSell = new Set()
+  const userBuy = new Set()
+  myListings.forEach(l => {
+    (l.sells || []).forEach(x => userSell.add(String(x).toLowerCase()))
+    (l.buys || []).forEach(x => userBuy.add(String(x).toLowerCase()))
+  })
+  const bizSell = new Set((biz.sells || []).map(x => String(x).toLowerCase()))
+  const bizBuy = new Set((biz.buys || []).map(x => String(x).toLowerCase()))
+
+  const overlap1 = [...userSell].some(x => bizBuy.has(x))
+  const overlap2 = [...userBuy].some(x => bizSell.has(x))
+  if (overlap1 || overlap2) {
+    score += 5
+    reasons.push('Supply and demand align')
+  }
+
+  if (biz.verified) {
+    score += 2
+    reasons.push('Verified')
+  }
+  if ((biz.rating || 0) >= 4.5) {
+    score += 2
+    reasons.push('Strong rating')
+  }
+
+  if (score >= 11) labels.push('🔥 Best match right now')
+  else if (score >= 8) labels.push('⚡ Fastest to convert')
+
+  const reason = reasons.slice(0, 2).join(' · ') || 'Good fit for your profile'
+  return { score, labels, reason }
+}
+
+function getPrioritizedMatches(limit = 3) {
+  const listings = typeof getAllVisibleListings === 'function' ? getAllVisibleListings() : []
+  const savedIds = new Set((currentUser?.savedPartnerIds || []))
+  const scored = listings
+    .filter(b => !b.isOwner && !savedIds.has(b.id))
+    .map(b => {
+      const scoredBiz = scoreMatchOpportunity(b);
+      return { biz: { ...b, matchReason: scoredBiz.reason }, ...scoredBiz };
+    })
+    .sort((a,b) => b.score - a.score)
+  return scored.slice(0, limit)
+}
+
+
+function formatRelativeTimeLabel(label) {
+  const raw = String(label || '').toLowerCase();
+  if (!raw || raw === 'just now') return 'Active just now';
+  if (raw.includes('min')) return `Active ${label.toLowerCase()} ago`;
+  if (raw.includes('hour')) return `Active ${label.toLowerCase()} ago`;
+  if (raw.includes('day')) return `Active ${label.toLowerCase()} ago`;
+  return `Last active ${label}`;
+}
+
+function getConversationMomentum(thread) {
+  if (!thread) return { state: 'started', label: 'Conversation started', detail: 'A new connection is now in progress.' };
+  const unread = !!thread.unread;
+  const preview = String(thread.preview || '').toLowerCase();
+  if (unread) return { state: 'active', label: 'Active thread', detail: 'They replied — this is a good moment to respond.' };
+  if (preview.includes('get back to you') || preview.includes('check our current stock')) {
+    return { state: 'waiting', label: 'Waiting on reply', detail: 'They acknowledged the conversation and may respond again soon.' };
+  }
+  return { state: 'started', label: 'Conversation started', detail: 'You opened the relationship. Keep momentum with a timely follow-up.' };
+}
+
+function renderTypingIndicator(name = 'They') {
+  return `
+    <div class="typing-indicator" id="chatTypingIndicator">
+      <span>${escapeHtml(name)} is typing</span>
+      <span class="typing-dots"><span></span><span></span><span></span></span>
+    </div>
+  `;
+}
+function getConversationPriority(thread) {
+  if (!thread) return { urgent: false, label: 'Active conversation', reason: 'Keep momentum going' }
+  if (thread.unread) {
+    return { urgent: true, label: 'Reply within 1 hour', reason: 'Fast replies build trust and increase conversions.' }
+  }
+  const preview = String(thread.preview || '').toLowerCase()
+  if (preview.includes('check our current stock') || preview.includes('get back to you')) {
+    return { urgent: false, label: 'Waiting on them', reason: 'Good moment to check back soon if needed.' }
+  }
+  return { urgent: false, label: 'Follow up soon', reason: 'A light follow-up can keep this connection moving.' }
+}
+
+function renderSmartPriorities() {
+  const mount = document.getElementById('smartPriorityMount')
+  if (!mount || !currentUser) return
+  const matches = getPrioritizedMatches(2)
+  const unreadThreads = (currentUser.messages || []).filter(m => m.unread)
+  const topThread = unreadThreads.length ? unreadThreads[0] : ((currentUser.messages || [])[0] || null)
+
+  const parts = []
+
+
+  const cards = []
+  if (matches.length) {
+    cards.push(`
+      <div class="priority-panel stack-12">
+        <div class="heading-lg">Best opportunities right now</div>
+        <div class="text-subtle">These matches are ranked first so you can focus on the businesses most likely to convert into a useful connection.</div>
+        <div class="priority-list">
+          ${matches.map((item, idx) => `
+            <div class="priority-item">
+              <div class="priority-main">
+                <div class="priority-head">
+                  <strong>${escapeHtml(item.biz.name)}</strong>
+                  ${(item.labels || []).map(label => `<span class="priority-badge ${label.includes('Best') ? 'best' : 'fast'}">${escapeHtml(label)}</span>`).join('')}
+                </div>
+                <div class="priority-reason">${escapeHtml(item.reason)} · ${escapeHtml(formatTypeLabel(item.biz.type))} · ${escapeHtml(item.biz.location)}</div>
+                ${renderConfidenceRow(item.biz)}
+                ${renderCredibilityRow(item.biz)}
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+                <button class="btn btn-ghost" onclick="openBizModal(${item.biz.id})">View</button>
+                <button class="btn btn-primary" onclick="withLoadingState(this, () => contactBiz(${item.biz.id}))">Message now</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `)
+  }
+
+  if (topThread) {
+    const p = getConversationPriority(topThread)
+    cards.push(`
+      <div class="priority-panel stack-12">
+        <div class="heading-lg">Conversation to prioritize</div>
+        <div class="text-subtle">The system is surfacing the thread most likely to need your attention now.</div>
+        <div class="priority-list">
+          <div class="priority-item">
+            <div class="priority-main">
+              <div class="priority-head">
+                <strong>${escapeHtml(topThread.partnerName || 'Business partner')}</strong>
+                <span class="${p.urgent ? 'reply-urgent' : 'priority-badge fast'}">${escapeHtml(p.label)}</span>
+              </div>
+              <div class="priority-reason">${escapeHtml(p.reason)} Preview: ${escapeHtml(topThread.preview || 'Open conversation')}</div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+              <button class="btn btn-primary" onclick="withLoadingState(this, () => openChatByPartnerId(${topThread.partnerId}))">Open thread</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `)
+  }
+
+  if (!cards.length) {
+    mount.innerHTML = ''
+    return
+  }
+  mount.innerHTML = cards.join('')
+}
+function renderDashboardNextStepBanner() {
+  const mount = document.getElementById('dashboardNextStepBanner');
+  if (!mount || !window.currentUser) return;
+  const step = getDashboardNextStepSummary();
+  mount.innerHTML = `
+    <div class="next-step-banner stack-12">
+      <div class="heading-lg">${escapeHtml(step.title)}</div>
+      <div class="text-subtle">${escapeHtml(step.copy)}</div>
+      <div class="next-step-banner-actions">
+        <button class="btn btn-primary" onclick="${step.primaryAction}">${escapeHtml(step.primaryLabel)}</button>
+        <button class="btn btn-ghost" onclick="${step.secondaryAction}">${escapeHtml(step.secondaryLabel)}</button>
+      </div>
+    </div>
+  `;
+}
 function renderDashboardMessages() {
+  const __dm = document.getElementById('dashboardMessagesList'); if (__dm && !__dm.dataset.warmed) { renderSimpleSkeleton('dashboardMessagesList', 2); __dm.dataset.warmed = '1'; }
   const container = document.getElementById('dashboardMessagesList');
   if (!container) return;
   container.innerHTML = currentUser.messages.length
     ? currentUser.messages.map(msg => `
-        <div class="mini-row">
+        <div class="mini-row uniform-card">
           <div>
             <strong>${escapeHtml(msg.partnerName)}</strong>
             <div class="mini-meta">${escapeHtml(msg.preview)}</div>
           </div>
-          <button class="btn btn-ghost" onclick="openChatByPartnerId(${msg.partnerId})">Open</button>
+          <button class="btn btn-ghost" onclick="withLoadingState(this, () => openChatByPartnerId(${msg.partnerId}))">Open</button>
         </div>
       `).join('')
-    : `<div class="mini-row"><div><strong>No messages yet</strong><div class="mini-meta">Message a business from Browse and your conversation will appear here.</div></div><button class="btn btn-ghost" onclick="goToBrowseAndFocusSearch()">Browse</button></div>`;
+    : `<div class="mini-row uniform-card"><div><strong>No messages yet</strong><div class="mini-meta">Message a business from Browse and your conversation will appear here.</div></div><button class="btn btn-ghost" onclick="goToBrowseAndFocusSearch()">Browse</button></div>`;
 }
 
 function renderSavedPartners() {
+  const __sp = document.getElementById('savedPartnersList'); if (__sp && !__sp.dataset.warmed) { renderSimpleSkeleton('savedPartnersList', 2); __sp.dataset.warmed = '1'; }
   const container = document.getElementById('dashboardSavedPartnersList');
   if (!container) return;
   const partners = currentUser.savedPartnerIds
@@ -2625,15 +3681,15 @@ function renderSavedPartners() {
     .filter(Boolean);
   container.innerHTML = partners.length
     ? partners.map(biz => `
-        <div class="mini-row">
+        <div class="mini-row uniform-card">
           <div>
             <strong>${escapeHtml(biz.name)}</strong>
             <div class="mini-meta">${escapeHtml(formatTypeLabel(biz.type))} partner · ${escapeHtml(biz.location)}</div>
           </div>
-          <button class="btn btn-ghost" onclick="openBizModal(${biz.id})">View</button>
+          <button class="btn btn-ghost" onclick="withLoadingState(this, () => openBizModal(${biz.id}))">View</button>
         </div>
       `).join('')
-    : `<div class="mini-row"><div><strong>No saved partners yet</strong><div class="mini-meta">Save a business from Browse so you can come back to it quickly.</div></div><button class="btn btn-ghost" onclick="goToBrowseAndFocusSearch()">Browse</button></div>`;
+    : `<div class="mini-row uniform-card"><div><strong>No saved partners yet</strong><div class="mini-meta">Save a business from Browse so you can come back to it quickly.</div></div><button class="btn btn-ghost" onclick="goToBrowseAndFocusSearch()">Browse</button></div>`;
 }
 
 function renderRatingSection() {
@@ -2645,7 +3701,7 @@ function renderRatingSection() {
   if (list) {
     const items = currentUser.ratingHighlights.length ? currentUser.ratingHighlights : [{ label: 'No ratings yet', meta: 'Complete your first trade to build your rating.' }];
     list.innerHTML = items.map(item => `
-      <div class="mini-row">
+      <div class="mini-row uniform-card">
         <div><strong>${escapeHtml(item.label)}</strong><div class="mini-meta">${escapeHtml(item.meta)}</div></div>
         <span class="star-rating">${item.label === 'No ratings yet' ? '☆☆☆☆☆' : '★★★★★'}</span>
       </div>
@@ -2705,18 +3761,27 @@ function openBizModal(id) {
     ${biz.verified
       ? `<div class="license-verify"><span>✅</span><p>License verified — active and in good standing</p></div>`
       : `<div class="license-verify" style="background:#fef3c7;border-color:#fcd34d;"><span>⏳</span><p style="color:#92400e;">Verification pending</p></div>`}
-    <div class="product-list-preview">
-      <h3>Selling</h3>
+    ${renderConfidenceRow(biz)}
+    ${renderCredibilityRow(biz)}
+    <hr class="clean-divider"><div class="product-list-preview">
+      <div class="heading-lg">Selling</div>
       ${biz.sells.map(p => `<span class="product-pill">📦 ${escapeHtml(p)}</span>`).join('')}
     </div>
-    <div class="product-list-preview">
-      <h3>Looking to Buy</h3>
+    <hr class="clean-divider"><div class="product-list-preview">
+      <div class="heading-lg">Looking to Buy</div>
       ${biz.buys.map(p => `<span class="product-pill">🛒 ${escapeHtml(p)}</span>`).join('')}
     </div>
     ${biz.isOwner
       ? `<button class="btn btn-primary btn-full btn-lg" style="margin-bottom:10px;" onclick="openBusinessEditModal(${biz.id});closeModal('bizModal');">✏️ Edit This Business</button>`
-      : `<button class="btn btn-primary btn-full btn-lg" style="margin-bottom:10px;" onclick="contactBiz(${biz.id})">💬 Send Message</button>
-         <button class="btn btn-ghost btn-full" onclick="saveBiz(${biz.id})">🔖 Save Partner</button>`}
+      : `<button class="btn btn-primary btn-full btn-lg" style="margin-bottom:10px;" onclick="withLoadingState(this, () => contactBiz(${biz.id}))">💬 Send Message</button>
+         <button class="btn btn-ghost btn-full" onclick="withLoadingState(this, () => saveBiz(${biz.id}))">🔖 Save Partner</button>`}
+    <div class="flow-inline-hint">
+      <div class="flow-inline-icon icon-badge">→</div>
+      <div>
+        <div class="heading-lg">${biz.isOwner ? 'Best next step: keep your business info current' : 'Best next step: message now'}</div>
+        <div class="text-subtle">${biz.isOwner ? 'Up-to-date details make your profile easier to trust and match.' : 'A quick message creates momentum faster than saving and leaving.'}</div>
+      </div>
+    </div>
   `;
   openModal('bizModal');
 }
@@ -2771,12 +3836,16 @@ function sendMessage() {
   }
 
   const msgs = document.getElementById('chatMessages');
+  const momentumChip = document.getElementById('chatMomentumChip');
+  const activeMeta = document.getElementById('chatActiveMeta');
   const div = document.createElement('div');
   div.className = 'msg msg-out';
   div.textContent = text;
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
   input.value = '';
+  if (momentumChip) { momentumChip.textContent = 'Waiting on reply'; momentumChip.className = 'thread-chip waiting'; }
+  if (activeMeta) activeMeta.textContent = 'Last active just now';
 
   const existing = currentUser.messages.find(msg => msg.partnerId === partnerId);
   if (existing) {
@@ -2796,15 +3865,30 @@ function sendMessage() {
   }
   renderConversationList();
   renderDashboardMessages();
-  renderDashboardGuidance();
   updateDashboardCounts();
+  flashSuccessChip(document.querySelector('#chatModal .btn-primary, #chatModal button[onclick*="sendMessage"]'), 'Message sent');
+  showUxToast('Message sent', 'Message sent ✓ → Check messages or reach out to another strong match.');
+  if ((currentUser.messages || []).length === 1) {
+    setTimeout(() => showUxToast('First conversation started!', '🎉 You just created your first live marketplace connection.', '🎉'), 520);
+  }
+  setTimeout(() => showUxToast('Progress updated', 'Your conversation count just increased.'), 450);
+  setTimeout(() => openFlowAfterMessageSent(), 180);
+
+  const typingWrap = document.createElement('div');
+  typingWrap.innerHTML = renderTypingIndicator(partnerName);
+  msgs.appendChild(typingWrap.firstElementChild);
+  msgs.scrollTop = msgs.scrollHeight;
 
   setTimeout(() => {
+    const typing = document.getElementById('chatTypingIndicator');
+    if (typing) typing.remove();
     const reply = document.createElement('div');
     reply.className = 'msg msg-in';
     reply.textContent = 'Got it! Let me check our current stock and get back to you.';
     msgs.appendChild(reply);
     msgs.scrollTop = msgs.scrollHeight;
+    if (momentumChip) { momentumChip.textContent = 'Active thread'; momentumChip.className = 'thread-chip active'; }
+    if (activeMeta) activeMeta.textContent = 'Last active just now';
 
     const convo = currentUser.messages.find(msg => msg.partnerId === partnerId);
     if (convo) {
@@ -2813,7 +3897,6 @@ function sendMessage() {
       convo.unread = true;
       renderConversationList();
       renderDashboardMessages();
-      renderDashboardGuidance();
       updateDashboardCounts();
     }
   }, 1200);
@@ -2830,11 +3913,77 @@ function saveBiz(id) {
   if (!currentUser.savedPartnerIds.includes(id)) {
     currentUser.savedPartnerIds.unshift(id);
     renderSavedPartners();
-    renderDashboardGuidance();
     updateDashboardCounts();
   }
   showToast(`🔖 ${biz.name} saved to your partners.`);
+  showUxToast('Partner saved', 'Saved ✓ → Message them now or keep browsing good matches.');
+  if ((currentUser.savedPartnerIds || []).length >= 2) {
+    setTimeout(() => showUxToast('Your network is growing fast', '🚀 You are building a stronger business network with every good fit you save.', '🚀'), 520);
+  }
+  setTimeout(() => showUxToast('Progress updated', 'Your network just grew by one saved partner.'), 450);
+  setTimeout(() => openFlowAfterPartnerSaved(id), 180);
 }
+
+
+function showUxToast(title, copy = '', icon = '✓') {
+  const stack = document.getElementById('uxToastStack');
+  if (!stack) return;
+  const toast = document.createElement('div');
+  toast.className = 'ux-toast toast-soft-enter';
+  toast.innerHTML = `
+    <div class="ux-toast-icon">${icon}</div>
+    <div>
+      <div class="ux-toast-title">${escapeHtml(title)}</div>
+      <div class="ux-toast-copy">${escapeHtml(copy)}</div>
+    </div>
+  `;
+  stack.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(8px) scale(.985)';
+    toast.style.transition = 'opacity .2s ease, transform .2s cubic-bezier(.2,.8,.2,1)';
+    setTimeout(() => toast.remove(), 200);
+  }, 2200);
+}
+
+function withLoadingState(target, fn, delay = 150) {
+  if (!target) { fn(); return; }
+  target.classList.add('is-loading', 'tap-confirm');
+  window.setTimeout(() => {
+    try { fn(); }
+    finally {
+      window.setTimeout(() => {
+        target.classList.remove('is-loading', 'tap-confirm');
+      }, 140);
+    }
+  }, delay);
+}
+
+function renderSimpleSkeleton(containerId, count = 2) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = Array.from({ length: count }).map(() => `
+    <div class="skeleton-card">
+      <div class="skeleton-line sm"></div>
+      <div class="skeleton-line lg"></div>
+      <div class="skeleton-line md"></div>
+    </div>
+  `).join('');
+}
+
+function flashSuccessChip(button, text) {
+  if (!button) return;
+  const original = button.innerHTML;
+  button.classList.add('pulse-success');
+  button.innerHTML = `<span class="success-chip">✓ ${escapeHtml(text)}</span>`;
+  button.disabled = true;
+  setTimeout(() => {
+    button.innerHTML = original;
+    button.disabled = false;
+    button.classList.remove('pulse-success');
+  }, 950);
+}
+
 
 function showToast(msg, duration = 2800) {
   const t = document.getElementById('toast');
@@ -2850,10 +3999,30 @@ renderConversationList();
 renderDashboardMessages();
 renderSavedPartners();
 renderRatingSection();
-renderDashboardGuidance();
 updateDashboardCounts();
 </script>
 
+
+  <div class="ux-toast-stack" id="uxToastStack" aria-live="polite" aria-atomic="true"></div>
+<script>
+document.addEventListener('click', function uxButtonFeedback(e) {
+  const target = e.target.closest('.btn, button, .chip, .bottom-nav-item');
+  if (!target) return;
+  target.classList.add('tap-confirm');
+  setTimeout(() => target.classList.remove('tap-confirm'), 220);
+}, true);
+</script>
+
+  <div class="modal" id="flowHandoffModal" aria-hidden="true">
+    <div class="sheet medium">
+      <button class="close-x" onclick="closeModal('flowHandoffModal')">×</button>
+      <div class="flow-handoff-card stack-12">
+        <div class="heading-lg" id="flowHandoffTitle">Next step ready</div>
+        <div class="text-subtle" id="flowHandoffCopy">Keep moving with the next best action.</div>
+        <div class="flow-handoff-actions" id="flowHandoffActions"></div>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>
