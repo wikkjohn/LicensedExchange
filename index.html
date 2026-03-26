@@ -3797,7 +3797,7 @@ function updateDashboardCounts() {
   }
   const alertBadge = document.getElementById('nav-alerts-badge');
   if (alertBadge) {
-    const alertCount = unreadCount > 0 ? 1 : 0;
+    const alertCount = unreadCount;
     alertBadge.textContent = alertCount > 0 ? String(alertCount) : '';
     alertBadge.classList.toggle('hidden', alertCount === 0);
   }
