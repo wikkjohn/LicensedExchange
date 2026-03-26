@@ -3940,9 +3940,7 @@ function sendMessage() {
       unread: false
     });
   }
-  renderConversationList();
-  renderDashboardMessages();
-  updateDashboardCounts();
+  renderAllOwnerViews();
   flashSuccessChip(document.querySelector('#chatModal .btn-primary, #chatModal button[onclick*="sendMessage"]'), 'Message sent');
   showUxToast('Message sent', 'Message sent ✓ → Check messages or reach out to another strong match.');
   if ((currentUser.messages || []).length === 1) {
