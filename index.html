@@ -5,6 +5,61 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Licensed Business Exchange</title>
   <style>
+/* Layout spacing utilities */
+.stack-8 > * + * { margin-top: 8px; }
+.stack-12 > * + * { margin-top: 12px; }
+.stack-16 > * + * { margin-top: 16px; }
+.stack-24 > * + * { margin-top: 24px; }
+
+/* Section containers */
+.section-shell {
+  padding: 24px 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Headings */
+.heading-lg {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.text-subtle {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* Cards */
+.uniform-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
+}
+
+/* Message thread chips */
+.thread-chip {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.reply-urgent {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+/* Smooth transition hooks */
+.view-transitioning {
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+</style>
+
+  <style>
     /* ── Reset & Base ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -908,6 +963,12 @@
     </div>
   </div>
 </nav>
+<nav id="bottom-nav">
+  <button id="nav-browse"><span>Browse</span></button>
+  <button id="nav-messages"><span>Messages</span><span class="badge hidden"></span></button>
+  <button id="nav-saved"><span>Saved</span><span class="badge hidden"></span></button>
+  <button id="nav-dashboard"><span>Dashboard</span></button>
+</nav>
 
 
 <!-- ══════════════════════════════════════
@@ -1625,6 +1686,13 @@
 
 
 <script>
+window.currentUser = { isLoggedIn: false };
+window.recommendedMatchesCache = window.recommendedMatchesCache || [];
+window.conversations = window.conversations || [];
+window.savedPartners = window.savedPartners || [];
+
+
+
 /* ── Sample Data ── */
 const LISTINGS = [
   {
@@ -2235,16 +2303,22 @@ function renderDashboardGuidance() {
   nextBtn.textContent = nextStep ? nextStep.actionLabel : 'View your rating';
 }
 
-function switchView(v) {
-  const root = document.body;
+function switchView(id) {
+  const root = document.querySelector('#app');
+  if (!root) return;
+
   root.classList.add('view-transitioning');
-  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.remove('active'));
-  window.setTimeout(() => {
-    document.getElementById('view-' + v).classList.add('active');
-    document.getElementById('nav-' + v).classList.add('active');
-    window.setTimeout(() => root.classList.remove('view-transitioning'), 180);
-  }, 70);
+
+  setTimeout(() => {
+    document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+    const target = document.getElementById(id);
+    if (target) target.classList.remove('hidden');
+
+    root.classList.remove('view-transitioning');
+  }, 180);
+}
+
+
 }
 
 function scrollToListings() {
@@ -3244,67 +3318,35 @@ function getPersonalizedMessagePrompt(biz) {
   return `Hi ${businessName}, this is ${myBusiness}. We wanted to reconnect and see whether there may be a good opportunity to work together right now.`;
 }
 
+
 function renderPersonalizationBanner() {
-  const mount = document.getElementById('personalizationBannerMount');
-  if (!mount || !currentUser) return;
-  const plan = getPersonalizedDashboardPlan();
-  mount.innerHTML = `
-    <div class="personalization-banner stack-12">
-      <div class="personalization-kicker">${escapeHtml(plan.kicker)}</div>
-      <div class="heading-xl">${escapeHtml(plan.title)}</div>
-      <div class="text-subtle">${escapeHtml(plan.copy)}</div>
-      <div class="personalization-actions">
-        ${plan.actions.map(action => `<button class="btn ${action.kind === 'ghost' ? 'btn-ghost' : 'btn-primary'}" onclick="${action.onclick}">${escapeHtml(action.label)}</button>`).join('')}
-      </div>
-    </div>
-  `;
+  const mount = document.getElementById('personalization-banner');
+  if (!mount) return;
+
+  if (!currentUser || !currentUser.isLoggedIn) {
+    mount.innerHTML = "";
+    return;
+  }
+
+  mount.innerHTML = `<div class="uniform-card">Welcome back, ${currentUser.name}</div>`;
 }
+
+
+}
+
 function getDashboardNextStepSummary() {
-  const matchCount = (Array.isArray(window.recommendedMatchesCache) ? window.recommendedMatchesCache.length : 0) || 0;
-  const unreadCount = (Array.isArray(window.conversations) ? window.conversations.filter(c => c.unread).length : 0) || 0;
-  const savedCount = Array.isArray(window.savedPartners) ? window.savedPartners.length : 0;
+  const rec = window.recommendedMatchesCache;
+  const conv = window.conversations;
+  const saved = window.savedPartners;
 
-  if (unreadCount > 0) {
-    return {
-      title: `You have ${unreadCount} conversation${unreadCount === 1 ? '' : 's'} needing attention`,
-      copy: 'Replying quickly helps keep momentum and builds trust with potential partners.',
-      primaryLabel: 'Open messages',
-      primaryAction: 'scrollIntoViewById("messagesSection")',
-      secondaryLabel: 'Browse matches',
-      secondaryAction: 'scrollIntoViewById("recommendedMatchesSection")'
-    };
-  }
+  if (rec.length > 0) return "You have a new recommended partner to review.";
+  if (conv.length === 0) return "Start your first conversation to activate your dashboard.";
+  if (saved.length > 0) return "You have saved partners to follow up with.";
 
-  if (matchCount > 0) {
-    return {
-      title: `You have ${matchCount} strong match${matchCount === 1 ? '' : 'es'} → Reach out`,
-      copy: 'Recommended matches are the fastest path to a new connection.',
-      primaryLabel: 'View matches',
-      primaryAction: 'scrollIntoViewById("recommendedMatchesSection")',
-      secondaryLabel: 'Message a match',
-      secondaryAction: 'messageFirstRecommendedMatch()'
-    };
-  }
+  return "Complete your profile to unlock personalized matches.";
+}
 
-  if (savedCount > 0) {
-    return {
-      title: 'Saved partners are ready for follow-up',
-      copy: 'A quick message is usually the best next step after saving a good fit.',
-      primaryLabel: 'Message saved partner',
-      primaryAction: 'messageMostRecentSavedPartner()',
-      secondaryLabel: 'Open saved partners',
-      secondaryAction: 'scrollIntoViewById("savedPartnersSection")'
-    };
-  }
 
-  return {
-    title: 'Browse businesses and start one conversation',
-    copy: 'The fastest way to see value is to reach out to one strong fit.',
-    primaryLabel: 'Browse businesses',
-    primaryAction: "setView('browse')",
-    secondaryLabel: 'Open dashboard messages',
-    secondaryAction: 'scrollIntoViewById("messagesSection")'
-  };
 }
 
 function scrollIntoViewById(id) {
@@ -3312,12 +3354,17 @@ function scrollIntoViewById(id) {
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+
 function messageFirstRecommendedMatch() {
-  const first = Array.isArray(window.recommendedMatchesCache) && window.recommendedMatchesCache.length ? window.recommendedMatchesCache[0] : null;
-  if (first && first.id) {
-    if (typeof openGuidedMessageComposer === 'function') return openGuidedMessageComposer(first.id);
-    if (typeof contactBiz === 'function') return contactBiz(first.id);
+  const rec = window.recommendedMatchesCache[0];
+  if (!rec) {
+    console.warn("No recommended match found");
+    return;
   }
+  startConversation(rec.id);
+}
+
+
 }
 
 
@@ -3571,75 +3618,20 @@ function getConversationPriority(thread) {
   return { urgent: false, label: 'Follow up soon', reason: 'A light follow-up can keep this connection moving.' }
 }
 
+
 function renderSmartPriorities() {
-  const mount = document.getElementById('smartPriorityMount')
-  if (!mount || !currentUser) return
-  const matches = getPrioritizedMatches(2)
-  const unreadThreads = (currentUser.messages || []).filter(m => m.unread)
-  const topThread = unreadThreads.length ? unreadThreads[0] : ((currentUser.messages || [])[0] || null)
+  const mount = document.getElementById('smart-priorities');
+  if (!mount) return;
 
-  const parts = []
-
-
-  const cards = []
-  if (matches.length) {
-    cards.push(`
-      <div class="priority-panel stack-12">
-        <div class="heading-lg">Best opportunities right now</div>
-        <div class="text-subtle">These matches are ranked first so you can focus on the businesses most likely to convert into a useful connection.</div>
-        <div class="priority-list">
-          ${matches.map((item, idx) => `
-            <div class="priority-item">
-              <div class="priority-main">
-                <div class="priority-head">
-                  <strong>${escapeHtml(item.biz.name)}</strong>
-                  ${(item.labels || []).map(label => `<span class="priority-badge ${label.includes('Best') ? 'best' : 'fast'}">${escapeHtml(label)}</span>`).join('')}
-                </div>
-                <div class="priority-reason">${escapeHtml(item.reason)} · ${escapeHtml(formatTypeLabel(item.biz.type))} · ${escapeHtml(item.biz.location)}</div>
-                ${renderConfidenceRow(item.biz)}
-                ${renderCredibilityRow(item.biz)}
-              </div>
-              <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
-                <button class="btn btn-ghost" onclick="openBizModal(${item.biz.id})">View</button>
-                <button class="btn btn-primary" onclick="withLoadingState(this, () => contactBiz(${item.biz.id}))">Message now</button>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `)
+  if (!currentUser || !currentUser.isLoggedIn) {
+    mount.innerHTML = "";
+    return;
   }
 
-  if (topThread) {
-    const p = getConversationPriority(topThread)
-    cards.push(`
-      <div class="priority-panel stack-12">
-        <div class="heading-lg">Conversation to prioritize</div>
-        <div class="text-subtle">The system is surfacing the thread most likely to need your attention now.</div>
-        <div class="priority-list">
-          <div class="priority-item">
-            <div class="priority-main">
-              <div class="priority-head">
-                <strong>${escapeHtml(topThread.partnerName || 'Business partner')}</strong>
-                <span class="${p.urgent ? 'reply-urgent' : 'priority-badge fast'}">${escapeHtml(p.label)}</span>
-              </div>
-              <div class="priority-reason">${escapeHtml(p.reason)} Preview: ${escapeHtml(topThread.preview || 'Open conversation')}</div>
-            </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
-              <button class="btn btn-primary" onclick="withLoadingState(this, () => openChatByPartnerId(${topThread.partnerId}))">Open thread</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `)
-  }
-
-  if (!cards.length) {
-    mount.innerHTML = ''
-    return
-  }
-  mount.innerHTML = cards.join('')
+  mount.innerHTML = `<div class="uniform-card">Your next task is ready.</div>`;
 }
+
+
 function renderDashboardNextStepBanner() {
   const mount = document.getElementById('dashboardNextStepBanner');
   if (!mount || !window.currentUser) return;
@@ -3709,24 +3701,21 @@ function renderRatingSection() {
   }
 }
 
+
 function updateDashboardCounts() {
-  const activeListingsCount = getSecondaryListings().length;
-  const messagesCount = currentUser.messages.length;
-  const savedPartnersCount = currentUser.savedPartnerIds.length;
-  const ratingDisplay = getRatingDisplay();
+  const unread = window.conversations.filter(c => c.unread).length;
+  const el = document.querySelector('#nav-messages .badge');
+  if (!el) return;
 
-  const setText = (id, value) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = value;
-  };
+  if (unread > 0) {
+    el.textContent = unread;
+    el.classList.remove('hidden');
+  } else {
+    el.classList.add('hidden');
+  }
+}
 
-  setText('dashActiveListingsCount', activeListingsCount);
-  setText('dashMessagesCount', messagesCount);
-  setText('dashSavedPartnersCount', savedPartnersCount);
-  setText('dashRatingCount', ratingDisplay);
 
-  const bottomMessagesBadge = document.querySelector('#nav-messages .badge');
-  if (bottomMessagesBadge) bottomMessagesBadge.textContent = messagesCount;
 }
 
 function renderAllOwnerViews() {
@@ -4013,16 +4002,7 @@ document.addEventListener('click', function uxButtonFeedback(e) {
 }, true);
 </script>
 
-  <div class="modal" id="flowHandoffModal" aria-hidden="true">
-    <div class="sheet medium">
-      <button class="close-x" onclick="closeModal('flowHandoffModal')">×</button>
-      <div class="flow-handoff-card stack-12">
-        <div class="heading-lg" id="flowHandoffTitle">Next step ready</div>
-        <div class="text-subtle" id="flowHandoffCopy">Keep moving with the next best action.</div>
-        <div class="flow-handoff-actions" id="flowHandoffActions"></div>
-      </div>
-    </div>
-  </div>
+  <div id="flow-handoff-modal" class="hidden"></div>
 
 </body>
 </html>
