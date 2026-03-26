@@ -963,12 +963,7 @@
     </div>
   </div>
 </nav>
-<nav id="bottom-nav">
-  <button id="nav-browse"><span>Browse</span></button>
-  <button id="nav-messages"><span>Messages</span><span class="badge hidden"></span></button>
-  <button id="nav-saved"><span>Saved</span><span class="badge hidden"></span></button>
-  <button id="nav-dashboard"><span>Dashboard</span></button>
-</nav>
+
 
 
 <!-- ══════════════════════════════════════
@@ -1277,18 +1272,18 @@
   <button class="bottom-nav-item active" id="nav-browse"    onclick="switchView('browse')">
     <span class="icon">🔍</span>Browse
   </button>
-  <button class="bottom-nav-item"        id="nav-notif"     onclick="switchView('notif')">
-    <span class="nav-item-wrap">
-      <span class="icon">🔔</span>
-      <span class="badge">2</span>
-    </span>Alerts
-  </button>
-  <button class="bottom-nav-item"        id="nav-messages"  onclick="switchView('messages')">
-    <span class="nav-item-wrap">
-      <span class="icon">💬</span>
-      <span class="badge">1</span>
-    </span>Messages
-  </button>
+  <button class="bottom-nav-item" id="nav-notif" onclick="switchView('notif')">
+  <span class="nav-item-wrap">
+    <span class="icon">🔔</span>
+    <span class="badge hidden" id="nav-alerts-badge"></span>
+  </span>Alerts
+</button>
+  <button class="bottom-nav-item" id="nav-messages" onclick="switchView('messages')">
+  <span class="nav-item-wrap">
+    <span class="icon">💬</span>
+    <span class="badge hidden" id="nav-messages-badge"></span>
+  </span>Messages
+</button>
   <button class="bottom-nav-item"        id="nav-dashboard" onclick="switchView('dashboard')">
     <span class="icon">📊</span>Dashboard
   </button>
@@ -1686,7 +1681,7 @@
 
 
 <script>
-window.currentUser = { isLoggedIn: false };
+
 window.recommendedMatchesCache = window.recommendedMatchesCache || [];
 window.conversations = window.conversations || [];
 window.savedPartners = window.savedPartners || [];
@@ -2199,33 +2194,31 @@ function handleBusinessCardClick(id) {
   openBizModal(id);
 }
 
-function getFilteredData() {
-  const q = document.getElementById('searchInput').value.toLowerCase().trim();
-  let data = [...getAllVisibleListings()];
-  if (currentFilter !== 'all') {
-    data = data.filter(b => b.type === currentFilter);
-  }
-  if (q) {
-    data = data.filter(b => {
-      const searchableText = [
-        b.name,
-        b.location,
-        b.type,
-        ...(b.sells || []),
-        ...(b.buys || []),
-        ...(b.tags || []),
-        b.featuredOffer || '',
-        b.wantLabel || '',
-        b.description || ''
-      ]
-        .join(' ')
-        .toLowerCase();
 
-      return searchableText.includes(q);
-    }) + `${listingState === 'inactive' ? '<div class="inactive-badge">⏸ Needs more detail to feel active</div>' : ''}</div>`;
-  }
-  return data;
+function getFilteredData() {
+  const query = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+  const base = getAllVisibleListings();
+
+  return base.filter(biz => {
+    const fields = [
+      biz.name,
+      biz.location,
+      formatTypeLabel(biz.type),
+      ...(Array.isArray(biz.sells) ? biz.sells : []),
+      ...(Array.isArray(biz.buys) ? biz.buys : [])
+    ]
+      .filter(Boolean)
+      .map(v => String(v).toLowerCase());
+
+    const matchesQuery = !query || fields.some(v => v.includes(query));
+    const matchesType = currentFilter === 'all' ||
+      String(biz.type || '').toLowerCase() === currentFilter;
+
+    return matchesQuery && matchesType;
+  });
 }
+
+
 
 function setFilter(f, el) {
   currentFilter = f;
@@ -2303,19 +2296,14 @@ function renderDashboardGuidance() {
   nextBtn.textContent = nextStep ? nextStep.actionLabel : 'View your rating';
 }
 
-function switchView(id) {
-  const root = document.querySelector('#app');
-  if (!root) return;
-
-  root.classList.add('view-transitioning');
-
-  setTimeout(() => {
-    document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
-    const target = document.getElementById(id);
-    if (target) target.classList.remove('hidden');
-
-    root.classList.remove('view-transitioning');
-  }, 180);
+function switchView(v) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.remove('active'));
+  const view = document.getElementById('view-' + v);
+  const navBtn = document.getElementById('nav-' + v);
+  if (view) view.classList.add('active');
+  if (navBtn) navBtn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 
@@ -2469,38 +2457,17 @@ function logout() {
   isLoggedIn = false;
   currentEditingBusinessId = null;
   currentChatPartnerId = null;
-  closeModal('accountModal');
-  closeModal('editListingModal');
-  closeModal('chatModal');
-  closeModal('bizModal');
-  closeModal('listingModal');
+  ['accountModal','editListingModal','chatModal','bizModal',
+   'listingModal','flowHandoffModal'].forEach(id => closeModal(id));
   clearAuthForms();
   resetCurrentUserState();
   document.getElementById('dashGuest').classList.remove('hidden');
   document.getElementById('dashUser').classList.add('hidden');
   renderNavActions();
-  switchView('browse');
-  filterCards();
   updateDashboardCounts();
-  renderCelebrationMoments();
-  renderCelebrationMoments();
-  renderLiveMarketplaceFeed();
-  renderLiveMarketplaceFeed();
-  renderCelebrationMoments();
-  renderOutcomeBoard();
-  renderOutcomeBoard();
-  renderLiveMarketplaceFeed();
-  renderLifecycleBanner();
-  renderNotificationCenter();
-  renderLifecycleBanner();
-  renderOutcomeBoard();
-  renderPersonalizationBanner();
-  renderSmartPriorities();
-  renderPersonalizationBanner();
-  renderDashboardNextStepBanner();
-  renderNotificationCenter();
-  renderSmartPriorities();
-showToast('👋 You have been logged out.');
+  filterCards();
+  switchView('browse');
+  showToast('👋 You have been logged out.');
 }
 
 function goListingStep(step) {
@@ -3320,30 +3287,139 @@ function getPersonalizedMessagePrompt(biz) {
 
 
 function renderPersonalizationBanner() {
-  const mount = document.getElementById('personalization-banner');
+  const mount = document.getElementById('personalization-banner') ||
+                document.getElementById('personalizationBannerMount');
   if (!mount) return;
-
-  if (!currentUser || !currentUser.isLoggedIn) {
-    mount.innerHTML = "";
+  if (!isLoggedIn || !currentUser.profile) {
+    mount.innerHTML = '';
     return;
   }
-
-  mount.innerHTML = `<div class="uniform-card">Welcome back, ${currentUser.name}</div>`;
+  const plan = getPersonalizedDashboardPlan();
+  mount.innerHTML = `
+    <div class="personalization-banner stack-12">
+      <div class="personalization-kicker">${escapeHtml(plan.kicker)}</div>
+      <div class="heading-lg">${escapeHtml(plan.title)}</div>
+      <div class="text-subtle">${escapeHtml(plan.copy)}</div>
+      <div class="personalization-actions">
+        ${plan.actions.map(a =>
+          `<button class="btn ${a.kind === 'ghost' ? 'btn-ghost' : 'btn-primary'}"
+           onclick="${a.onclick}">${escapeHtml(a.label)}</button>`
+        ).join('')}
+      </div>
+    </div>
+  `;
+}
+// Replace renderSmartPriorities guard with:
+function renderSmartPriorities() {
+  const mount = document.getElementById('smartPriorityMount') ||
+                document.getElementById('smart-priorities');
+  if (!mount) return;
+  if (!isLoggedIn || !currentUser.profile) {
+    mount.innerHTML = '';
+    return;
+  }
+  const matches = getPrioritizedMatches(2);
+  const unreadThreads = currentUser.messages.filter(m => m.unread);
+  const topThread = unreadThreads[0] || currentUser.messages[0] || null;
+  const cards = [];
+  if (matches.length) {
+    cards.push(`
+      <div class="priority-panel stack-12">
+        <div class="heading-lg">Best opportunities right now</div>
+        <div class="text-subtle">Ranked by match quality so you can act on the best fit first.</div>
+        <div class="priority-list">
+          ${matches.map(item => `
+            <div class="priority-item">
+              <div class="priority-main">
+                <div class="priority-head">
+                  <strong>${escapeHtml(item.biz.name)}</strong>
+                  ${(item.labels || []).map(label =>
+                    `<span class="priority-badge">${escapeHtml(label)}</span>`
+                  ).join('')}
+                </div>
+                <div class="priority-reason">${escapeHtml(item.reason)} ·
+                  ${escapeHtml(formatTypeLabel(item.biz.type))} ·
+                  ${escapeHtml(item.biz.location)}</div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-ghost" onclick="openBizModal(${item.biz.id})">View</button>
+                <button class="btn btn-primary" onclick="contactBiz(${item.biz.id})">Message now</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `);
+  }
+  if (topThread) {
+    const p = getConversationPriority(topThread);
+    cards.push(`
+      <div class="priority-panel stack-12">
+        <div class="heading-lg">Conversation to prioritize</div>
+        <div class="priority-list">
+          <div class="priority-item">
+            <div class="priority-main">
+              <div class="priority-head">
+                <strong>${escapeHtml(topThread.partnerName || 'Partner')}</strong>
+                <span class="${p.urgent ? 'reply-urgent' : 'thread-chip'}">${escapeHtml(p.label)}</span>
+              </div>
+              <div class="priority-reason">${escapeHtml(p.reason)}</div>
+            </div>
+            <button class="btn btn-primary"
+              onclick="openChatByPartnerId(${topThread.partnerId})">Open thread</button>
+          </div>
+        </div>
+      </div>
+    `);
+  }
+  mount.innerHTML = cards.length ? cards.join('') : '';
 }
 
 
 
 
 function getDashboardNextStepSummary() {
-  const rec = window.recommendedMatchesCache;
-  const conv = window.conversations;
-  const saved = window.savedPartners;
-
-  if (rec.length > 0) return "You have a new recommended partner to review.";
-  if (conv.length === 0) return "Start your first conversation to activate your dashboard.";
-  if (saved.length > 0) return "You have saved partners to follow up with.";
-
-  return "Complete your profile to unlock personalized matches.";
+  const unreadCount = currentUser.messages.filter(m => m.unread).length;
+  const matchCount = getPrioritizedMatches(3).length;
+  const savedCount = currentUser.savedPartnerIds.length;
+  if (unreadCount > 0) {
+    return {
+      title: `You have ${unreadCount} conversation${unreadCount === 1 ? '' : 's'} needing attention`,
+      copy: 'Replying quickly builds trust and keeps momentum going.',
+      primaryLabel: 'Open messages',
+      primaryAction: "scrollIntoViewById('dashboard-messages')",
+      secondaryLabel: 'Browse matches',
+      secondaryAction: "switchView('browse')"
+    };
+  }
+  if (matchCount > 0) {
+    return {
+      title: `You have ${matchCount} strong match${matchCount === 1 ? '' : 'es'} to reach out to`,
+      copy: 'Recommended matches are the fastest path to a new connection.',
+      primaryLabel: 'View matches',
+      primaryAction: "scrollIntoViewById('dashboard-active-listings')",
+      secondaryLabel: 'Browse businesses',
+      secondaryAction: "switchView('browse')"
+    };
+  }
+  if (savedCount > 0) {
+    return {
+      title: 'Your saved partners are ready for follow-up',
+      copy: 'A quick message is usually the best next step after saving a fit.',
+      primaryLabel: 'View saved partners',
+      primaryAction: "scrollIntoViewById('dashboard-saved-partners')",
+      secondaryLabel: 'Browse businesses',
+      secondaryAction: "switchView('browse')"
+    };
+  }
+  return {
+    title: 'Start by browsing and sending one message',
+    copy: 'The fastest way to see value is to reach out to one strong fit.',
+    primaryLabel: 'Browse businesses',
+    primaryAction: "switchView('browse')",
+    secondaryLabel: 'View dashboard',
+    secondaryAction: "scrollIntoViewById('dashboard-messages')"
+  };
 }
 
 
@@ -3356,12 +3432,12 @@ function scrollIntoViewById(id) {
 
 
 function messageFirstRecommendedMatch() {
-  const rec = window.recommendedMatchesCache[0];
-  if (!rec) {
-    console.warn("No recommended match found");
+  const matches = getPrioritizedMatches(1);
+  if (!matches.length) {
+    showToast('No recommended matches yet. Keep browsing!');
     return;
   }
-  startConversation(rec.id);
+  contactBiz(matches[0].biz.id);
 }
 
 
@@ -3703,15 +3779,27 @@ function renderRatingSection() {
 
 
 function updateDashboardCounts() {
-  const unread = window.conversations.filter(c => c.unread).length;
-  const el = document.querySelector('#nav-messages .badge');
-  if (!el) return;
-
-  if (unread > 0) {
-    el.textContent = unread;
-    el.classList.remove('hidden');
-  } else {
-    el.classList.add('hidden');
+  // Dashboard stat tiles
+  const setText = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  };
+  setText('dashActiveListingsCount', getSecondaryListings().length);
+  setText('dashMessagesCount', currentUser.messages.length);
+  setText('dashSavedPartnersCount', currentUser.savedPartnerIds.length);
+  setText('dashRatingCount', getRatingDisplay());
+  // Bottom nav badges — use actual data
+  const unreadCount = currentUser.messages.filter(m => m.unread).length;
+  const msgBadge = document.getElementById('nav-messages-badge');
+  if (msgBadge) {
+    msgBadge.textContent = unreadCount > 0 ? String(unreadCount) : '';
+    msgBadge.classList.toggle('hidden', unreadCount === 0);
+  }
+  const alertBadge = document.getElementById('nav-alerts-badge');
+  if (alertBadge) {
+    const alertCount = unreadCount > 0 ? 1 : 0;
+    alertBadge.textContent = alertCount > 0 ? String(alertCount) : '';
+    alertBadge.classList.toggle('hidden', alertCount === 0);
   }
 }
 
@@ -4002,7 +4090,21 @@ document.addEventListener('click', function uxButtonFeedback(e) {
 }, true);
 </script>
 
-  <div id="flow-handoff-modal" class="hidden"></div>
+  <div class="modal-overlay" id="flowHandoffModal"
+     onclick="overlayClose(event,'flowHandoffModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <h2 id="flowHandoffTitle">Next step ready</h2>
+      <button class="modal-close" onclick="closeModal('flowHandoffModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p id="flowHandoffCopy" style="font-size:.9rem;color:#6b7280;margin-bottom:20px;"></p>
+      <div id="flowHandoffActions"
+           style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
