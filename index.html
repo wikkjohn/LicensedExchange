@@ -3987,8 +3987,7 @@ function saveBiz(id) {
   if (!biz) return;
   if (!currentUser.savedPartnerIds.includes(id)) {
     currentUser.savedPartnerIds.unshift(id);
-    renderSavedPartners();
-    updateDashboardCounts();
+    renderAllOwnerViews();
   }
   showToast(`🔖 ${biz.name} saved to your partners.`);
   showUxToast('Partner saved', 'Saved ✓ → Message them now or keep browsing good matches.');
