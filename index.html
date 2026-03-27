@@ -112,9 +112,17 @@
       display: flex; align-items: center; justify-content: space-between;
     }
     .nav-logo {
-      font-weight: 700; font-size: 1.1rem; color: var(--green);
-      display: flex; align-items: center; gap: 6px;
+  font-weight: 700; font-size: 1.1rem; color: var(--green);
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none;
     }
+    .nav-logo img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+}
     .nav-logo span { font-size: 1.3rem; }
     .nav-actions { display: flex; gap: 8px; }
 
@@ -961,7 +969,10 @@
 ══════════════════════════════════════ -->
 <nav>
   <div class="nav-inner">
-    <div class="nav-logo"><span>🌿</span> Ofni </div>
+    <div class="nav-logo" onclick="switchView('browse'); window.scrollTo({ top: 0, behavior: 'smooth' });">
+  <img src="site-logo.png" alt="BizExchange logo" />
+  <span>Ofni</span>
+</div>
     <div class="nav-actions" id="navActions">
       <button class="btn btn-ghost"   onclick="openModal('authModal')">Log in</button>
       <button class="btn btn-primary" onclick="openModal('authModal')">Sign up</button>
