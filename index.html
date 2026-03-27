@@ -562,7 +562,7 @@
     .tag-list {
       display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;
     }
-    .tag {
+    .tag-list .tag
       display: inline-flex; align-items: center; gap: 6px;
       background: var(--green-pale); color: var(--green);
       border-radius: 999px; padding: 4px 12px;
@@ -704,15 +704,7 @@
     .dash-stat .num { font-size: 1.8rem; font-weight: 800; color: var(--green); }
     .dash-stat .lbl { font-size: .75rem; color: var(--muted); margin-top: 2px; }
 
-    .dash-stat {
-      cursor: pointer;
-      transition: transform .15s, box-shadow .15s, border-color .15s;
-    }
-    .dash-stat:hover {
-      transform: translateY(-1px);
-      box-shadow: var(--shadow-sm);
-      border-color: var(--green-light);
-    }
+    
     .dashboard-section-card {
       background: var(--white); border-radius: var(--radius);
       border: 1px solid var(--border); padding: 16px;
@@ -3719,17 +3711,7 @@ function getConversationPriority(thread) {
 }
 
 
-function renderSmartPriorities() {
-  const mount = document.getElementById('smart-priorities');
-  if (!mount) return;
 
-  if (!currentUser || !currentUser.isLoggedIn) {
-    mount.innerHTML = "";
-    return;
-  }
-
-  mount.innerHTML = `<div class="uniform-card">Your next task is ready.</div>`;
-}
 
 
 function renderDashboardNextStepBanner() {
