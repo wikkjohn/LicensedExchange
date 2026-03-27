@@ -963,7 +963,7 @@
   </style>
 </head>
 <body>
-
+<div id="supabaseTestResult">Testing connection...</div>
 <!-- ══════════════════════════════════════
      TOP NAV
 ══════════════════════════════════════ -->
@@ -1676,9 +1676,34 @@
 <!-- ══════════════════════════════════════
      JAVASCRIPT
 ══════════════════════════════════════ -->
+<script>
+  const SUPABASE_URL = 'https://grxzagpvypzmyfycmlba.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdyeHphZ3B2eXB6bXlmeWNtbGJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwMzQzNDYsImV4cCI6MjA4NzYxMDM0Nn0.78b4DCS2sK0srA5_lsnAPxru0HqRgJduzpDsdrwIExU';
 
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  async function testSupabaseConnection() {
+    const resultEl = document.getElementById('supabaseTestResult');
+    resultEl.textContent = 'Testing Supabase connection...';
+
+    const { data, error } = await supabase.auth.getSession();
+
+    if (error) {
+      resultEl.textContent = `Connection failed: ${error.message}`;
+      console.error(error);
+      return;
+    }
+
+    resultEl.textContent = 'Supabase connection successful.';
+    console.log('Session response:', data);
+  }
+
+  testSupabaseConnection();
+</script>
 
 <script>
+
+  
 
 window.recommendedMatchesCache = window.recommendedMatchesCache || [];
 window.conversations = window.conversations || [];
