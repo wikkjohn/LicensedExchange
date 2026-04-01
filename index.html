@@ -165,7 +165,7 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
   color: var(--text);
   padding: 44px 20px 32px;
   text-align: left;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid #000;
 }
 #hero p { opacity: 1; max-width: 480px; margin: 0 0 24px; color: var(--muted); }
 .hero-cta { align-items: flex-start; }
@@ -208,7 +208,7 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
       text-align: center;
     }
     #hero h1 {
-      font-size: clamp(1.6rem, 5vw, 2.4rem);
+      font-size: clamp(1.6rem, 5vw, 3.4rem);
       font-weight: 800; line-height: 1.2;
       margin-bottom: 12px;
     }
@@ -229,7 +229,7 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
     /* ── Search Bar ── */
     .search-wrap {
       background: var(--white);
-      border-bottom: 1px solid var(--border);
+      border-bottom: 2px solid #000;
       position: sticky; top: 56px; z-index: 90;
       width: 100%;
     }
@@ -5102,9 +5102,6 @@ function updateDashboardCounts() {
   }
 }
 
-
-
-
 function renderAllOwnerViews() {
   filterCards();
   renderMyBusinessCard();
@@ -5115,16 +5112,23 @@ function renderAllOwnerViews() {
   renderRatingSection();
   renderDashboardGuidance();
   updateDashboardCounts();
-    renderSmartPriorities();
-  renderPersonalizationBanner();
-  renderLifecycleBanner();
-  renderNotificationCenter();
-  renderOutcomeBoard();
-  renderCelebrationMoments();
-  renderDashboardNextStepBanner();
-  renderLiveMarketplaceFeed();
-}
 
+  renderPersonalizationBanner();
+  renderSmartPriorities();
+  renderDashboardNextStepBanner();
+
+  const lifecycleMount = document.getElementById('lifecycleBannerMount');
+  const notificationMount = document.getElementById('notificationCenterMount');
+  const outcomeMount = document.getElementById('outcomeBoardMount');
+  const celebrationMount = document.getElementById('celebrationMomentsMount');
+  const liveFeedMount = document.getElementById('liveMarketplaceFeedMount');
+
+  if (lifecycleMount) lifecycleMount.innerHTML = '';
+  if (notificationMount) notificationMount.innerHTML = '';
+  if (outcomeMount) outcomeMount.innerHTML = '';
+  if (celebrationMount) celebrationMount.innerHTML = '';
+  if (liveFeedMount) liveFeedMount.innerHTML = '';
+}
 function openBizModal(id) {
   const biz = getAllVisibleListings().find(b => String(b.id) === String(id));
   if (!biz) return;
@@ -5210,7 +5214,7 @@ function openChatByPartnerId(partnerId) {
   openChat(biz.name, biz.id);
 }
 
-function openChat(name, partnerId = null) {
+async function openChat(name, partnerId = null) {
   if (!isLoggedIn) {
     openModal('authModal');
     return;
@@ -5225,11 +5229,90 @@ function openChat(name, partnerId = null) {
   }
 
   document.getElementById('chatPartnerName').textContent = name;
-  document.getElementById('chatMessages').innerHTML = `<div class="msg msg-in">Hi! Interested in what you have listed.</div>`;
   closeModal('bizModal');
   openModal('chatModal');
+
+  const chatMessages = document.getElementById('chatMessages');
+  if (chatMessages) {
+    chatMessages.innerHTML = `<div class="msg msg-in">Loading conversation…</div>`;
+  }
+
+  await loadChatThreadFromSupabase(currentChatPartnerId, name);
 }
 
+async function loadChatThreadFromSupabase(partnerId, partnerName = 'Partner') {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  if (!isSupabaseUuidLike(partnerId)) {
+    chatMessages.innerHTML = `<div class="msg msg-in">This conversation is attached to demo data and has no saved thread history.</div>`;
+    return;
+  }
+
+  const ownedListingId = getUserListings()[0]?.id;
+  if (!isSupabaseUuidLike(ownedListingId)) {
+    chatMessages.innerHTML = `<div class="msg msg-in">Your business listing is not ready yet, so the thread could not be loaded.</div>`;
+    return;
+  }
+
+  try {
+    const supabase = getSupabaseClient();
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    if (authError || !authData?.user) {
+      chatMessages.innerHTML = `<div class="msg msg-in">Please log in again to load this conversation.</div>`;
+      return;
+    }
+
+    const listingIds = [ownedListingId, partnerId].sort();
+
+    const { data: conversationRows, error: conversationError } = await supabase
+      .from('conversations')
+      .select('id')
+      .eq('listing_a_id', listingIds[0])
+      .eq('listing_b_id', listingIds[1])
+      .limit(1);
+
+    if (conversationError) {
+      throw conversationError;
+    }
+
+    const conversationId = conversationRows?.[0]?.id || null;
+
+    if (!conversationId) {
+      chatMessages.innerHTML = `<div class="msg msg-in">No messages yet with ${escapeHtml(partnerName)}.</div>`;
+      return;
+    }
+
+    const { data: rows, error: messagesError } = await supabase
+      .from('messages')
+      .select('id, sender_id, body, created_at')
+      .eq('conversation_id', conversationId)
+      .order('created_at', { ascending: true });
+
+    if (messagesError) {
+      throw messagesError;
+    }
+
+    if (!rows || !rows.length) {
+      chatMessages.innerHTML = `<div class="msg msg-in">No messages yet with ${escapeHtml(partnerName)}.</div>`;
+      return;
+    }
+
+    chatMessages.innerHTML = rows.map(row => {
+      const mine = row.sender_id === authData.user.id;
+      return `
+        <div class="msg ${mine ? 'msg-out' : 'msg-in'}">
+          ${escapeHtml(row.body || '')}
+        </div>
+      `;
+    }).join('');
+
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  } catch (err) {
+    console.error('Failed to load chat thread:', err);
+    chatMessages.innerHTML = `<div class="msg msg-in">Could not load this conversation.</div>`;
+  }
+}
 async function persistMessageToSupabase(partnerId, text, partnerName = '') {
   if (!isSupabaseUuidLike(partnerId)) return null;
   const ownedListingId = getUserListings()[0]?.id;
