@@ -999,13 +999,352 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
       .trust-grid       { grid-template-columns: repeat(4, 1fr); }
       .dashboard-stats  { grid-template-columns: repeat(4, 1fr); }
     }
-    @media (min-width: 960px) {
+        @media (min-width: 960px) {
       .bottom-nav {
         max-width: 720px; left: 50%;
         transform: translateX(-50%);
         right: auto; width: 100%;
       }
     }
+
+    /* ── Dashboard enhancement styles ── */
+    #view-dashboard {
+      background: #f7f7f7;
+    }
+
+#view-dashboard section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px 110px;
+}
+
+#dashUser > div {
+  margin-bottom: 16px;
+}
+
+#personalization-banner,
+#lifecycleBannerMount,
+#notificationCenterMount,
+#outcomeBoardMount,
+#celebrationMomentsMount,
+#liveMarketplaceFeedMount,
+#dashboardNextStepBanner,
+#smartPriorityMount {
+  margin-bottom: 16px;
+}
+
+.personalization-banner,
+.lifecycle-banner,
+.outcome-board,
+.celebration-banner,
+.priority-panel,
+.next-step-banner {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.personalization-kicker,
+.lifecycle-kicker,
+.outcome-kicker,
+.celebration-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .76rem;
+  font-weight: 800;
+  color: var(--muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.lifecycle-title,
+.outcome-title,
+.celebration-title {
+  font-size: 1.45rem;
+  line-height: 1.2;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.lifecycle-copy,
+.outcome-copy,
+.celebration-copy,
+.notification-copy,
+.priority-reason,
+.live-copy {
+  font-size: .92rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.personalization-actions,
+.lifecycle-actions,
+.celebration-actions,
+.next-step-banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.notification-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 12px;
+}
+
+.notification-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.notification-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #000000;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.notification-title {
+  font-size: .96rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.notification-meta {
+  margin-top: 6px;
+  font-size: .76rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.outcome-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.outcome-metric {
+  background: #f8f8f8;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.outcome-number {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.outcome-label {
+  font-size: .78rem;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.outcome-growth {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: .88rem;
+  color: var(--muted);
+}
+
+.celebration-banner {
+  background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+}
+
+.priority-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.priority-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  background: #f8f8f8;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.priority-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.priority-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #000000;
+  color: #ffffff;
+  font-size: .72rem;
+  font-weight: 800;
+}
+
+.next-step-banner {
+  background: #ffffff;
+}
+
+.live-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.live-activity-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.live-activity-main {
+  display: flex;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.live-pulse {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #000000;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.live-title {
+  font-size: .95rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.live-time {
+  font-size: .75rem;
+  color: var(--muted);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.state-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.state-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.icon-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f3f3f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+#dashboardMessagesList .mini-row,
+#dashboardSavedPartnersList .mini-row,
+#dashboardRatingHighlights .mini-row {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+#dashboardMessagesList .mini-row + .mini-row,
+#dashboardSavedPartnersList .mini-row + .mini-row,
+#dashboardRatingHighlights .mini-row + .mini-row {
+  margin-top: 10px;
+}
+
+@media (max-width: 640px) {
+  .dashboard-welcome-top,
+  .priority-item,
+  .notification-card,
+  .live-activity-card {
+    flex-direction: column;
+  }
+
+  .dashboard-quick-actions,
+  .outcome-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .personalization-actions,
+  .lifecycle-actions,
+  .celebration-actions,
+  .next-step-banner-actions {
+    flex-direction: column;
+  }
+
+    .personalization-actions .btn,
+  .lifecycle-actions .btn,
+  .celebration-actions .btn,
+  .next-step-banner-actions .btn {
+    width: 100%;
+  }
+}
   </style>
 </head>
 <body>
@@ -1222,6 +1561,14 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
       </div>
     </div>
     <div id="dashUser" class="hidden">
+       <div id="personalization-banner"></div>
+  <div id="lifecycleBannerMount"></div>
+  <div id="notificationCenterMount"></div>
+  <div id="outcomeBoardMount"></div>
+  <div id="celebrationMomentsMount"></div>
+  <div id="liveMarketplaceFeedMount"></div>
+  <div id="dashboardNextStepBanner"></div>
+  <div id="smartPriorityMount"></div>
       <div class="dashboard-welcome" id="dashboardWelcomeCard">
         <div class="dashboard-welcome-top">
           <div>
@@ -1725,13 +2072,28 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
   </div>
 </div>
 
+<!-- ══════════════════════════════════════
+     MODAL: Flow Handoff
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="flowHandoffModal" onclick="overlayClose(event,'flowHandoffModal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <h2 id="flowHandoffTitle">Next step ready</h2>
+      <button class="modal-close" onclick="closeModal('flowHandoffModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p id="flowHandoffCopy" style="font-size:.9rem;color:var(--muted);margin-bottom:16px;"></p>
+      <div id="flowHandoffActions" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+  </div>
+</div>
 
 <!-- ══════════════════════════════════════
      TOAST
 ══════════════════════════════════════ -->
+<div class="ux-toast-stack" id="uxToastStack" aria-live="polite" aria-atomic="true"></div>
 <div class="toast" id="toast"></div>
-
-
 <!-- ══════════════════════════════════════
      JAVASCRIPT
 ══════════════════════════════════════ -->
@@ -1881,6 +2243,25 @@ function escapeJsSingleQuoted(value) {
     .replace(/'/g, "\\'");
 }
 
+function normalizeProductList(value) {
+  if (Array.isArray(value)) {
+    return value
+      .map(item => String(item ?? '').trim())
+      .filter(Boolean);
+  }
+
+  if (typeof value === 'string') {
+    return value
+      .split(/\r?\n|,/)
+      .map(item => item.trim())
+      .filter(Boolean);
+  }
+
+  if (value == null) return [];
+
+  return [String(value).trim()].filter(Boolean);
+}
+
 function formatTypeLabel(type) {
   const map = {
     microbusiness: 'MicroBusiness',
@@ -1942,16 +2323,26 @@ function buildTrustPills(biz, mode = 'browse') {
 }
 
 function getSellPreview(biz) {
-  return biz.sells && biz.sells.length ? biz.sells[0] : 'Add product details to make this listing stronger.';
+  const sells = normalizeProductList(biz?.sells);
+  return sells.length
+    ? sells[0]
+    : 'Add product details to make this listing stronger.';
 }
 
 function getBuyPreview(biz) {
-  return biz.buys && biz.buys.length ? biz.buys[0] : 'Open to buying, selling, and collaboration opportunities.';
+  const buys = normalizeProductList(biz?.buys);
+  return buys.length
+    ? buys[0]
+    : 'Open to buying, selling, and collaboration opportunities.';
 }
 
 function getCardIntent(biz) {
-  const hasSells = biz.sells && biz.sells.length;
-  const hasBuys = biz.buys && biz.buys.length;
+  const sells = normalizeProductList(biz?.sells);
+  const buys = normalizeProductList(biz?.buys);
+
+  const hasSells = sells.length > 0;
+  const hasBuys = buys.length > 0;
+
   if (hasSells && hasBuys) return 'Buy, sell, and collaborate';
   if (hasSells) return 'Selling';
   if (hasBuys) return 'Buying';
@@ -1959,11 +2350,16 @@ function getCardIntent(biz) {
 }
 
 function buildCardTags(biz, mode = 'browse') {
-  const tags = [formatTypeLabel(biz.type)];
-  if (biz.sells && biz.sells.length) tags.push('Seller');
-  if (biz.buys && biz.buys.length) tags.push('Buyer');
+  const sells = normalizeProductList(biz?.sells);
+  const buys = normalizeProductList(biz?.buys);
+
+  const tags = [formatTypeLabel(biz?.type)];
+
+  if (sells.length) tags.push('Seller');
+  if (buys.length) tags.push('Buyer');
   if (mode === 'listing') tags.push('Active');
   if (mode === 'business') tags.push('Profile');
+
   return Array.from(new Set(tags)).slice(0, 4);
 }
 
@@ -2111,8 +2507,10 @@ function getSecondaryListings() {
 function listingHasRealDetails(biz) {
   if (!biz) return false;
   const placeholderTokens = ['coming soon', 'product details', 'matchmaking'];
-  const products = [...(biz.sells || []), ...(biz.buys || [])].join(' ').toLowerCase();
-  return products && !placeholderTokens.some(token => products.includes(token));
+  const sells = normalizeProductList(biz?.sells);
+  const buys = normalizeProductList(biz?.buys);
+  const products = [...sells, ...buys].join(' ').toLowerCase();
+  return !!products && !placeholderTokens.some(token => products.includes(token));
 }
 
 function hasCompleteBusinessProfile() {
@@ -2317,7 +2715,7 @@ function renderCards(data) {
 }
 
 function handleBusinessCardClick(id) {
-  const biz = getAllVisibleListings().find(b => b.id === id);
+  const biz = getAllVisibleListings().find(b => String(b.id) === String(id));
   if (!biz) return;
   if (biz.isOwner) {
     openBusinessEditModal(id);
@@ -2336,8 +2734,8 @@ function getFilteredData() {
       biz.name,
       biz.location,
       formatTypeLabel(biz.type),
-      ...(Array.isArray(biz.sells) ? biz.sells : []),
-      ...(Array.isArray(biz.buys) ? biz.buys : [])
+      ...normalizeProductList(biz?.sells),
+      ...normalizeProductList(biz?.buys)
     ]
       .filter(Boolean)
       .map(v => String(v).toLowerCase());
@@ -2349,7 +2747,6 @@ function getFilteredData() {
     return matchesQuery && matchesType;
   });
 }
-
 
 
 function setFilter(f, el) {
@@ -2442,23 +2839,35 @@ function switchView(v) {
 
 
 function scrollToListings() {
-  document.getElementById('listingsAnchor').scrollIntoView({ behavior: 'smooth' });
+  const anchor = document.getElementById('listingsAnchor');
+  if (!anchor) return;
+  anchor.scrollIntoView({ behavior: 'smooth' });
 }
 
 function openModal(id) {
+  const modal = document.getElementById(id);
+  if (!modal) return;
+
   if (id === 'authModal' && !isLoggedIn) {
     clearAuthForms();
   }
   if (id === 'listingModal' && isLoggedIn) {
     syncAccountDataToForms();
   }
-  document.getElementById(id).classList.add('open');
+
+  modal.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
 function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-  document.body.style.overflow = '';
+  const modal = document.getElementById(id);
+  if (!modal) return;
+
+  modal.classList.remove('open');
+
+  if (!document.querySelector('.modal-overlay.open')) {
+    document.body.style.overflow = '';
+  }
 }
 
 function overlayClose(e, id) {
@@ -2638,8 +3047,6 @@ function formatDashboardMessageTime(isoString) {
 
 async function hydrateCurrentUserFromSupabase() {
   const supabase = getSupabaseClient();
-  const previousMessages = Array.isArray(currentUser.messages) ? currentUser.messages : [];
-  const previousSavedPartnerIds = Array.isArray(currentUser.savedPartnerIds) ? currentUser.savedPartnerIds : [];
   const { data: authData, error: authError } = await supabase.auth.getUser();
   if (authError || !authData.user) {
     isLoggedIn = false;
@@ -2696,9 +3103,15 @@ async function hydrateCurrentUserFromSupabase() {
     .select('listing_id')
     .eq('user_id', user.id);
 
-  currentUser.savedPartnerIds = !savedError && Array.isArray(savedRows) && savedRows.length
-    ? savedRows.map(row => row.listing_id)
-    : previousSavedPartnerIds;
+    if (savedError) {
+    console.warn('Failed to load saved partners from Supabase:', savedError);
+    showToast('Could not refresh saved partners.');
+    currentUser.savedPartnerIds = [];
+  } else {
+    currentUser.savedPartnerIds = Array.isArray(savedRows)
+      ? savedRows.map(row => row.listing_id)
+      : [];
+  }
 
   const ownedListingIds = currentUser.listings.map(listing => listing.id).filter(isSupabaseUuidLike);
   let hydratedMessages = [];
@@ -2764,7 +3177,10 @@ async function hydrateCurrentUserFromSupabase() {
     }
   }
 
-  currentUser.messages = hydratedMessages.length ? hydratedMessages : previousMessages;
+    if (!hydratedMessages.length && previousMessages.length) {
+    console.warn('Using previous local messages because Supabase returned no fresh message rows.');
+  }
+  currentUser.messages = hydratedMessages;
   currentUser.ratingHighlights = [];
   isLoggedIn = true;
 }
@@ -2782,8 +3198,8 @@ function mapSupabaseListingRowToCard(row, options = {}) {
     state: row.state || '',
     rating: 0,
     reviews: 0,
-    sells: Array.isArray(row.sells) ? row.sells : [],
-    buys: Array.isArray(row.buys) ? row.buys : [],
+    sells: normalizeProductList(row.sells),
+    buys: normalizeProductList(row.buys),
     avatar: (row.business_name || 'B').charAt(0).toUpperCase(),
     avatarColor: '#2d6a4f',
     isOwner: !!options.isOwner,
@@ -3192,19 +3608,25 @@ function goListingStep(step) {
     document.getElementById('ls-line' + n).classList.toggle('done', n < step);
   });
   if (step === 1 && isLoggedIn) syncAccountDataToForms();
-  document.querySelector('#listingModal .modal-sheet').scrollTop = 0;
+  const sheet = document.querySelector('#listingModal .modal-sheet');
+  if (sheet) sheet.scrollTop = 0;
 }
 
 function addTag(type) {
   const input = document.getElementById(type === 'sell' ? 'sellInput' : 'buyInput');
   const val = input.value.trim();
   if (!val) return;
+
   const arr = type === 'sell' ? sellTags : buyTags;
   const list = document.getElementById(type === 'sell' ? 'sellTagList' : 'buyTagList');
+
   arr.push(val);
+
+  const safeVal = escapeJsSingleQuoted(val);
   const tag = document.createElement('span');
   tag.className = 'tag';
-  tag.innerHTML = `${escapeHtml(val)} <button class="tag-remove" onclick="removeTag('${type}','${val.replace(/'/g, "\'")}',this)">×</button>`;
+  tag.innerHTML = `${escapeHtml(val)} <button class="tag-remove" onclick="removeTag('${type}','${safeVal}',this)">×</button>`;
+
   list.appendChild(tag);
   input.value = '';
   input.focus();
@@ -3257,6 +3679,22 @@ async function submitListing() {
   if (!businessName || !licenseType || !state || !city) {
     showToast('Please complete the required listing fields.');
     goListingStep(1);
+    return;
+  }
+
+  const profileResult = await ensureProfileForCurrentUser({
+    email: currentUser.profile?.email || user.email || '',
+    business_name: businessName,
+    city,
+    state,
+    license_type: licenseType,
+    license_number: licenseNumber,
+    contact_name: contactName,
+    contact_email: contactEmail
+  });
+
+  if (!profileResult.ok) {
+    showToast('Your account is missing a profile record. Please log in again.');
     return;
   }
 
@@ -3315,8 +3753,8 @@ function renderStateCard({ kind = 'empty', icon = '•', title = '', copy = '', 
 }
 
 function getListingActivityState(listing) {
-  const sells = Array.isArray(listing?.sells) ? listing.sells : [];
-  const buys = Array.isArray(listing?.buys) ? listing.buys : [];
+  const sells = normalizeProductList(listing?.sells);
+  const buys = normalizeProductList(listing?.buys);
   const hasRealSupply = sells.some(item => !/coming soon/i.test(String(item)));
   const hasRealDemand = buys.some(item => !/opportunities/i.test(String(item)));
   return hasRealSupply || hasRealDemand ? 'active' : 'inactive';
@@ -3361,7 +3799,7 @@ function openBusinessEditModal(id) {
     openModal('authModal');
     return;
   }
-  const biz = getUserListings().find(b => b.id === id) || getPrimaryBusiness();
+  const biz = getUserListings().find(b => String(b.id) === String(id)) || getPrimaryBusiness();
   if (!biz) return;
   currentEditingBusinessId = biz.id;
   document.getElementById('accountBizName').value = biz.name || '';
@@ -3379,7 +3817,7 @@ function openListingEditModal(id) {
     openModal('authModal');
     return;
   }
-  const biz = getUserListings().find(b => b.id === id) || getPrimaryBusiness();
+  const biz = getUserListings().find(b => String(b.id) === String(id)) || getPrimaryBusiness();
   if (!biz) return;
   currentEditingBusinessId = biz.id;
   const parsedLocation = parseLocation(biz.location);
@@ -3387,63 +3825,168 @@ function openListingEditModal(id) {
   document.getElementById('editListingBizType').value = formatTypeLabel(biz.type);
   document.getElementById('editListingState').value = parsedLocation.state;
   document.getElementById('editListingCity').value = parsedLocation.city;
-  document.getElementById('editListingSells').value = (biz.sells || []).join('\n');
-  document.getElementById('editListingBuys').value = (biz.buys || []).join('\n');
+  document.getElementById('editListingSells').value = normalizeProductList(biz?.sells).join('\n');
+  document.getElementById('editListingBuys').value = normalizeProductList(biz?.buys).join('\n');
   document.getElementById('editListingContactName').value = biz.contactName || '';
   document.getElementById('editListingContactEmail').value = biz.contactEmail || '';
   openModal('editListingModal');
 }
 
-function saveListingInfo() {
-  if (currentEditingBusinessId == null) return;
-  const biz = getUserListings().find(b => b.id === currentEditingBusinessId) || buildPrimaryBusinessFromProfile();
-  if (!biz) return;
 
-  biz.name = document.getElementById('editListingBizName').value.trim() || biz.name;
-  biz.type = document.getElementById('editListingBizType').value.toLowerCase();
-  const stateName = document.getElementById('editListingState').value || 'New York';
-  const city = document.getElementById('editListingCity').value.trim();
-  biz.location = locationFromParts(city, stateName);
-  biz.sells = document.getElementById('editListingSells').value
-    .split('\n').map(item => item.trim()).filter(Boolean);
-  biz.buys = document.getElementById('editListingBuys').value
-    .split('\n').map(item => item.trim()).filter(Boolean);
-  biz.contactName = document.getElementById('editListingContactName').value.trim() || biz.contactName;
-  biz.contactEmail = document.getElementById('editListingContactEmail').value.trim() || biz.contactEmail;
-  biz.avatar = biz.name.charAt(0).toUpperCase();
-
-  updateProfileFromBusiness(biz);
-  syncAccountDataToForms();
-
-  closeModal('editListingModal');
-  renderAllOwnerViews();
-  showToast('✅ Active listing updated.');
+async function getCurrentAuthUserOrThrow() {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data?.user) {
+    throw new Error('Please log in again.');
+  }
+  return data.user;
 }
 
-function saveBusinessInfo() {
+
+async function saveListingInfo() {
   if (currentEditingBusinessId == null) return;
-  const biz = getUserListings().find(b => b.id === currentEditingBusinessId) || buildPrimaryBusinessFromProfile();
-  if (!biz) return;
 
-  biz.name = document.getElementById('accountBizName').value.trim() || biz.name;
-  biz.type = document.getElementById('accountBizType').value.toLowerCase();
-  const stateName = document.getElementById('accountState').value || 'New York';
+  const biz = getUserListings().find(b => String(b.id) === String(currentEditingBusinessId));
+  if (!biz) {
+    showToast('Listing could not be found.');
+    return;
+  }
+
+  if (!isSupabaseUuidLike(biz.id)) {
+    showToast('This listing is local demo data and cannot be saved to Supabase.');
+    return;
+  }
+
+  const businessName = document.getElementById('editListingBizName').value.trim() || biz.name;
+  const licenseType = (document.getElementById('editListingBizType').value || biz.type || '').toLowerCase();
+  const stateName = document.getElementById('editListingState').value || biz.state || 'New York';
+  const city = document.getElementById('editListingCity').value.trim();
+  const sells = document.getElementById('editListingSells').value
+    .split('\n')
+    .map(item => item.trim())
+    .filter(Boolean);
+  const buys = document.getElementById('editListingBuys').value
+    .split('\n')
+    .map(item => item.trim())
+    .filter(Boolean);
+  const contactName = document.getElementById('editListingContactName').value.trim() || biz.contactName || '';
+  const contactEmail = document.getElementById('editListingContactEmail').value.trim() || biz.contactEmail || '';
+
+  try {
+    const supabase = getSupabaseClient();
+
+    const user = await getCurrentAuthUserOrThrow();
+    const { error } = await supabase
+      .from('listings')
+      .update({
+        business_name: businessName,
+        license_type: licenseType,
+        city,
+        state: stateName,
+        contact_name: contactName,
+        contact_email: contactEmail,
+        sells,
+        buys
+      })
+      .eq('id', biz.id)
+      .eq('owner_id', user.id);
+    if (error) {
+      console.error('saveListingInfo failed:', error);
+      showToast(error.message || 'Failed to save listing.');
+      return;
+    }
+
+    await hydrateCurrentUserFromSupabase();
+    await loadPublicListingsFromSupabase();
+    syncAccountDataToForms();
+
+    closeModal('editListingModal');
+    renderAllOwnerViews();
+    filterCards();
+    showToast('✅ Active listing updated.');
+  } catch (err) {
+    console.error('saveListingInfo crashed:', err);
+    showToast(err.message || 'Failed to save listing.');
+  }
+}
+async function saveBusinessInfo() {
+  if (currentEditingBusinessId == null) return;
+
+  const biz = getUserListings().find(b => String(b.id) === String(currentEditingBusinessId)) || getPrimaryBusiness();
+  if (!biz) {
+    showToast('Business could not be found.');
+    return;
+  }
+
+  const businessName = document.getElementById('accountBizName').value.trim() || biz.name || '';
+  const licenseType = (document.getElementById('accountBizType').value || biz.type || '').toLowerCase();
+  const stateName = document.getElementById('accountState').value || biz.state || 'New York';
   const city = document.getElementById('accountCity').value.trim();
-  biz.location = locationFromParts(city, stateName);
-  biz.contactName = document.getElementById('accountContactName').value.trim() || biz.contactName;
-  biz.contactEmail = document.getElementById('accountContactEmail').value.trim() || biz.contactEmail;
-  biz.avatar = biz.name.charAt(0).toUpperCase();
+  const contactName = document.getElementById('accountContactName').value.trim() || biz.contactName || '';
+  const contactEmail = document.getElementById('accountContactEmail').value.trim() || biz.contactEmail || currentUser.profile?.email || '';
 
-  updateProfileFromBusiness(biz);
-  syncAccountDataToForms();
+  try {
+    const user = await getCurrentAuthUserOrThrow();
+    const supabase = getSupabaseClient();
 
-  closeModal('accountModal');
-  renderAllOwnerViews();
-  showToast('✅ This business was updated.');
+    const profilePayload = {
+      id: user.id,
+      business_name: businessName,
+      license_type: licenseType,
+      city,
+      state: stateName,
+      contact_name: contactName,
+      contact_email: contactEmail,
+      email: currentUser.profile?.email || user.email || contactEmail
+    };
+
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .upsert(profilePayload);
+
+    if (profileError) {
+      console.error('saveBusinessInfo profile update failed:', profileError);
+      showToast(profileError.message || 'Failed to save business profile.');
+      return;
+    }
+
+    if (isSupabaseUuidLike(biz.id)) {
+            const { error: listingError } = await supabase
+        .from('listings')
+        .update({
+          business_name: businessName,
+          license_type: licenseType,
+          city,
+          state: stateName,
+          contact_name: contactName,
+          contact_email: contactEmail
+        })
+        .eq('id', biz.id)
+        .eq('owner_id', user.id);
+
+      if (listingError) {
+        console.error('saveBusinessInfo listing mirror update failed:', listingError);
+        showToast(listingError.message || 'Business profile saved, but listing sync failed.');
+        return;
+      }
+    }
+
+    await hydrateCurrentUserFromSupabase();
+    await loadPublicListingsFromSupabase();
+    syncAccountDataToForms();
+
+    closeModal('accountModal');
+    renderAllOwnerViews();
+    filterCards();
+    showToast('✅ This business was updated.');
+  } catch (err) {
+    console.error('saveBusinessInfo crashed:', err);
+    showToast(err.message || 'Failed to save business profile.');
+  }
 }
 
 function saveAccountInfo() {
-  saveBusinessInfo();
+  return saveBusinessInfo();
 }
 
 function scrollToDashboardSection(id) {
@@ -3784,7 +4327,7 @@ function getLifecycleSummary() {
       copy: 'Fast replies build trust and make your marketplace feel active for both sides.',
       actions: [
         { label: 'Open messages', kind: 'primary', onclick: "scrollIntoViewById('dashboard-messages')" },
-        { label: 'Reply now', kind: 'ghost', onclick: unread[0] ? `openChatByPartnerId(${unread[0].partnerId})` : "scrollIntoViewById('dashboard-messages')" }
+        { label: 'Reply now', kind: 'ghost', onclick: unread[0] ? `openChatByPartnerId('${escapeJsSingleQuoted(unread[0].partnerId)}')` : "scrollIntoViewById('dashboard-messages')" }
       ]
     };
   }
@@ -3837,7 +4380,7 @@ function getLightNotifications() {
       title: `${unread.length} unanswered message${unread.length === 1 ? '' : 's'}`,
       copy: 'Replying soon is the fastest way to move a conversation forward.',
       meta: 'Needs attention now',
-      action: unread[0] ? `openChatByPartnerId(${unread[0].partnerId})` : "scrollIntoViewById('dashboard-messages')"
+      action: unread[0] ? `openChatByPartnerId('${escapeJsSingleQuoted(unread[0].partnerId)}')` : "scrollIntoViewById('dashboard-messages')"
     });
   }
   if (matches.length) {
@@ -3845,7 +4388,7 @@ function getLightNotifications() {
       title: `${matches[0].biz.name} is a strong match right now`,
       copy: matches[0].reason || 'Recommended based on your current profile and listings.',
       meta: 'Prioritized for you',
-      action: `openBizModal(${matches[0].biz.id})`
+      action: `openBizModal('${escapeJsSingleQuoted(matches[0].biz.id)}')`
     });
   }
   if (savedCount) {
@@ -3961,8 +4504,8 @@ function getPersonalizedDashboardPlan() {
             { label: 'View matches', kind: 'ghost', onclick: "scrollIntoViewById('dashboard-active-listings')" }
           ]
         : [
-            { label: 'View top match', kind: 'primary', onclick: firstMatch ? `openBizModal(${firstMatch.biz.id})` : "scrollIntoViewById('dashboard-active-listings')" },
-            { label: 'Message now', kind: 'ghost', onclick: firstMatch ? `contactBiz(${firstMatch.biz.id})` : "scrollIntoViewById('dashboard-messages')" }
+            { label: 'View top match', kind: 'primary', onclick: firstMatch ? `openBizModal('${escapeJsSingleQuoted(firstMatch.biz.id)}')` : "scrollIntoViewById('dashboard-active-listings')" },
+            { label: 'Message now', kind: 'ghost', onclick: firstMatch ? `contactBiz('${escapeJsSingleQuoted(firstMatch.biz.id)}')` : "scrollIntoViewById('dashboard-messages')" }
           ]
     };
   }
@@ -4071,8 +4614,8 @@ function renderSmartPriorities() {
                   ${escapeHtml(item.biz.location)}</div>
               </div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="btn btn-ghost" onclick="openBizModal(${item.biz.id})">View</button>
-                <button class="btn btn-primary" onclick="contactBiz(${item.biz.id})">Message now</button>
+                <button class="btn btn-ghost" onclick="openBizModal('${escapeJsSingleQuoted(item.biz.id)}')">View</button>
+                <button class="btn btn-primary" onclick="contactBiz('${escapeJsSingleQuoted(item.biz.id)}')">Message now</button>
               </div>
             </div>
           `).join('')}
@@ -4095,7 +4638,7 @@ function renderSmartPriorities() {
               <div class="priority-reason">${escapeHtml(p.reason)}</div>
             </div>
             <button class="btn btn-primary"
-              onclick="openChatByPartnerId(${JSON.stringify(topThread.partnerId)})">Open thread</button>
+              onclick="openChatByPartnerId('${escapeJsSingleQuoted(topThread.partnerId)}')">Open thread</button>
           </div>
         </div>
       </div>
@@ -4169,10 +4712,36 @@ function messageFirstRecommendedMatch() {
   contactBiz(matches[0].biz.id);
 }
 
+function messageMostRecentSavedPartner() {
+  if (!isLoggedIn) {
+    openModal('authModal');
+    showToast('Sign up free to message businesses.');
+    return;
+  }
 
+  const savedIds = Array.isArray(currentUser.savedPartnerIds)
+    ? currentUser.savedPartnerIds
+    : [];
 
+  if (!savedIds.length) {
+    showToast('No saved partners yet.');
+    scrollIntoViewById('dashboard-saved-partners');
+    return;
+  }
 
+  const mostRecentSavedId = savedIds[0];
 
+  const biz =
+    getAllVisibleListings().find(b => String(b.id) === String(mostRecentSavedId)) ||
+    allListings.find(b => String(b.id) === String(mostRecentSavedId));
+
+  if (!biz) {
+    showToast('Saved partner could not be found.');
+    return;
+  }
+
+  contactBiz(biz.id);
+}
 
 
 function inferTransactionsCompleted(biz) {
@@ -4187,8 +4756,11 @@ function inferTransactionsCompleted(biz) {
 function inferActiveAgoLabel(biz) {
   const rating = Number(biz?.rating || 0);
   const verified = !!biz?.verified;
-  const hasRealSupply = Array.isArray(biz?.sells) && biz.sells.some(item => !/coming soon/i.test(String(item)));
-  const hasRealDemand = Array.isArray(biz?.buys) && biz.buys.some(item => !/opportunities/i.test(String(item)));
+  const sells = normalizeProductList(biz?.sells);
+  const buys = normalizeProductList(biz?.buys);
+  const hasRealSupply = sells.some(item => !/coming soon/i.test(String(item)));
+  const hasRealDemand = buys.some(item => !/opportunities/i.test(String(item)));
+
   if (verified && rating >= 4.5 && hasRealSupply) return 'Active 2 hours ago';
   if (verified && (hasRealSupply || hasRealDemand)) return 'Active 2 hours ago';
   if (hasRealSupply || hasRealDemand) return 'Active this week';
@@ -4257,8 +4829,8 @@ function getConfidenceSignals(biz) {
 
   const rating = Number(biz.rating || 0);
   const reviews = Number(biz.reviews || 0);
-  const sells = Array.isArray(biz.sells) ? biz.sells : [];
-  const buys = Array.isArray(biz.buys) ? biz.buys : [];
+  const sells = normalizeProductList(biz?.sells);
+  const buys = normalizeProductList(biz?.buys);
   const hasRealSupply = sells.some(item => !/coming soon/i.test(String(item)));
   const hasRealDemand = buys.some(item => !/opportunities/i.test(String(item)));
   const activity = hasRealSupply || hasRealDemand;
@@ -4337,14 +4909,20 @@ function scoreMatchOpportunity(biz) {
     reasons.push('Good license fit')
   }
 
-  const userSell = new Set()
-  const userBuy = new Set()
-  myListings.forEach(l => {
-    (l.sells || []).forEach(x => userSell.add(String(x).toLowerCase()))
-    (l.buys || []).forEach(x => userBuy.add(String(x).toLowerCase()))
-  })
-  const bizSell = new Set((biz.sells || []).map(x => String(x).toLowerCase()))
-  const bizBuy = new Set((biz.buys || []).map(x => String(x).toLowerCase()))
+  const userSell = new Set();
+  const userBuy = new Set();
+
+myListings.forEach(l => {
+  normalizeProductList(l.sells).forEach(x => userSell.add(String(x).toLowerCase()));
+  normalizeProductList(l.buys).forEach(x => userBuy.add(String(x).toLowerCase()));
+});
+
+const bizSell = new Set(
+  normalizeProductList(biz.sells).map(x => String(x).toLowerCase())
+);
+const bizBuy = new Set(
+  normalizeProductList(biz.buys).map(x => String(x).toLowerCase())
+);
 
   const overlap1 = [...userSell].some(x => bizBuy.has(x))
   const overlap2 = [...userBuy].some(x => bizSell.has(x))
@@ -4370,18 +4948,17 @@ function scoreMatchOpportunity(biz) {
 }
 
 function getPrioritizedMatches(limit = 3) {
-  const listings = typeof getAllVisibleListings === 'function' ? getAllVisibleListings() : []
-  const savedIds = new Set((currentUser?.savedPartnerIds || []))
+  const listings = typeof getAllVisibleListings === 'function' ? getAllVisibleListings() : [];
+  const savedIds = new Set((currentUser?.savedPartnerIds || []).map(id => String(id)));
   const scored = listings
-    .filter(b => !b.isOwner && !savedIds.has(b.id))
+    .filter(b => !b.isOwner && !savedIds.has(String(b.id)))
     .map(b => {
       const scoredBiz = scoreMatchOpportunity(b);
       return { biz: { ...b, matchReason: scoredBiz.reason }, ...scoredBiz };
     })
-    .sort((a,b) => b.score - a.score)
-  return scored.slice(0, limit)
+    .sort((a, b) => b.score - a.score);
+  return scored.slice(0, limit);
 }
-
 
 function formatRelativeTimeLabel(label) {
   const raw = String(label || '').toLowerCase();
@@ -4423,23 +5000,9 @@ function getConversationPriority(thread) {
   return { urgent: false, label: 'Follow up soon', reason: 'A light follow-up can keep this connection moving.' }
 }
 
-
-function renderSmartPriorities() {
-  const mount = document.getElementById('smart-priorities');
-  if (!mount) return;
-
-  if (!currentUser || !currentUser.isLoggedIn) {
-    mount.innerHTML = "";
-    return;
-  }
-
-  mount.innerHTML = `<div class="uniform-card">Your next task is ready.</div>`;
-}
-
-
 function renderDashboardNextStepBanner() {
   const mount = document.getElementById('dashboardNextStepBanner');
-  if (!mount || !window.currentUser) return;
+  if (!mount || !currentUser) return;
   const step = getDashboardNextStepSummary();
   mount.innerHTML = `
     <div class="next-step-banner stack-12">
@@ -4470,12 +5033,19 @@ function renderDashboardMessages() {
 }
 
 function renderSavedPartners() {
-  const __sp = document.getElementById('dashboardSavedPartnersList'); if (__sp && !__sp.dataset.warmed) { renderSimpleSkeleton('dashboardSavedPartnersList', 2); __sp.dataset.warmed = '1'; }
+  const __sp = document.getElementById('dashboardSavedPartnersList');
+  if (__sp && !__sp.dataset.warmed) {
+    renderSimpleSkeleton('dashboardSavedPartnersList', 2);
+    __sp.dataset.warmed = '1';
+  }
+
   const container = document.getElementById('dashboardSavedPartnersList');
   if (!container) return;
+
   const partners = currentUser.savedPartnerIds
-    .map(id => allListings.find(b => b.id === id))
+    .map(id => allListings.find(b => String(b.id) === String(id)))
     .filter(Boolean);
+
   container.innerHTML = partners.length
     ? partners.map(biz => `
         <div class="mini-row uniform-card">
@@ -4545,11 +5115,21 @@ function renderAllOwnerViews() {
   renderRatingSection();
   renderDashboardGuidance();
   updateDashboardCounts();
+    renderSmartPriorities();
+  renderPersonalizationBanner();
+  renderLifecycleBanner();
+  renderNotificationCenter();
+  renderOutcomeBoard();
+  renderCelebrationMoments();
+  renderDashboardNextStepBanner();
+  renderLiveMarketplaceFeed();
 }
 
 function openBizModal(id) {
-  const biz = getAllVisibleListings().find(b => b.id === id);
+  const biz = getAllVisibleListings().find(b => String(b.id) === String(id));
   if (!biz) return;
+  const sells = normalizeProductList(biz?.sells);
+  const buys = normalizeProductList(biz?.buys); 
   document.getElementById('bizModalBody').innerHTML = `
     <div class="business-detail-top">
       <div class="biz-avatar" style="background:${escapeHtml(biz.avatarColor)}">${escapeHtml(biz.avatar)}</div>
@@ -4570,13 +5150,17 @@ function openBizModal(id) {
     ${renderConfidenceRow(biz)}
     ${renderCredibilityRow(biz)}
     <hr class="clean-divider"><div class="product-list-preview">
-      <div class="heading-lg">Selling</div>
-      ${biz.sells.map(p => `<span class="product-pill">📦 ${escapeHtml(p)}</span>`).join('')}
-    </div>
-    <hr class="clean-divider"><div class="product-list-preview">
-      <div class="heading-lg">Looking to Buy</div>
-      ${biz.buys.map(p => `<span class="product-pill">🛒 ${escapeHtml(p)}</span>`).join('')}
-    </div>
+  <div class="heading-lg">Selling</div>
+  ${sells.length
+    ? sells.map(p => `<span class="product-pill">📦 ${escapeHtml(p)}</span>`).join('')
+    : `<span class="product-pill">No selling products listed yet</span>`}
+</div>
+<hr class="clean-divider"><div class="product-list-preview">
+  <div class="heading-lg">Looking to Buy</div>
+  ${buys.length
+    ? buys.map(p => `<span class="product-pill">🛒 ${escapeHtml(p)}</span>`).join('')
+    : `<span class="product-pill">No buying products listed yet</span>`}
+</div>
     ${biz.isOwner
       ? `<button class="btn btn-primary btn-full btn-lg" style="margin-bottom:10px;" onclick="openBusinessEditModal('${escapeJsSingleQuoted(biz.id)}');closeModal('bizModal');">✏️ Edit This Business</button>`
       : `<button class="btn btn-primary btn-full btn-lg" style="margin-bottom:10px;" onclick="withLoadingState(this, () => contactBiz('${escapeJsSingleQuoted(biz.id)}'))">💬 Send Message</button>
@@ -4599,7 +5183,7 @@ function contactBiz(id) {
     showToast('Sign up free to message businesses.');
     return;
   }
-  const biz = allListings.find(b => b.id === id) || getAllVisibleListings().find(b => b.id === id);
+  const biz = allListings.find(b => String(b.id) === String(id)) || getAllVisibleListings().find(b => String(b.id) === String(id));
   if (!biz) return;
   if (!isSupabaseUuidLike(biz.id)) {
     closeModal('bizModal');
@@ -4612,13 +5196,18 @@ function contactBiz(id) {
 }
 
 function openChatByPartnerId(partnerId) {
-  const biz = getAllVisibleListings().find(b => b.id === partnerId) || allListings.find(b => b.id === partnerId);
+  const biz =
+    getAllVisibleListings().find(b => String(b.id) === String(partnerId)) ||
+    allListings.find(b => String(b.id) === String(partnerId));
+
   if (!biz) return;
+
   if (!isSupabaseUuidLike(biz.id)) {
     showToast('This business is a demo card. Open a real Supabase listing to test persistent messages.');
     return;
   }
-  openChat(biz.name, partnerId);
+
+  openChat(biz.name, biz.id);
 }
 
 function openChat(name, partnerId = null) {
@@ -4629,7 +5218,9 @@ function openChat(name, partnerId = null) {
 
   currentChatPartnerId = partnerId ?? currentChatPartnerId;
   if (currentChatPartnerId == null) {
-    const existing = currentUser.messages.find(msg => msg.partnerName === name);
+    const existing = currentUser.messages.find(
+      msg => String(msg.partnerName || '').trim().toLowerCase() === String(name || '').trim().toLowerCase()
+    );
     currentChatPartnerId = existing ? existing.partnerId : null;
   }
 
@@ -4647,16 +5238,16 @@ async function persistMessageToSupabase(partnerId, text, partnerName = '') {
   const { data: authData } = await supabase.auth.getUser();
   if (!authData?.user) return null;
   const listingIds = [ownedListingId, partnerId].sort();
-  const { data: existingConversation, error: existingConversationError } = await supabase
+    const { data: existingConversationRows, error: existingConversationError } = await supabase
     .from('conversations')
     .select('id')
     .eq('listing_a_id', listingIds[0])
     .eq('listing_b_id', listingIds[1])
-    .maybeSingle();
+    .limit(1);
 
   if (existingConversationError) throw existingConversationError;
 
-  let conversationId = existingConversation?.id || null;
+  let conversationId = existingConversationRows?.[0]?.id || null;
   if (!conversationId) {
     const { data: insertedConversation, error: insertedConversationError } = await supabase
       .from('conversations')
@@ -4698,7 +5289,9 @@ async function sendMessage() {
   const partnerName = document.getElementById('chatPartnerName').textContent.trim();
   let partnerId = currentChatPartnerId;
   if (partnerId == null) {
-    const match = allListings.find(b => b.name === partnerName);
+    const match = allListings.find(
+      b => String(b.name || '').trim().toLowerCase() === String(partnerName || '').trim().toLowerCase()
+    );
     partnerId = match ? match.id : null;
   }
 
@@ -4709,8 +5302,6 @@ async function sendMessage() {
   }
 
   const msgs = document.getElementById('chatMessages');
-  const momentumChip = document.getElementById('chatMomentumChip');
-  const activeMeta = document.getElementById('chatActiveMeta');
   const div = document.createElement('div');
   div.className = 'msg msg-out';
   div.textContent = text;
@@ -4718,20 +5309,27 @@ async function sendMessage() {
   msgs.scrollTop = msgs.scrollHeight;
   input.value = '';
 
-  let messageRow = null;
+    let messageRow = null;
   try {
     messageRow = await persistMessageToSupabase(partnerId, text, partnerName);
   } catch (err) {
     console.warn('Message sync skipped:', err);
   }
 
-  const existing = currentUser.messages.find(msg => msg.partnerId === partnerId);
+  if (!messageRow) {
+    div.remove();
+    showToast('Failed to send message to Supabase.');
+    showUxToast('Message not saved', 'Please try again. The message was not stored in Supabase.', '⚠️');
+    return;
+  }
+
+  const existing = currentUser.messages.find(msg => String(msg.partnerId) === String(partnerId));
   if (existing) {
     existing.preview = text;
     existing.time = 'Just now';
     existing.unread = false;
     if (messageRow?.id) existing.id = messageRow.id;
-    currentUser.messages = [existing, ...currentUser.messages.filter(msg => msg.partnerId !== partnerId)];
+    currentUser.messages = [existing, ...currentUser.messages.filter(msg => String(msg.partnerId) !== String(partnerId))];
   } else {
     currentUser.messages.unshift(messageRow || {
       id: Date.now(),
@@ -4768,7 +5366,7 @@ async function sendMessage() {
     msgs.appendChild(reply);
     msgs.scrollTop = msgs.scrollHeight;
 
-    const convo = currentUser.messages.find(msg => msg.partnerId === partnerId);
+    const convo = currentUser.messages.find(msg => String(msg.partnerId) === String(partnerId));
     if (convo) {
       convo.preview = 'Got it! Let me check our current stock and get back to you.';
       convo.time = 'Just now';
@@ -4782,13 +5380,26 @@ async function sendMessage() {
 }
 
 async function persistSavedPartnerToSupabase(id) {
-  if (!isSupabaseUuidLike(id)) return;
+  if (!isSupabaseUuidLike(id)) return { ok: false, reason: 'demo-id' };
+
   const supabase = getSupabaseClient();
-  const { data: authData } = await supabase.auth.getUser();
-  if (!authData?.user) return;
-  await supabase
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+  if (authError || !authData?.user) {
+    return { ok: false, reason: 'no-user', error: authError };
+  }
+
+  const { error } = await supabase
     .from('saved_partners')
-    .upsert({ user_id: authData.user.id, listing_id: id }, { onConflict: 'user_id,listing_id' });
+    .upsert(
+      { user_id: authData.user.id, listing_id: id },
+      { onConflict: 'user_id,listing_id' }
+    );
+
+  if (error) {
+    return { ok: false, reason: 'upsert-failed', error };
+  }
+
+  return { ok: true };
 }
 
 function saveBiz(id) {
@@ -4797,19 +5408,37 @@ function saveBiz(id) {
     showToast('Sign up to save partners.');
     return;
   }
-  const biz = allListings.find(b => b.id === id) || getAllVisibleListings().find(b => b.id === id);
+  const biz =
+    allListings.find(b => String(b.id) === String(id)) ||
+    getAllVisibleListings().find(b => String(b.id) === String(id));
   if (!biz) return;
   if (!isSupabaseUuidLike(id)) {
     showToast('This card is demo data. Saved partners persist only for real Supabase listings.');
     showUxToast('Live listing required', 'Save a real Supabase listing to keep it after refresh.', 'ℹ️');
     return;
   }
-  if (!currentUser.savedPartnerIds.includes(id)) {
+  if (!currentUser.savedPartnerIds.some(savedId => String(savedId) === String(id))) {
     currentUser.savedPartnerIds.unshift(id);
     renderSavedPartners();
     renderDashboardGuidance();
     updateDashboardCounts();
-    persistSavedPartnerToSupabase(id).catch(err => console.warn('Saved partner sync skipped:', err));
+        persistSavedPartnerToSupabase(id).then(result => {
+      if (!result?.ok) {
+        currentUser.savedPartnerIds = currentUser.savedPartnerIds.filter(savedId => String(savedId) !== String(id));
+        renderSavedPartners();
+        renderDashboardGuidance();
+        updateDashboardCounts();
+        showToast('Failed to save partner to Supabase.');
+        console.warn('Saved partner sync failed:', result?.error || result);
+      }
+    }).catch(err => {
+      currentUser.savedPartnerIds = currentUser.savedPartnerIds.filter(savedId => String(savedId) !== String(id));
+      renderSavedPartners();
+      renderDashboardGuidance();
+      updateDashboardCounts();
+      showToast('Failed to save partner to Supabase.');
+      console.warn('Saved partner sync crashed:', err);
+    });
   }
   showToast(`🔖 ${biz.name} saved to your partners.`);
   showUxToast('Partner saved', 'Saved ✓ → Message them now or keep browsing good matches.');
@@ -4883,6 +5512,7 @@ function flashSuccessChip(button, text) {
 
 function showToast(msg, duration = 2800) {
   const t = document.getElementById('toast');
+  if (!t) return;
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), duration);
