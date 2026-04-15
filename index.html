@@ -149,7 +149,7 @@ nav {
   border-bottom: 1px solid #111111;
   height: 56px;
 }
-.btn-primary   { background: #000000;  color: #ffffff; box-shadow: var(--shadow-sm); }
+
 .btn-primary:hover  { opacity: 1; box-shadow: inset 999px 999px 0 rgba(255,255,255,.08); }
 .btn-secondary { background: #f3f3f3; color: #000000; }
 .btn-secondary:hover { opacity: 1; box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
@@ -2207,7 +2207,7 @@ const stateMap = {
   "Arizona": "AZ"
 };
 
-const allListings = [...LISTINGS];
+const allListings = [];
 
 const currentUser = {
   profile: null,
@@ -2395,10 +2395,17 @@ function renderCardActions(biz, mode = 'browse') {
       <button class="btn btn-ghost" onclick="event.stopPropagation();switchView('dashboard')">Dashboard</button>
     `;
   }
+  if (!isSupabaseUuidLike(biz.id)) {
   return `
-    <button class="btn btn-primary" onclick="event.stopPropagation();contactBiz('${safeId}')">Message now</button>
-    <button class="btn btn-ghost" onclick="event.stopPropagation();saveBiz('${safeId}')">Save</button>
+    <button class="btn btn-secondary" onclick="event.stopPropagation();openBizModal('${safeId}')">View details</button>
+    <button class="btn btn-ghost" onclick="event.stopPropagation();showToast('Demo listing only. Live actions work on Supabase listings.')">Demo only</button>
   `;
+}
+
+return `
+  <button class="btn btn-primary" onclick="event.stopPropagation();contactBiz('${safeId}')">Message now</button>
+  <button class="btn btn-ghost" onclick="event.stopPropagation();saveBiz('${safeId}')">Save</button>
+`;
 }
 
 function renderPremiumCard(biz, mode = 'browse') {
@@ -3046,6 +3053,7 @@ function formatDashboardMessageTime(isoString) {
 }
 
 async function hydrateCurrentUserFromSupabase() {
+const previousMessages = Array.isArray(currentUser?.messages) ? [...currentUser.messages] : [];
   const supabase = getSupabaseClient();
   const { data: authData, error: authError } = await supabase.auth.getUser();
   if (authError || !authData.user) {
@@ -3178,9 +3186,10 @@ async function hydrateCurrentUserFromSupabase() {
   }
 
     if (!hydratedMessages.length && previousMessages.length) {
-    console.warn('Using previous local messages because Supabase returned no fresh message rows.');
-  }
-  currentUser.messages = hydratedMessages;
+  console.warn('Using previous local messages because Supabase returned no fresh message rows.');
+  hydratedMessages = previousMessages;
+}
+currentUser.messages = hydratedMessages;
   currentUser.ratingHighlights = [];
   isLoggedIn = true;
 }
@@ -5042,9 +5051,14 @@ function renderSavedPartners() {
   const container = document.getElementById('dashboardSavedPartnersList');
   if (!container) return;
 
-  const partners = currentUser.savedPartnerIds
-    .map(id => allListings.find(b => String(b.id) === String(id)))
-    .filter(Boolean);
+ const visibleListings = getAllVisibleListings();
+
+const partners = currentUser.savedPartnerIds
+  .map(id =>
+    visibleListings.find(b => String(b.id) === String(id)) ||
+    allListings.find(b => String(b.id) === String(id))
+  )
+  .filter(Boolean);
 
   container.innerHTML = partners.length
     ? partners.map(biz => `
@@ -5187,7 +5201,14 @@ function contactBiz(id) {
     showToast('Sign up free to message businesses.');
     return;
   }
-  const biz = allListings.find(b => String(b.id) === String(id)) || getAllVisibleListings().find(b => String(b.id) === String(id));
+  const ownedListingId = getUserListings()[0]?.id;
+if (!isSupabaseUuidLike(ownedListingId)) {
+  closeModal('bizModal');
+  showToast('Create your first live listing before messaging businesses.');
+  openModal('listingModal');
+  return;
+}
+  const biz = getAllVisibleListings().find(b => String(b.id) === String(id)) || allListings.find(b => String(b.id) === String(id));
   if (!biz) return;
   if (!isSupabaseUuidLike(biz.id)) {
     closeModal('bizModal');
@@ -5615,7 +5636,7 @@ loadPublicListingsFromSupabase();
 </script>
 
 
-  <div class="ux-toast-stack" id="uxToastStack" aria-live="polite" aria-atomic="true"></div>
+ 
 <script>
 document.addEventListener('click', function uxButtonFeedback(e) {
   const target = e.target.closest('.btn, button, .chip, .bottom-nav-item');
