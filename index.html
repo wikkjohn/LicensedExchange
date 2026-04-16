@@ -1396,11 +1396,18 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
     <div class="search-inner">
     <div class="search-bar">
       <input
-        type="search"
-        placeholder="🔍  Search by business name, location, product, or license type"
-        id="searchInput"
-        oninput="filterCards()"
-      />
+  type="search"
+  id="searchInput"
+  name="random-search-field-xyz"
+  placeholder="🔍  Search by business name, location, product, or license type"
+  autocomplete="new-password"
+  autocapitalize="off"
+  autocorrect="off"
+  spellcheck="false"
+  data-lpignore="true"
+  data-form-type="other"
+  oninput="filterCards()"
+/>
     </div>
     <div class="filter-row" id="filterRow">
       <button class="chip active"   data-filter="all"          onclick="setFilter('all',this)">All</button>
@@ -1668,72 +1675,43 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
       </div>
 
       <!-- Sign Up form -->
-      <div id="auth-signup">
-        <div class="form-group">
-          <label>License #</label>
-          <input type="text" id="signupLicenseNumber" placeholder="e.g. C11-0001234-LIC" />
-        </div>
-        <div class="form-group">
-          <label>License Type</label>
-          <select id="signupLicenseType">
-            <option value="">Select license type…</option>
-            <option value="microbusiness">MicroBusiness</option>
-            <option value="cultivator">Cultivator</option>
-            <option value="dispensary">Dispensary</option>
-            <option value="distributor">Distributor</option>
-            <option value="processor">Processor</option>
-            <option value="lab">Lab</option>
-            <option value="retailer">Retailer</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Business Name</label>
-          <input type="text" id="signupBusinessName" placeholder="e.g. Green Valley Farms" />
-        </div>
-        <div class="form-group">
-          <label>Business Address</label>
-          <input type="text" id="signupBusinessAddress" placeholder="e.g. 123 Main Street" />
-        </div>
-        <div class="form-group">
-          <label>City</label>
-          <input type="text" id="signupCity" placeholder="e.g. Brooklyn" />
-        </div>
-        <div class="form-group">
-          <label>State</label>
-          <select id="signupState">
-            <option value="">Select state…</option>
-            <option value="New York">New York</option>
-            <option value="California">California</option>
-            <option value="Colorado">Colorado</option>
-            <option value="Oregon">Oregon</option>
-            <option value="Washington">Washington</option>
-            <option value="Nevada">Nevada</option>
-            <option value="Michigan">Michigan</option>
-            <option value="Illinois">Illinois</option>
-            <option value="Massachusetts">Massachusetts</option>
-            <option value="Arizona">Arizona</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Contact Name</label>
-          <input type="text" id="signupContactName" placeholder="First and last name" />
-        </div>
-        <div class="form-group">
-          <label>Contact Email</label>
-          <input type="email" id="signupEmail" placeholder="you@business.com" />
-        </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="signupPassword" placeholder="Min. 8 characters" />
-        </div>
-        <button id="signupSubmitBtn" class="btn btn-primary btn-full btn-lg" onclick="signUpWithSupabase()">
-          Create Free Account →
-        </button>
-        <p id="authSignupStatus" style="text-align:center;font-size:.82rem;color:var(--muted);margin-top:10px;min-height:1.2em;"></p>
-        <p style="text-align:center;font-size:.78rem;color:var(--muted);margin-top:12px;">
-          By signing up you agree to our Terms &amp; Privacy Policy.
-        </p>
-      </div>
+       <div id="auth-signup">
+
+  <!-- STAGE 1: LICENSE VERIFICATION -->
+  <div id="signup-stage-1">
+    <input
+      id="signupLicenseNumber"
+      placeholder="License Number"
+    />
+
+    <button onclick="verifyLicense()">
+      Verify License
+    </button>
+
+    <div id="authSignupStatus" class="auth-status"></div>
+  </div>
+    <!-- STAGE 2: ACCOUNT SETUP (HIDDEN INITIALLY) -->
+  <div id="signup-stage-2" style="display:none;">
+    
+    <input id="signupBusinessName" placeholder="Business Name" />
+    <input id="signupBusinessAddress" placeholder="Business Address" />
+    <input id="signupCity" placeholder="City" />
+    <input id="signupState" placeholder="State" />
+    <input id="signupLicenseType" placeholder="License Type" />
+    <input id="signupContactName" placeholder="Contact Name" />
+    <input id="signupContactEmail" placeholder="Contact Email (if available)" />
+
+    <input id="signupEmail" placeholder="Login Email" />
+    <input id="signupPassword" type="password" placeholder="Password" />
+
+    <button id="signupSubmitBtn" onclick="signUpWithSupabase()">
+  Create Account
+</button>
+
+  </div>
+
+</div>
+      
 
       <!-- Log In form -->
       <div id="auth-login" class="hidden">
@@ -2581,11 +2559,13 @@ function buildProfileFromInputs() {
   const businessName = document.getElementById('signupBusinessName').value.trim() || 'Your Business';
   const email = document.getElementById('signupEmail').value.trim() || 'you@business.com';
   const contactName = document.getElementById('signupContactName')?.value.trim() || businessName;
+  const contactEmail = document.getElementById('signupContactEmail')?.value.trim() || email;
   const licenseType = document.getElementById('signupLicenseType')?.value || 'microbusiness';
   const state = document.getElementById('signupState')?.value || 'New York';
   const city = document.getElementById('signupCity')?.value.trim() || 'Brooklyn';
   const license = document.getElementById('signupLicenseNumber')?.value.trim() || '';
   const address = document.getElementById('signupBusinessAddress')?.value.trim() || '';
+
   return {
     businessName,
     email,
@@ -2595,7 +2575,7 @@ function buildProfileFromInputs() {
     city,
     license,
     address,
-    contactEmail: email
+    contactEmail
   };
 }
 
@@ -2619,17 +2599,21 @@ function createOwnerBusinessFromProfile(profile) {
 }
 
 function seedDemoAccount() {
+  const signupContactEmail = document.getElementById('signupContactEmail')?.value.trim();
+  const signupEmail = document.getElementById('signupEmail')?.value.trim();
+
   currentUser.profile = {
     businessName: 'Your Business',
-    email: 'alex@bizexchange.com',
+    email: signupEmail || 'alex@bizexchange.com',
     contactName: document.getElementById('signupContactName')?.value.trim() || 'Alex Morgan',
     type: document.getElementById('signupLicenseType')?.value || 'microbusiness',
     state: document.getElementById('signupState')?.value || 'New York',
     city: document.getElementById('signupCity')?.value.trim() || 'Brooklyn',
     license: document.getElementById('signupLicenseNumber')?.value.trim() || '',
     address: document.getElementById('signupBusinessAddress')?.value.trim() || '',
-    contactEmail: 'alex@bizexchange.com'
+    contactEmail: signupContactEmail || signupEmail || 'alex@bizexchange.com'
   };
+
   currentUser.listings = [createOwnerBusinessFromProfile(currentUser.profile)];
   currentUser.messages = [];
   currentUser.savedPartnerIds = [...starterSavedPartnerIds];
@@ -2660,10 +2644,12 @@ function syncAccountDataToForms() {
   setValue('signupCity', profile.city || '');
   setValue('signupState', profile.state || 'New York');
   setValue('signupContactName', profile.contactName || profile.businessName);
-  setValue('signupEmail', profile.contactEmail || profile.email);
+  setValue('signupContactEmail', profile.contactEmail || profile.email || '');
+  setValue('signupEmail', profile.email || profile.contactEmail || '');
+
   setValue('lsBizName', profile.businessName);
   setValue('lsCity', profile.city || '');
-  setValue('lsContactEmail', profile.email);
+  setValue('lsContactEmail', profile.contactEmail || profile.email || '');
   setValue('lsContactName', profile.contactName || profile.businessName);
   setValue('lsBizType', formatTypeLabel(profile.type));
   setValue('lsState', profile.state || 'New York');
@@ -2680,7 +2666,6 @@ function syncAccountDataToForms() {
     setValue('accountCity', parsedLocation.city);
   }
 }
-
 function updateProfileFromBusiness(biz) {
   if (!biz || !currentUser.profile) return;
   currentUser.profile.businessName = biz.name || currentUser.profile.businessName;
@@ -2704,11 +2689,22 @@ function getRatingMeta() {
   const trades = ownerListings.reduce((sum, biz) => sum + (biz.reviews || 0), 0);
   return `Based on ${trades} completed trades with licensed partners.`;
 }
-
+function seedInitialListingsIfNeeded() {
+  if (allListings.length) return;
+  LISTINGS.forEach(listing => {
+    upsertListingIntoCatalog({
+      ...listing,
+      isOwner: false
+    });
+  });
+}
 function getAllVisibleListings() {
+  seedInitialListingsIfNeeded();
+
   const ownerListings = getUserListings();
   const ownerIds = new Set(ownerListings.map(b => String(b.id)));
   const publicListings = allListings.filter(b => !ownerIds.has(String(b.id)));
+
   return [...ownerListings, ...publicListings];
 }
 
@@ -2722,6 +2718,8 @@ function renderCards(data) {
 }
 
 function handleBusinessCardClick(id) {
+  console.log("CLICK → handleBusinessCardClick", id);
+  console.log("Listings count:", document.querySelectorAll(".card").length);
   const biz = getAllVisibleListings().find(b => String(b.id) === String(id));
   if (!biz) return;
   if (biz.isOwner) {
@@ -2764,7 +2762,16 @@ function setFilter(f, el) {
 }
 
 function filterCards() {
-  renderCards(getFilteredData());
+  const data = getFilteredData();
+
+  // 🔒 HARD SAFETY: never allow empty grid
+  if (!data || data.length === 0) {
+    console.warn("Prevented empty render — restoring listings");
+    renderCards(getAllVisibleListings());
+    return;
+  }
+
+  renderCards(data);
 }
 
 function goToBrowseAndFocusSearch() {
@@ -2846,6 +2853,8 @@ function switchView(v) {
 
 
 function scrollToListings() {
+  console.log("RUN → scrollToListings");
+  console.log("Listings count:", document.querySelectorAll(".card").length);
   const anchor = document.getElementById('listingsAnchor');
   if (!anchor) return;
   anchor.scrollIntoView({ behavior: 'smooth' });
@@ -3002,23 +3011,39 @@ function clearSignupCooldown() {
 }
 
 function applySignupCooldownUi() {
-  const btn = getSignupSubmitBtn();
+  const btn = document.getElementById('signupSubmitBtn');
   const until = getSignupCooldownUntil();
+
   if (!btn) return;
+
   if (!until || until <= Date.now()) {
     clearSignupCooldown();
-    setButtonBusy(btn, false, 'Creating account…', 'Create Free Account →');
-    if ((document.getElementById('authSignupStatus') || {}).textContent?.includes('Please wait')) {
+    btn.disabled = false;
+    btn.style.opacity = '';
+    btn.style.pointerEvents = '';
+    btn.style.cursor = '';
+    btn.textContent = 'Create Account';
+
+    const statusEl = document.getElementById('authSignupStatus');
+    if (statusEl && statusEl.textContent.includes('Please wait')) {
       setAuthStatus('authSignupStatus', '');
     }
     return;
   }
+
   const secondsLeft = Math.max(1, Math.ceil((until - Date.now()) / 1000));
   btn.disabled = true;
-  btn.style.opacity = '0.7';
+  btn.style.opacity = '0.6';
   btn.style.pointerEvents = 'none';
+  btn.style.cursor = 'not-allowed';
   btn.textContent = `Please wait ${secondsLeft}s`;
-  setAuthStatus('authSignupStatus', `Too many signup attempts. Please wait ${secondsLeft} seconds, then try again.`, true);
+
+  setAuthStatus(
+    'authSignupStatus',
+    `Too many signup attempts. Please wait ${secondsLeft} seconds, then try again.`,
+    true
+  );
+
   window.setTimeout(applySignupCooldownUi, 1000);
 }
 
@@ -3302,65 +3327,96 @@ async function ensureProfileForCurrentUser(profileSeed = {}) {
 
 async function signUpWithSupabase() {
   const supabase = getSupabaseClient();
-  const btn = getSignupSubmitBtn();
+  const btn = document.getElementById('signupSubmitBtn');
+  const status = document.getElementById('authSignupStatus');
+  const stage2 = document.getElementById('signup-stage-2');
+
+  if (!btn || !status || !stage2) {
+    console.error('Signup UI is missing required elements.');
+    return;
+  }
+
   const cooldownUntil = getSignupCooldownUntil();
   if (cooldownUntil > Date.now()) {
     applySignupCooldownUi();
     return;
   }
 
-  const licenseNumber = document.getElementById('signupLicenseNumber').value.trim();
-  const licenseType = document.getElementById('signupLicenseType').value;
-  const businessName = document.getElementById('signupBusinessName').value.trim();
-  const businessAddress = document.getElementById('signupBusinessAddress').value.trim();
-  const city = document.getElementById('signupCity').value.trim();
-  const state = document.getElementById('signupState').value;
-  const contactName = document.getElementById('signupContactName').value.trim();
-  const email = document.getElementById('signupEmail').value.trim();
-  const password = document.getElementById('signupPassword').value;
+  const licenseNumber = document.getElementById('signupLicenseNumber')?.value.trim() || '';
+  const email = document.getElementById('signupEmail')?.value.trim() || '';
+  const password = document.getElementById('signupPassword')?.value || '';
 
-  if (!licenseNumber || !licenseType || !businessName || !businessAddress || !city || !state || !contactName || !email || !password) {
-    setAuthStatus('authSignupStatus', 'Please complete all sign up fields.', true);
-    showToast('Please complete all sign up fields.');
+  if (!licenseNumber) {
+    setAuthStatus('authSignupStatus', 'Please enter your license number first.', true);
+    showToast('Please enter your license number first.');
     return;
   }
 
+  if (stage2.style.display === 'none') {
+    setAuthStatus('authSignupStatus', 'Please verify your license before creating an account.', true);
+    showToast('Please verify your license before creating an account.');
+    return;
+  }
+
+  if (!email || !password) {
+    setAuthStatus('authSignupStatus', 'Please enter your login email and password.', true);
+    showToast('Please enter your login email and password.');
+    return;
+  }
+
+  const businessName = document.getElementById('signupBusinessName')?.value.trim() || '';
+  const businessAddress = document.getElementById('signupBusinessAddress')?.value.trim() || '';
+  const city = document.getElementById('signupCity')?.value.trim() || '';
+  const state = document.getElementById('signupState')?.value || '';
+  const licenseType = document.getElementById('signupLicenseType')?.value || '';
+  const contactName = document.getElementById('signupContactName')?.value.trim() || '';
+  const contactEmail = document.getElementById('signupContactEmail')?.value.trim() || email;
+
   setAuthStatus('authSignupStatus', 'Creating your account...');
-  setButtonBusy(btn, true, 'Creating account…', 'Create Free Account →');
+  setButtonBusy(btn, true, 'Creating account…', 'Create Account');
 
   try {
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password
+    });
+
     if (error) {
       console.error('signUpWithSupabase failed:', error);
+
       const message = /rate limit/i.test(error.message || '')
         ? 'Too many signup attempts. Please wait about a minute, then try again once.'
         : (error.message || 'Sign up failed.');
+
       if (/rate limit/i.test(error.message || '')) {
         setSignupCooldown(60);
         applySignupCooldownUi();
       } else {
-        setButtonBusy(btn, false, 'Creating account…', 'Create Free Account →');
+        setButtonBusy(btn, false, 'Creating account…', 'Create Account');
       }
+
       setAuthStatus('authSignupStatus', message, true);
       showToast(message);
       return;
     }
 
     clearSignupCooldown();
-    const user = data.user;
+
+    const user = data?.user;
     if (!user) {
-      setButtonBusy(btn, false, 'Creating account…', 'Create Free Account →');
+      setButtonBusy(btn, false, 'Creating account…', 'Create Account');
       setAuthStatus('authSignupStatus', 'Account could not be created.', true);
       showToast('Account could not be created.');
       return;
     }
 
-    if (!data.session) {
-      setButtonBusy(btn, false, 'Creating account…', 'Create Free Account →');
+    // IMPORTANT: handle "signup created but no active session yet" BEFORE profile creation
+    if (!data?.session) {
+      setButtonBusy(btn, false, 'Creating account…', 'Create Account');
       setAuthStatus('authSignupStatus', 'Account created. Check your email to confirm, then log in.');
+      showToast('Account created. Check your email to confirm, then log in.');
       closeModal('authModal');
       clearAuthForms();
-      showToast('Account created. Check your email to confirm, then log in.');
       return;
     }
 
@@ -3373,19 +3429,20 @@ async function signUpWithSupabase() {
       license_number: licenseNumber,
       business_address: businessAddress,
       contact_name: contactName,
-      contact_email: email
+      contact_email: contactEmail
     });
 
     if (!profileResult.ok) {
-      setButtonBusy(btn, false, 'Creating account…', 'Create Free Account →');
-      setAuthStatus('authSignupStatus', 'Account created, but profile setup needs another login.', true);
-      showToast('Account created, but profile setup needs another login.');
+      setButtonBusy(btn, false, 'Creating account…', 'Create Account');
+      setAuthStatus('authSignupStatus', 'Your account was created, but your business profile could not be saved yet. Please log in and try again.');
+      showToast('Your account was created, but your business profile could not be saved yet. Please log in and try again.');
       closeModal('authModal');
       clearAuthForms();
       return;
     }
 
     await hydrateCurrentUserFromSupabase();
+
     currentUser.profile = {
       ...(currentUser.profile || {}),
       businessName: currentUser.profile?.businessName || businessName,
@@ -3396,16 +3453,21 @@ async function signUpWithSupabase() {
       city: currentUser.profile?.city || city,
       license: currentUser.profile?.license || licenseNumber,
       address: currentUser.profile?.address || businessAddress,
-      contactEmail: currentUser.profile?.contactEmail || email
+      contactEmail: currentUser.profile?.contactEmail || contactEmail
     };
+
     closeModal('authModal');
     clearAuthForms();
     setSignedInUi();
     showToast('🎉 Account created. Next, add your first active listing.');
     setTimeout(() => openFlowAfterSignup(), 180);
+  } catch (err) {
+    console.error('signUpWithSupabase crashed:', err);
+    setAuthStatus('authSignupStatus', err.message || 'Signup failed. Please try again.', true);
+    showToast(err.message || 'Signup failed. Please try again.');
   } finally {
     if (getSignupCooldownUntil() <= Date.now()) {
-      setButtonBusy(btn, false, 'Creating account…', 'Create Free Account →');
+      setButtonBusy(btn, false, 'Creating account…', 'Create Account');
     }
   }
 }
@@ -3490,14 +3552,44 @@ function fakeAuth(mode = 'signup') {
 }
 
 function clearAuthForms() {
-  ['signupLicenseNumber','signupLicenseType','signupBusinessName','signupBusinessAddress','signupCity','signupState','signupContactName','signupEmail','signupPassword','loginEmail','loginPassword'].forEach(id => {
+  [
+    'signupLicenseNumber',
+    'signupBusinessName',
+    'signupBusinessAddress',
+    'signupCity',
+    'signupState',
+    'signupLicenseType',
+    'signupContactName',
+    'signupContactEmail',
+    'signupEmail',
+    'signupPassword',
+    'loginEmail',
+    'loginPassword'
+  ].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+
+  const stage2 = document.getElementById('signup-stage-2');
+  if (stage2) stage2.style.display = 'none';
+
+  const signupBtn = document.getElementById('signupSubmitBtn');
+  if (signupBtn) {
+    signupBtn.disabled = false;
+    signupBtn.style.opacity = '';
+    signupBtn.style.pointerEvents = '';
+    signupBtn.style.cursor = '';
+    signupBtn.textContent = 'Create Account';
+  }
+
   setAuthStatus('authSignupStatus', '');
   setAuthStatus('authLoginStatus', '');
+
+  if (window.signupLicenseVerified) {
+    window.signupLicenseVerified = false;
+  }
+
   applySignupCooldownUi();
-  setButtonBusy(getLoginSubmitBtn(), false, 'Logging in…', 'Log In →');
 }
 
 function resetCurrentUserState() {
@@ -3526,15 +3618,20 @@ function setSignedOutUi(options = {}) {
   isLoggedIn = false;
   currentEditingBusinessId = null;
   currentChatPartnerId = null;
+
   if (options.closeModals !== false) {
-    ['accountModal','editListingModal','chatModal','bizModal','listingModal','flowHandoffModal'].forEach(id => closeModal(id));
+    ['accountModal','editListingModal','chatModal','bizModal','listingModal','flowHandoffModal']
+      .forEach(id => closeModal(id));
   }
+
   clearAuthForms();
   resetCurrentUserState();
+
   const guest = document.getElementById('dashGuest');
   const user = document.getElementById('dashUser');
   if (guest) guest.classList.remove('hidden');
   if (user) user.classList.add('hidden');
+
   renderNavActions();
   renderConversationList();
   renderDashboardMessages();
@@ -3542,7 +3639,7 @@ function setSignedOutUi(options = {}) {
   renderRatingSection();
   renderDashboardGuidance();
   updateDashboardCounts();
-  filterCards();
+
   if (!options.preserveView) switchView('browse');
   if (!options.silent) showToast('👋 You have been logged out.');
 }
@@ -3736,13 +3833,124 @@ async function submitListing() {
   showToast('🎉 Listing published successfully.');
   setTimeout(() => openFlowAfterListingPublished(), 180);
 }
+async function verifyLicense() {
+  const licenseInput = document.getElementById('signupLicenseNumber');
+  const statusEl = document.getElementById('authSignupStatus');
+  const stage2 = document.getElementById('signup-stage-2');
 
+  if (!licenseInput || !statusEl || !stage2) return;
+
+  const rawLicense = licenseInput.value.trim();
+  const licenseNumber = rawLicense.toUpperCase();
+
+  stage2.style.display = 'none';
+
+  if (!licenseNumber) {
+    statusEl.textContent = 'Please enter your license number first.';
+    statusEl.style.color = '#b91c1c';
+    return;
+  }
+
+  statusEl.textContent = 'Checking official NY OCM license records...';
+  statusEl.style.color = 'var(--muted)';
+
+  try {
+    const endpoint =
+      `https://data.ny.gov/resource/jskf-tt3q.json?$limit=1&license_number=${encodeURIComponent(licenseNumber)}`;
+
+    const response = await fetch(endpoint, {
+      headers: {
+        Accept: 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`License lookup failed with status ${response.status}`);
+    }
+
+    const rows = await response.json();
+    const record = Array.isArray(rows) ? rows[0] : null;
+
+    if (!record) {
+      statusEl.textContent = 'We could not verify that license number in the official NY OCM records.';
+      statusEl.style.color = '#b91c1c';
+      stage2.style.display = 'none';
+      return;
+    }
+
+    const setValue = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.value = value || '';
+    };
+
+    licenseInput.value = record.license_number || licenseNumber;
+
+    setValue('signupLicenseType', record.license_type || '');
+
+    setValue(
+      'signupBusinessName',
+      record.business_name ||
+      record.business_legal_name ||
+      record.licensee_name ||
+      record.doing_business_as_dba ||
+      ''
+    );
+
+    setValue(
+      'signupBusinessAddress',
+      record.business_address ||
+      record.premises_address ||
+      record.address ||
+      record.street_address ||
+      ''
+    );
+
+    setValue(
+      'signupCity',
+      record.city ||
+      record.business_city ||
+      record.premises_city ||
+      ''
+    );
+
+    setValue(
+      'signupState',
+      record.state ||
+      record.business_state ||
+      record.premises_state ||
+      'New York'
+    );
+
+    setValue(
+      'signupContactName',
+      record.primary_contact_name ||
+      record.contact_name ||
+      ''
+    );
+
+    setValue(
+      'signupContactEmail',
+      record.primary_contact_email ||
+      record.contact_email ||
+      ''
+    );
+
+    stage2.style.display = 'block';
+    statusEl.textContent = 'License verified. Please review the business details and finish creating your account.';
+    statusEl.style.color = 'green';
+  } catch (error) {
+    console.error('verifyLicense failed:', error);
+    stage2.style.display = 'none';
+    statusEl.textContent = 'We could not verify that license right now. Please try again.';
+    statusEl.style.color = '#b91c1c';
+  }
+}
 window.signUpWithSupabase = signUpWithSupabase;
 window.loginWithSupabase = loginWithSupabase;
 window.logout = logout;
 window.submitListing = submitListing;
 window.restoreSessionFromSupabase = restoreSessionFromSupabase;
-
+window.verifyLicense = verifyLicense;
 
 function renderStateCard({ kind = 'empty', icon = '•', title = '', copy = '', actions = [] }) {
   return `
@@ -5144,53 +5352,55 @@ function renderAllOwnerViews() {
   if (liveFeedMount) liveFeedMount.innerHTML = '';
 }
 function openBizModal(id) {
+  console.log("RUN → openBizModal", id);
+  console.log("Listings count:", document.querySelectorAll(".card").length);
   const biz = getAllVisibleListings().find(b => String(b.id) === String(id));
   if (!biz) return;
-  const sells = normalizeProductList(biz?.sells);
-  const buys = normalizeProductList(biz?.buys); 
-  document.getElementById('bizModalBody').innerHTML = `
+
+  const body = document.getElementById('bizModalBody');
+  if (!body) return;
+
+  const sells = normalizeProductList(biz.sells);
+  const buys = normalizeProductList(biz.buys);
+
+  body.innerHTML = `
     <div class="business-detail-top">
-      <div class="biz-avatar" style="background:${escapeHtml(biz.avatarColor)}">${escapeHtml(biz.avatar)}</div>
+      <div class="biz-avatar">${escapeHtml((biz.avatar || biz.name || 'B').charAt(0).toUpperCase())}</div>
       <div class="biz-meta">
-        <h2>${escapeHtml(biz.name)}</h2>
-        <p>${escapeHtml(formatTypeLabel(biz.type))} · 📍 ${escapeHtml(biz.location)}</p>
-        <div class="star-rating">
-          ${'★'.repeat(Math.max(1, Math.round(biz.rating || 0)))}
-          <span style="color:var(--muted);font-size:.78rem;">
-            ${(biz.rating || 0).toFixed(1)} (${biz.reviews || 0} reviews)
-          </span>
-        </div>
+        <h2>${escapeHtml(biz.name || 'Business')}</h2>
+        <p>${escapeHtml(formatTypeLabel(biz.type || ''))} · 📍 ${escapeHtml(biz.location || 'Location not available')}</p>
       </div>
     </div>
-    ${biz.verified
-      ? `<div class="license-verify"><span>✅</span><p>License verified — active and in good standing</p></div>`
-      : `<div class="license-verify" style="background:#fef3c7;border-color:#fcd34d;"><span>⏳</span><p style="color:#92400e;">Verification pending</p></div>`}
-    ${renderConfidenceRow(biz)}
-    ${renderCredibilityRow(biz)}
-    <hr class="clean-divider"><div class="product-list-preview">
-  <div class="heading-lg">Selling</div>
-  ${sells.length
-    ? sells.map(p => `<span class="product-pill">📦 ${escapeHtml(p)}</span>`).join('')
-    : `<span class="product-pill">No selling products listed yet</span>`}
-</div>
-<hr class="clean-divider"><div class="product-list-preview">
-  <div class="heading-lg">Looking to Buy</div>
-  ${buys.length
-    ? buys.map(p => `<span class="product-pill">🛒 ${escapeHtml(p)}</span>`).join('')
-    : `<span class="product-pill">No buying products listed yet</span>`}
-</div>
-    ${biz.isOwner
-      ? `<button class="btn btn-primary btn-full btn-lg" style="margin-bottom:10px;" onclick="openBusinessEditModal('${escapeJsSingleQuoted(biz.id)}');closeModal('bizModal');">✏️ Edit This Business</button>`
-      : `<button class="btn btn-primary btn-full btn-lg" style="margin-bottom:10px;" onclick="withLoadingState(this, () => contactBiz('${escapeJsSingleQuoted(biz.id)}'))">💬 Send Message</button>
-         <button class="btn btn-ghost btn-full" onclick="withLoadingState(this, () => saveBiz('${escapeJsSingleQuoted(biz.id)}'))">🔖 Save Partner</button>`}
-    <div class="flow-inline-hint">
-      <div class="flow-inline-icon icon-badge">→</div>
-      <div>
-        <div class="heading-lg">${biz.isOwner ? 'Best next step: keep your business info current' : 'Best next step: message now'}</div>
-        <div class="text-subtle">${biz.isOwner ? 'Up-to-date details make your profile easier to trust and match.' : 'A quick message creates momentum faster than saving and leaving.'}</div>
-      </div>
+
+    <div class="license-verify">
+      <span>${biz.verified ? '✅' : '⏳'}</span>
+      <p>${biz.verified ? 'License verified' : 'Verification pending'}</p>
+    </div>
+
+    <div class="product-list-preview">
+      <h3>Selling</h3>
+      ${
+        sells.length
+          ? sells.map(item => `<span class="product-pill">${escapeHtml(item)}</span>`).join('')
+          : '<p style="color:var(--muted);font-size:.85rem;">No selling products listed.</p>'
+      }
+    </div>
+
+    <div class="product-list-preview">
+      <h3>Buying</h3>
+      ${
+        buys.length
+          ? buys.map(item => `<span class="product-pill">${escapeHtml(item)}</span>`).join('')
+          : '<p style="color:var(--muted);font-size:.85rem;">No buying products listed.</p>'
+      }
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button class="btn btn-primary" style="flex:1;" onclick="contactBiz('${escapeJsSingleQuoted(biz.id)}')">Message</button>
+      <button class="btn btn-ghost" style="flex:1;" onclick="saveBiz('${escapeJsSingleQuoted(biz.id)}')">Save</button>
     </div>
   `;
+
   openModal('bizModal');
 }
 
@@ -5621,18 +5831,32 @@ function showToast(msg, duration = 2800) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), duration);
 }
+document.addEventListener('DOMContentLoaded', async () => {
 
-/* ── Init ── */
-renderNavActions();
-filterCards();
-renderConversationList();
-renderDashboardMessages();
-renderSavedPartners();
-renderRatingSection();
-updateDashboardCounts();
-setSignedOutUi({ preserveView: true, silent: true, closeModals: false });
-restoreSessionFromSupabase({ preserveView: true });
-loadPublicListingsFromSupabase();
+  // 🔥 FORCE CLEAR AFTER BROWSER AUTOFILL
+  setTimeout(() => {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = '';
+  }, 100);
+
+  seedInitialListingsIfNeeded();
+
+  renderNavActions();
+  renderConversationList();
+  renderDashboardMessages();
+  renderSavedPartners();
+  renderRatingSection();
+  updateDashboardCounts();
+
+  filterCards();
+
+  try {
+    await restoreSessionFromSupabase({ preserveView: true });
+    await loadPublicListingsFromSupabase();
+  } catch (err) {
+    console.warn('Startup restore/load skipped:', err);
+  }
+});
 </script>
 
 
