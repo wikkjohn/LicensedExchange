@@ -4,12 +4,1382 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Licensed Business Exchange</title>
-  
-  <!-- External CSS Files -->
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/layout.css">
-  <link rel="stylesheet" href="css/dashboard.css">
+  <style>
+/* Layout spacing utilities */
+.stack-8 > * + * { margin-top: 8px; }
+.stack-12 > * + * { margin-top: 12px; }
+.stack-16 > * + * { margin-top: 16px; }
+.stack-24 > * + * { margin-top: 24px; }
+
+/* Section containers */
+.section-shell {
+  padding: 24px 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Headings */
+.heading-lg {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.text-subtle {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* Cards */
+.uniform-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
+}
+
+/* Message thread chips */
+.thread-chip {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.reply-urgent {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+/* Smooth transition hooks */
+.view-transitioning {
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+</style>
+
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    
+:root {
+  --green:       #000000;
+  --green-light: #1f1f1f;
+  --green-pale:  #f3f3f3;
+  --accent:      #000000;
+  --text:        #000000;
+  --muted:       #6b6b6b;
+  --border:      #e5e5e5;
+  --bg:          #ffffff;
+  --white:       #ffffff;
+  --radius:      14px;
+  --shadow:      0 6px 24px rgba(0,0,0,.08);
+  --shadow-sm:   0 2px 8px rgba(0,0,0,.06);
+}
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .page-shell {
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      background: var(--bg);
+    }
+
+    .hidden  { display: none !important; }
+    .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      height: 56px;
+    }
+    .nav-inner {
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 16px;
+      height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-weight: 700; font-size: 1.1rem; color: var(--white);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .nav-logo span { font-size: 1.3rem; filter: grayscale(1); }
+    .nav-actions { display: flex; gap: 8px; }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 6px;
+      padding: 0 18px; height: 40px;
+      border-radius: 999px; border: none; cursor: pointer;
+      font-size: .9rem; font-weight: 600;
+      transition: transform .15s, box-shadow .15s, opacity .15s;
+      text-decoration: none;
+    }
+    .btn:active { transform: scale(.96); }
+    .btn-primary   { background: var(--green);  color: var(--white); box-shadow: var(--shadow-sm); }
+    .btn-primary:hover  { opacity: .9; }
+    .btn-secondary { background: var(--green-pale); color: var(--green); }
+    .btn-secondary:hover { opacity: .85; }
+    .btn-accent    { background: var(--accent);  color: var(--white); box-shadow: var(--shadow-sm); }
+    .btn-accent:hover   { opacity: .9; }
+    .btn-ghost     { background: transparent; color: var(--green); border: 1.5px solid var(--green); }
+    .btn-ghost:hover    { background: var(--green-pale); }
+    .btn-lg  { height: 52px; font-size: 1rem;   padding: 0 28px; }
+    .btn-xl  { height: 60px; font-size: 1.1rem; padding: 0 36px; }
+    .btn-full { width: 100%; }
+
+
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: #000000;
+  border-bottom: 1px solid #111111;
+  height: 56px;
+}
+
+.btn-primary:hover  { opacity: 1; box-shadow: inset 999px 999px 0 rgba(255,255,255,.08); }
+.btn-secondary { background: #f3f3f3; color: #000000; }
+.btn-secondary:hover { opacity: 1; box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
+.btn-accent    { background: #000000;  color: #ffffff; box-shadow: var(--shadow-sm); }
+.btn-accent:hover   { opacity: 1; box-shadow: inset 999px 999px 0 rgba(255,255,255,.08); }
+.btn-ghost     { background: transparent; color: #000000; border: 1.5px solid #000000; }
+.btn-ghost:hover    { background: #f3f3f3; }
+nav .btn-ghost { color: #ffffff; border-color: #ffffff; }
+nav .btn-ghost:hover { background: rgba(255,255,255,.08); }
+nav .btn-primary { background: #ffffff; color: #000000; }
+nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
+#hero {
+  color: var(--text);
+  padding: 44px 20px 32px;
+  text-align: left;
+  border-bottom: 2px solid #000;
+}
+#hero p { opacity: 1; max-width: 480px; margin: 0 0 24px; color: var(--muted); }
+.hero-cta { align-items: flex-start; }
+.hero-trust { justify-content: flex-start; color: #000; opacity: 1; }
+.search-wrap { background: #ffffff; }
+.search-bar input { background: #f6f6f6; border-color: #f0f0f0; }
+.search-bar input:focus { border-color: #000000; background: #ffffff; }
+.chip.active, .chip:hover { border-color: #000000; background: #000000; color: #ffffff; }
+.stats-bar {
+  background: #ffffff;
+  color: #000000;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.stat-label { opacity: .7; }
+.step-num { background: #000000; }
+.see-all { color: #000000; }
+.stepper-step.active .stepper-dot { border-color: #000000; background: #000000; color: #ffffff; }
+.stepper-step.done .stepper-dot { border-color: #000000; background: #f3f3f3; color: #000000; }
+.stepper-step.active .stepper-label { color: #000000; }
+.stepper-line.done { background: #000000; }
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus { border-color: #000000; }
+.msg-out { background: #000000; color: #ffffff; }
+.send-btn { background: #000000; }
+.convo-avatar, .biz-avatar { background: #000000; }
+.dash-stat .num { color: #000000; }
+.bottom-nav-item.active { color: #000000; }
+.bottom-nav-item .badge { background: #000000; color: #ffffff; }
+.toast { background: #000000; color: #ffffff; }
+.cta-banner .btn { background: #ffffff !important; color: #000000 !important; }
+
+
+    /* ── Hero ── */
+    #hero {
+      background: var(--white);
+      color: var(--text);
+      padding: 48px 20px 40px;
+      text-align: center;
+    }
+    #hero h1 {
+      font-size: clamp(1.6rem, 5vw, 3.4rem);
+      font-weight: 800; line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    #hero h1 em { color: var(--text); font-style: normal; }
+    #hero p {
+      font-size: 1rem; opacity: .88;
+      max-width: 400px; margin: 0 auto 28px;
+    }
+    .hero-cta {
+      display: flex; flex-direction: column;
+      gap: 12px; align-items: center;
+    }
+    .hero-trust {
+      margin-top: 20px; font-size: 1.05rem; opacity: 2.2;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+
+    /* ── Search Bar ── */
+    .search-wrap {
+      background: var(--white);
+      border-bottom: 2px solid #000;
+      position: sticky; top: 56px; z-index: 90;
+      width: 100%;
+    }
+    .search-inner {
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    .search-bar {
+      display: flex; gap: 8px;
+    }
+    .search-bar input {
+      flex: 1;
+      height: 44px; padding: 0 16px;
+      border: 1.5px solid var(--border); border-radius: 999px;
+      font-size: .95rem; outline: none;
+      transition: border-color .2s;
+      width: 100%;
+    }
+    .search-bar input:focus { border-color: var(--green); }
+    .filter-row {
+      display: flex; gap: 8px; margin-top: 10px; overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+    .filter-row::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0;
+      height: 32px; padding: 0 14px;
+      border-radius: 999px; border: 1.5px solid var(--border);
+      background: var(--white); color: var(--muted);
+      font-size: .82rem; font-weight: 600; cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .chip.active, .chip:hover {
+      border-color: var(--green);
+      background: var(--green-pale);
+      color: var(--green);
+    }
+
+    /* ── Section ── */
+    section { padding: 20px 16px; }
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .section-header h2 { font-size: 1.1rem; font-weight: 700; }
+    .see-all { font-size: .85rem; color: var(--green); font-weight: 600; text-decoration: none; }
+    /* ── Premium Listing Cards ── */
+    .listings-grid {
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .06);
+      cursor: pointer;
+      transition: box-shadow .22s, transform .18s, border-color .18s;
+      overflow: hidden;
+      position: relative;
+    }
+    .card:hover {
+      box-shadow: 0 12px 28px rgba(0, 0, 0, .09);
+      transform: translateY(-2px);
+      border-color: #d9d9d9;
+    }
+    .premium-card {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .premium-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .business-meta {
+      display: flex;
+      gap: 12px;
+      min-width: 0;
+      flex: 1;
+    }
+    .business-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: #000000;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      font-weight: 800;
+      flex-shrink: 0;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.2);
+    }
+    .business-text {
+      min-width: 0;
+      flex: 1;
+    }
+    .card-name {
+      font-weight: 800;
+      font-size: 1.06rem;
+      line-height: 1.2;
+      letter-spacing: -.01em;
+      margin-bottom: 5px;
+    }
+    .card-subline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+    .card-type {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: var(--green-pale);
+      color: var(--green);
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: .01em;
+    }
+    .listing-status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: #f3f3f3;
+      color: #000000;
+      font-size: .74rem;
+      font-weight: 700;
+    }
+    .card-location {
+      font-size: .86rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .trust-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .trust-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 30px;
+      padding: 0 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #f8f8f8;
+      color: #3b3b3b;
+      font-size: .76rem;
+      font-weight: 700;
+    }
+    .card-summary {
+      background: #f8f8f8;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 12px 13px;
+      display: grid;
+      gap: 8px;
+    }
+    .summary-row {
+      display: grid;
+      gap: 3px;
+    }
+    .summary-label {
+      font-size: .71rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 800;
+    }
+    .summary-value {
+      font-size: .9rem;
+      color: var(--text);
+      font-weight: 600;
+      line-height: 1.35;
+    }
+    .card-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 11px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      color: #3b3b3b;
+      font-size: .76rem;
+      font-weight: 700;
+    }
+    .card-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .card-actions .btn {
+      flex: 1;
+      height: 42px;
+    }
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: .82rem;
+      color: var(--muted);
+    }
+    .card-footer-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .star-rating { color: #000000; font-size: .85rem; }
+
+    /* ── Stats Banner ── */
+    .stats-bar {
+      background: var(--green);
+      color: var(--white);
+      display: flex; justify-content: space-around;
+      padding: 16px;
+      text-align: center;
+    }
+    .stat-item { display: flex; flex-direction: column; gap: 2px; }
+    .stat-num  { font-size: 1.4rem; font-weight: 800; }
+    .stat-label {
+      font-size: .72rem; opacity: .8;
+      text-transform: uppercase; letter-spacing: .05em;
+    }
+
+    /* ── How It Works ── */
+    .steps { display: flex; flex-direction: column; gap: 16px; }
+    .step {
+      display: flex; gap: 14px; align-items: flex-start;
+      background: var(--white); border-radius: var(--radius);
+      padding: 16px; border: 1px solid var(--border);
+    }
+    .step-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--green); color: var(--white);
+      font-weight: 800; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-body h3 { font-size: .95rem; font-weight: 700; margin-bottom: 3px; }
+    .step-body p  { font-size: .83rem; color: var(--muted); }
+
+    /* ── Trust Grid ── */
+    .trust-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    .trust-card {
+      background: var(--white); border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 16px; text-align: center;
+    }
+    .trust-icon { font-size: 1.8rem; margin-bottom: 6px; }
+    .trust-card h3 { font-size: .88rem; font-weight: 700; margin-bottom: 4px; }
+    .trust-card p  { font-size: .78rem; color: var(--muted); }
+
+    /* ── CTA Banner ── */
+    .cta-banner {
+      background: #000000;
+      color: var(--white);
+      border-radius: var(--radius);
+      padding: 28px 20px; text-align: center;
+      margin: 0 16px 24px;
+    }
+    .cta-banner h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; }
+    .cta-banner p  { font-size: .88rem; opacity: .9; margin-bottom: 20px; }
+
+    /* ── Modals ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.5);
+      display: flex; align-items: flex-end;
+      opacity: 0; pointer-events: none;
+      transition: opacity .25s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal-overlay.open .modal-sheet { transform: translateY(0); }
+    .modal-sheet {
+      background: var(--white);
+      width: 100%; max-height: 92vh;
+      border-radius: var(--radius) var(--radius) 0 0;
+      overflow-y: auto;
+      transform: translateY(100%);
+      transition: transform .3s cubic-bezier(.32,0,.67,0);
+      padding: 0 0 env(safe-area-inset-bottom, 20px);
+    }
+    .modal-handle {
+      width: 40px; height: 4px;
+      background: var(--border); border-radius: 999px;
+      margin: 12px auto 0;
+    }
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-header h2 { font-size: 1.1rem; font-weight: 700; }
+    .modal-close {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--bg); border: none; cursor: pointer;
+      font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
+    }
+    .modal-body { padding: 20px; }
+
+    /* ── Stepper ── */
+    .stepper {
+      display: flex; align-items: center;
+      margin-bottom: 24px;
+    }
+    .stepper-step {
+      display: flex; flex-direction: column; align-items: center;
+      flex: 1;
+    }
+    .stepper-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 2px solid var(--border); background: var(--white);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem; font-weight: 700; color: var(--muted);
+      transition: all .2s;
+    }
+    .stepper-step.active .stepper-dot { border-color: var(--green); background: var(--green); color: var(--white); }
+    .stepper-step.done   .stepper-dot { border-color: var(--green); background: var(--green-pale); color: var(--green); }
+    .stepper-label { font-size: .7rem; margin-top: 4px; color: var(--muted); font-weight: 600; }
+    .stepper-step.active .stepper-label { color: var(--green); }
+    .stepper-line {
+      flex: 1; height: 2px; background: var(--border);
+      margin-bottom: 20px; transition: background .2s;
+    }
+    .stepper-line.done { background: var(--green); }
+
+    /* ── Forms ── */
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block; font-size: .83rem; font-weight: 600;
+      margin-bottom: 6px; color: var(--text);
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 12px 14px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-size: .95rem; outline: none;
+      transition: border-color .2s;
+      background: var(--white);
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--green); }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-hint { font-size: .75rem; color: var(--muted); margin-top: 4px; }
+
+    /* ── Product Tags ── */
+    .tag-list {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;
+    }
+    .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--green-pale); color: var(--green);
+      border-radius: 999px; padding: 4px 12px;
+      font-size: .8rem; font-weight: 600;
+    }
+    .tag-remove {
+      cursor: pointer; opacity: .7; font-size: .9rem;
+      background: none; border: none; color: var(--green); line-height: 1;
+    }
+    .tag-remove:hover { opacity: 1; }
+    .add-product-row {
+      display: flex; gap: 8px; align-items: center; margin-top: 8px;
+    }
+    .add-product-row input { flex: 1; }
+
+    /* ── Business Detail ── */
+    .business-detail-top {
+      display: flex; gap: 14px; align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .biz-avatar {
+      width: 56px; height: 56px; border-radius: 12px;
+      background: var(--green); color: var(--white);
+      font-size: 1.4rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .biz-meta h2 { font-size: 1.1rem; font-weight: 700; }
+    .biz-meta p  { font-size: .83rem; color: var(--muted); margin-top: 2px; }
+    .license-verify {
+      background: #f3f3f3; border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 14px;
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 16px;
+    }
+    .license-verify span { font-size: 1.2rem; }
+    .license-verify p { font-size: .82rem; color: var(--text); font-weight: 600; }
+    .product-list-preview { margin-bottom: 16px; }
+    .product-list-preview h3 {
+      font-size: .85rem; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px;
+    }
+    .product-pill {
+      display: inline-block; margin: 3px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 999px; padding: 4px 12px;
+      font-size: .8rem; color: var(--text);
+    }
+
+    /* ── Conversations ── */
+    .conversation-list { display: flex; flex-direction: column; gap: 0; }
+    .convo-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 20px; border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background .15s;
+    }
+    .convo-item:hover { background: var(--bg); }
+    .convo-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--green); color: var(--white);
+      font-weight: 700; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .convo-meta { flex: 1; min-width: 0; }
+    .convo-name    { font-weight: 700; font-size: .92rem; }
+    .convo-preview {
+      font-size: .8rem; color: var(--muted);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .convo-time  { font-size: .72rem; color: var(--muted); }
+    .unread-dot  {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--green); flex-shrink: 0;
+    }
+
+    /* ── Chat ── */
+    .chat-window { display: flex; flex-direction: column; height: 100%; }
+    .chat-messages {
+      flex: 1; overflow-y: auto; padding: 16px;
+      display: flex; flex-direction: column; gap: 10px;
+      max-height: 320px;
+    }
+    .msg {
+      max-width: 78%; padding: 10px 14px;
+      border-radius: 18px; font-size: .88rem; line-height: 1.4;
+    }
+    .msg-in  { background: var(--bg); border-radius: 18px 18px 18px 4px; align-self: flex-start; }
+    .msg-out { background: var(--green); color: var(--white); border-radius: 18px 18px 4px 18px; align-self: flex-end; }
+    .chat-input-row {
+      display: flex; gap: 8px; padding: 12px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .chat-input-row input {
+      flex: 1; height: 42px; padding: 0 14px;
+      border: 1.5px solid var(--border); border-radius: 999px;
+      font-size: .88rem; outline: none;
+    }
+    .chat-input-row input:focus { border-color: var(--green); }
+    .send-btn {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: var(--green); border: none; cursor: pointer;
+      color: var(--white); font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity .15s;
+    }
+    .send-btn:hover { opacity: .85; }
+
+    /* ── Notifications ── */
+    .notif-list { display: flex; flex-direction: column; gap: 10px; }
+    .notif-item {
+      background: var(--white); border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 14px 16px;
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .notif-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .notif-text h4 { font-size: .88rem; font-weight: 700; }
+    .notif-text p  { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── Dashboard ── */
+    .dashboard-stats {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px; margin-bottom: 20px;
+    }
+    .dash-stat {
+      background: var(--white); border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 16px; text-align: center;
+      cursor: pointer; width: 100%;
+      appearance: none;
+      transition: transform .15s, box-shadow .15s, border-color .15s;
+    }
+    .dash-stat:hover {
+      box-shadow: var(--shadow-sm);
+      border-color: var(--green);
+      transform: translateY(-1px);
+    }
+    .dash-stat .num { font-size: 1.8rem; font-weight: 800; color: var(--green); }
+    .dash-stat .lbl { font-size: .75rem; color: var(--muted); margin-top: 2px; }
+
+    .dash-stat {
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s, border-color .15s;
+    }
+    .dash-stat:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+      border-color: var(--green-light);
+    }
+    .dashboard-section-card {
+      background: var(--white); border-radius: var(--radius);
+      border: 1px solid var(--border); padding: 16px;
+      box-shadow: var(--shadow-sm); margin-bottom: 14px;
+    }
+    .dashboard-section-card h3 {
+      font-size: .98rem; font-weight: 700; margin-bottom: 10px;
+    }
+    .mini-list { display: flex; flex-direction: column; gap: 10px; }
+    .mini-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; padding: 12px 0; border-top: 1px solid var(--border);
+      font-size: .88rem;
+    }
+    .mini-row:first-child { border-top: none; padding-top: 0; }
+    .mini-row:last-child { padding-bottom: 0; }
+    .mini-meta { color: var(--muted); font-size: .8rem; }
+    .owner-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      margin-bottom: 8px; padding: 4px 10px;
+      border-radius: 999px; background: #f3f3f3; color: var(--text);
+      font-size: .74rem; font-weight: 700;
+    }
+
+
+    /* ── Guided Dashboard Onboarding ── */
+    .dashboard-welcome {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 16px;
+    }
+    .dashboard-welcome-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .dashboard-welcome h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .dashboard-welcome p {
+      font-size: .86rem;
+      color: var(--muted);
+    }
+    .progress-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: var(--green);
+      color: var(--white);
+      font-size: .8rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: #e9e9e9;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #000000;
+      border-radius: 999px;
+      transition: width .25s ease;
+    }
+    .onboarding-card {
+      background: var(--white);
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .onboarding-card h3 {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .onboarding-card p {
+      font-size: .84rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .onboarding-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .onboarding-step {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-top: 1px solid var(--border);
+    }
+    .onboarding-step:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+    .onboarding-step:last-child {
+      padding-bottom: 0;
+    }
+    .onboarding-step-main {
+      display: flex;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+    .onboarding-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #f3f3f3;
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .9rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .onboarding-step.done .onboarding-icon {
+      background: var(--green);
+      color: var(--white);
+    }
+    .onboarding-step-title {
+      font-size: .9rem;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .onboarding-step-meta {
+      font-size: .8rem;
+      color: var(--muted);
+    }
+    .onboarding-status {
+      font-size: .76rem;
+      font-weight: 800;
+      border-radius: 999px;
+      padding: 6px 10px;
+      white-space: nowrap;
+      align-self: center;
+    }
+    .onboarding-status.done {
+      background: #f3f3f3;
+      color: var(--green);
+    }
+    .onboarding-status.todo {
+      background: #f3f3f3;
+      color: #000000;
+    }
+    .dashboard-quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .dashboard-quick-actions .btn {
+      width: 100%;
+    }
+
+    /* ── Auth Tabs ── */
+    .auth-tabs {
+      display: flex; margin-bottom: 20px;
+      border-bottom: 2px solid var(--border);
+    }
+    .auth-tab {
+      flex: 1; padding: 12px; text-align: center;
+      font-weight: 700; font-size: .92rem; cursor: pointer;
+      border-bottom: 2px solid transparent; margin-bottom: -2px;
+      color: var(--muted); transition: all .2s;
+    }
+    .auth-tab.active { border-bottom-color: var(--green); color: var(--green); }
+
+    /* ── Bottom Nav ── */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      display: flex;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+    .bottom-nav-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 10px 4px 8px;
+      cursor: pointer; border: none; background: none;
+      color: var(--muted); font-size: .65rem; font-weight: 600;
+      gap: 3px; transition: color .15s;
+    }
+    .bottom-nav-item .icon { font-size: 1.3rem; }
+    .bottom-nav-item.active { color: var(--green); }
+    .bottom-nav-item .badge {
+      position: absolute; top: 6px; right: calc(50% - 16px);
+      background: var(--accent); color: var(--white);
+      border-radius: 999px; font-size: .6rem; font-weight: 700;
+      padding: 1px 5px; min-width: 16px; text-align: center;
+    }
+    .nav-item-wrap { position: relative; display: inline-flex; }
+
+    /* ── Views ── */
+    .view { display: none; padding-bottom: 80px; }
+    .view.active { display: block; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 80px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--text); color: var(--white);
+      padding: 10px 20px; border-radius: 999px;
+      font-size: .85rem; font-weight: 600;
+      z-index: 999; opacity: 0; transition: all .3s;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Saved Empty State ── */
+    .saved-empty {
+      text-align: center; padding: 40px 20px; color: var(--muted);
+    }
+    .saved-empty .icon { font-size: 3rem; margin-bottom: 12px; }
+
+    /* ── Responsive ── */
+    @media (min-width: 640px) {
+      .listings-grid    { display: grid; grid-template-columns: 1fr 1fr; }
+      .trust-grid       { grid-template-columns: repeat(4, 1fr); }
+      .dashboard-stats  { grid-template-columns: repeat(4, 1fr); }
+    }
+        @media (min-width: 960px) {
+      .bottom-nav {
+        max-width: 720px; left: 50%;
+        transform: translateX(-50%);
+        right: auto; width: 100%;
+      }
+    }
+
+    /* ── Dashboard enhancement styles ── */
+    #view-dashboard {
+      background: #f7f7f7;
+    }
+
+#view-dashboard section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 16px 110px;
+}
+
+#dashUser > div {
+  margin-bottom: 16px;
+}
+
+#personalization-banner,
+#lifecycleBannerMount,
+#notificationCenterMount,
+#outcomeBoardMount,
+#celebrationMomentsMount,
+#liveMarketplaceFeedMount,
+#dashboardNextStepBanner,
+#smartPriorityMount {
+  margin-bottom: 16px;
+}
+
+.personalization-banner,
+.lifecycle-banner,
+.outcome-board,
+.celebration-banner,
+.priority-panel,
+.next-step-banner {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.personalization-kicker,
+.lifecycle-kicker,
+.outcome-kicker,
+.celebration-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .76rem;
+  font-weight: 800;
+  color: var(--muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.lifecycle-title,
+.outcome-title,
+.celebration-title {
+  font-size: 1.45rem;
+  line-height: 1.2;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.lifecycle-copy,
+.outcome-copy,
+.celebration-copy,
+.notification-copy,
+.priority-reason,
+.live-copy {
+  font-size: .92rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.personalization-actions,
+.lifecycle-actions,
+.celebration-actions,
+.next-step-banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.notification-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 12px;
+}
+
+.notification-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.notification-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #000000;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.notification-title {
+  font-size: .96rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.notification-meta {
+  margin-top: 6px;
+  font-size: .76rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.outcome-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.outcome-metric {
+  background: #f8f8f8;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.outcome-number {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.outcome-label {
+  font-size: .78rem;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.outcome-growth {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: .88rem;
+  color: var(--muted);
+}
+
+.celebration-banner {
+  background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+}
+
+.priority-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.priority-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  background: #f8f8f8;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.priority-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.priority-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #000000;
+  color: #ffffff;
+  font-size: .72rem;
+  font-weight: 800;
+}
+
+.next-step-banner {
+  background: #ffffff;
+}
+
+.live-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.live-activity-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.live-activity-main {
+  display: flex;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.live-pulse {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #000000;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.live-title {
+  font-size: .95rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.live-time {
+  font-size: .75rem;
+  color: var(--muted);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.state-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.state-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.icon-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f3f3f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+#dashboardMessagesList .mini-row,
+#dashboardSavedPartnersList .mini-row,
+#dashboardRatingHighlights .mini-row {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+#dashboardMessagesList .mini-row + .mini-row,
+#dashboardSavedPartnersList .mini-row + .mini-row,
+#dashboardRatingHighlights .mini-row + .mini-row {
+  margin-top: 10px;
+}
+
+@media (max-width: 640px) {
+  #hero {
+    text-align: left;
+    padding: 44px 20px 32px;
+  }
+
+  #hero p {
+    max-width: 480px;
+    margin: 0 0 24px;
+  }
+
+  .hero-cta {
+    align-items: flex-start;
+  }
+
+  .hero-trust {
+    justify-content: flex-start;
+  }
+
+  .dashboard-welcome-top,
+  .priority-item,
+  .notification-card,
+  .live-activity-card,
+  .premium-card-header,
+  .business-detail-top,
+  .card-footer {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .dashboard-quick-actions,
+  .outcome-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .personalization-actions,
+  .lifecycle-actions,
+  .celebration-actions,
+  .next-step-banner-actions,
+  .card-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .personalization-actions .btn,
+  .lifecycle-actions .btn,
+  .celebration-actions .btn,
+  .next-step-banner-actions .btn,
+  .card-actions .btn {
+    width: auto;
+    flex: 1 1 calc(50% - 5px);
+    min-width: 0;
+  }
+
+  .live-time,
+  .notification-dot {
+    align-self: flex-start;
+  }
+}
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -26,7 +1396,6 @@
   </div>
 </nav>
 
-<<<<<<< HEAD
 
 
 <!-- ══════════════════════════════════════
@@ -59,21 +1428,40 @@
        CHANGE 4: MicroBusiness chip added between All and Dispensary.      -->
   <div class="search-wrap" id="listingsAnchor">
     <div class="search-inner">
-    <div class="search-bar">
-      <input
-  type="search"
-  id="searchInput"
-  name="random-search-field-xyz"
-  placeholder="🔍  Search by business name, location, product, or license type"
-  autocomplete="new-password"
-  autocapitalize="off"
-  autocorrect="off"
-  spellcheck="false"
-  data-lpignore="true"
-  data-form-type="other"
-  oninput="filterCards()"
-/>
-    </div>
+    <div class="search-bar" style="position:relative;">
+  <input
+    type="text"
+    autocomplete="off"
+    spellcheck="false"
+    placeholder="Search by name, location, product, or license type…"
+    id="searchInput"
+    oninput="filterCards(); document.getElementById('searchClearBtn').style.display = this.value ? 'flex' : 'none';"
+    style="padding-right: 44px;"
+  />
+  <button
+    id="searchClearBtn"
+    onclick="document.getElementById('searchInput').value=''; filterCards(); this.style.display='none'; document.getElementById('searchInput').focus();"
+    style="
+      display: none;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: #e5e5e5;
+      cursor: pointer;
+      font-size: .85rem;
+      align-items: center;
+      justify-content: center;
+      color: #555;
+    "
+    aria-label="Clear search"
+  >✕</button>
+</div>
+
     <div class="filter-row" id="filterRow">
       <button class="chip active"   data-filter="all"          onclick="setFilter('all',this)">All</button>
       <button class="chip"          data-filter="microbusiness" onclick="setFilter('microbusiness',this)">MicroBusiness</button>
@@ -297,35 +1685,31 @@
   </section>
 </div>
 
-=======
-<!-- [... REST OF YOUR HTML BODY CONTENT GOES HERE ...] -->
->>>>>>> 33d86f57dee3a4af0dcc2d33716cb508b3c4fef7
 
 <!-- ══════════════════════════════════════
      BOTTOM NAV
 ══════════════════════════════════════ -->
 <div class="bottom-nav" role="navigation" aria-label="Main navigation">
-  <button class="bottom-nav-item active" id="nav-browse" onclick="switchView('browse')">
+  <button class="bottom-nav-item active" id="nav-browse"    onclick="switchView('browse')">
     <span class="icon">🔍</span>Browse
   </button>
   <button class="bottom-nav-item" id="nav-notif" onclick="switchView('notif')">
-    <span class="nav-item-wrap">
-      <span class="icon">🔔</span>
-      <span class="badge hidden" id="nav-alerts-badge"></span>
-    </span>Alerts
-  </button>
+  <span class="nav-item-wrap">
+    <span class="icon">🔔</span>
+    <span class="badge hidden" id="nav-alerts-badge"></span>
+  </span>Alerts
+</button>
   <button class="bottom-nav-item" id="nav-messages" onclick="switchView('messages')">
-    <span class="nav-item-wrap">
-      <span class="icon">💬</span>
-      <span class="badge hidden" id="nav-messages-badge"></span>
-    </span>Messages
-  </button>
-  <button class="bottom-nav-item" id="nav-dashboard" onclick="switchView('dashboard')">
+  <span class="nav-item-wrap">
+    <span class="icon">💬</span>
+    <span class="badge hidden" id="nav-messages-badge"></span>
+  </span>Messages
+</button>
+  <button class="bottom-nav-item"        id="nav-dashboard" onclick="switchView('dashboard')">
     <span class="icon">📊</span>Dashboard
   </button>
 </div>
 
-<<<<<<< HEAD
 
 <!-- ══════════════════════════════════════
      MODAL: Auth
@@ -348,36 +1732,74 @@
 
   <!-- STAGE 1: LICENSE VERIFICATION -->
   <div id="signup-stage-1">
+  <p style="font-size:.85rem;color:var(--muted);margin-bottom:16px;">
+    Enter your cannabis license number to get started. We'll look up your business automatically.
+  </p>
+  <div class="form-group">
+    <label for="signupLicenseNumber">License number</label>
     <input
+      type="text"
       id="signupLicenseNumber"
-      placeholder="License Number"
+      placeholder="e.g. C11-0001234-LIC"
+      autocomplete="off"
     />
-
-    <button onclick="verifyLicense()">
-      Verify License
-    </button>
-
-    <div id="authSignupStatus" class="auth-status"></div>
+    <div class="form-hint">Your license is used to verify your business — never shown publicly.</div>
   </div>
+  <button class="btn btn-primary btn-full btn-lg" onclick="verifyLicense()">
+    Verify My License →
+  </button>
+  <p id="authSignupStatus" style="text-align:center;font-size:.82rem;color:var(--muted);margin-top:12px;min-height:1.2em;"></p>
+</div>
+
     <!-- STAGE 2: ACCOUNT SETUP (HIDDEN INITIALLY) -->
   <div id="signup-stage-2" style="display:none;">
-    
-    <input id="signupBusinessName" placeholder="Business Name" />
-    <input id="signupBusinessAddress" placeholder="Business Address" />
-    <input id="signupCity" placeholder="City" />
-    <input id="signupState" placeholder="State" />
-    <input id="signupLicenseType" placeholder="License Type" />
-    <input id="signupContactName" placeholder="Contact Name" />
-    <input id="signupContactEmail" placeholder="Contact Email (if available)" />
-
-    <input id="signupEmail" placeholder="Login Email" />
-    <input id="signupPassword" type="password" placeholder="Password" />
-
-    <button id="signupSubmitBtn" onclick="signUpWithSupabase()">
-  Create Account
-</button>
-
+  <p style="font-size:.85rem;color:var(--muted);margin-bottom:16px;">
+    ✅ License found. Review your details and set a password to finish.
+  </p>
+  <div class="form-group">
+    <label for="signupBusinessName">Business name</label>
+    <input type="text" id="signupBusinessName" placeholder="Your business name" />
   </div>
+  <div class="form-group">
+    <label for="signupBusinessAddress">Business address</label>
+    <input type="text" id="signupBusinessAddress" placeholder="123 Main Street" />
+  </div>
+  <div class="form-group">
+    <label for="signupCity">City</label>
+    <input type="text" id="signupCity" placeholder="e.g. Brooklyn" />
+  </div>
+  <div class="form-group">
+    <label for="signupState">State</label>
+    <input type="text" id="signupState" placeholder="e.g. New York" />
+  </div>
+  <div class="form-group">
+    <label for="signupLicenseType">License type</label>
+    <input type="text" id="signupLicenseType" placeholder="e.g. Cultivator" />
+  </div>
+  <div class="form-group">
+    <label for="signupContactName">Contact name</label>
+    <input type="text" id="signupContactName" placeholder="First and last name" />
+  </div>
+  <div class="form-group">
+    <label for="signupContactEmail">Contact email (optional)</label>
+    <input type="email" id="signupContactEmail" placeholder="contact@business.com" />
+  </div>
+  <div class="form-group">
+    <label for="signupEmail">Login email</label>
+    <input type="email" id="signupEmail" placeholder="you@email.com" />
+  </div>
+  <div class="form-group">
+    <label for="signupPassword">Password</label>
+    <input type="password" id="signupPassword" placeholder="Min. 8 characters" />
+  </div>
+  <button id="signupSubmitBtn" class="btn btn-primary btn-full btn-lg" onclick="signUpWithSupabase()">
+    Create Free Account →
+  </button>
+  <p style="text-align:center;font-size:.78rem;color:var(--muted);margin-top:12px;">
+    By signing up you agree to our Terms &amp; Privacy Policy.
+  </p>
+</div>
+
 
 </div>
       
@@ -702,9 +2124,6 @@
     </div>
     <div class="chat-window">
       <div class="chat-messages" id="chatMessages">
-        <div class="msg msg-in">Hey! Are you still looking for Blue Dream?</div>
-        <div class="msg msg-out">Yes! What sizes do you have available?</div>
-        <div class="msg msg-in">We have 1 lb and 5 lb units ready to ship.</div>
       </div>
       <div class="chat-input-row">
         <input
@@ -741,24 +2160,24 @@
 ══════════════════════════════════════ -->
 <div class="ux-toast-stack" id="uxToastStack" aria-live="polite" aria-atomic="true"></div>
 <div class="toast" id="toast"></div>
-=======
->>>>>>> 33d86f57dee3a4af0dcc2d33716cb508b3c4fef7
 <!-- ══════════════════════════════════════
      JAVASCRIPT
 ══════════════════════════════════════ -->
 
-<!-- Supabase SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
 <script>
-  window.SUPABASE_URL = 'https://grxzagpvypzmyfycmlba.supabase.co';
-  window.SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdyeHphZ3B2eXB6bXlmeWNtbGJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwMzQzNDYsImV4cCI6MjA4NzYxMDM0Nn0.78b4DCS2sK0srA5_lsnAPxru0HqRgJduzpDsdrwIExU';
-  window.supabaseApp = (window.supabase && typeof window.supabase.createClient === 'function')
-    ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY)
-    : null;
-  window.supabaseClient = window.supabaseApp;
+window.SUPABASE_URL = 'https://grxzagpvypzmyfycmlba.supabase.co';
+window.SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdyeHphZ3B2eXB6bXlmeWNtbGJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwMzQzNDYsImV4cCI6MjA4NzYxMDM0Nn0.78b4DCS2sK0srA5_lsnAPxru0HqRgJduzpDsdrwIExU';
+window.supabaseApp = (window.supabase && typeof window.supabase.createClient === 'function')
+  ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY)
+  : null;
+window.supabaseClient = window.supabaseApp;
+if (!window.supabaseApp) {
+  console.error('Supabase client failed to initialize.');
+}
 </script>
 
-<<<<<<< HEAD
 <script>
 
 window.recommendedMatchesCache = window.recommendedMatchesCache || [];
@@ -767,10 +2186,12 @@ window.savedPartners = window.savedPartners || [];
 function getSupabaseClient() {
   const client = window.supabaseApp || window.supabaseClient || null;
   if (!client) {
-    throw new Error('Supabase client failed to initialize.');
+    showToast('Connection unavailable. Please refresh and try again.');
+    throw new Error('Supabase client is unavailable.');
   }
   return client;
 }
+
 
 
 /* ── Sample Data ── */
@@ -1228,13 +2649,11 @@ function buildProfileFromInputs() {
   const businessName = document.getElementById('signupBusinessName').value.trim() || 'Your Business';
   const email = document.getElementById('signupEmail').value.trim() || 'you@business.com';
   const contactName = document.getElementById('signupContactName')?.value.trim() || businessName;
-  const contactEmail = document.getElementById('signupContactEmail')?.value.trim() || email;
   const licenseType = document.getElementById('signupLicenseType')?.value || 'microbusiness';
   const state = document.getElementById('signupState')?.value || 'New York';
   const city = document.getElementById('signupCity')?.value.trim() || 'Brooklyn';
   const license = document.getElementById('signupLicenseNumber')?.value.trim() || '';
   const address = document.getElementById('signupBusinessAddress')?.value.trim() || '';
-
   return {
     businessName,
     email,
@@ -1244,7 +2663,7 @@ function buildProfileFromInputs() {
     city,
     license,
     address,
-    contactEmail
+    contactEmail: email
   };
 }
 
@@ -1268,21 +2687,17 @@ function createOwnerBusinessFromProfile(profile) {
 }
 
 function seedDemoAccount() {
-  const signupContactEmail = document.getElementById('signupContactEmail')?.value.trim();
-  const signupEmail = document.getElementById('signupEmail')?.value.trim();
-
   currentUser.profile = {
     businessName: 'Your Business',
-    email: signupEmail || 'alex@bizexchange.com',
+    email: 'alex@bizexchange.com',
     contactName: document.getElementById('signupContactName')?.value.trim() || 'Alex Morgan',
     type: document.getElementById('signupLicenseType')?.value || 'microbusiness',
     state: document.getElementById('signupState')?.value || 'New York',
     city: document.getElementById('signupCity')?.value.trim() || 'Brooklyn',
     license: document.getElementById('signupLicenseNumber')?.value.trim() || '',
     address: document.getElementById('signupBusinessAddress')?.value.trim() || '',
-    contactEmail: signupContactEmail || signupEmail || 'alex@bizexchange.com'
+    contactEmail: 'alex@bizexchange.com'
   };
-
   currentUser.listings = [createOwnerBusinessFromProfile(currentUser.profile)];
   currentUser.messages = [];
   currentUser.savedPartnerIds = [...starterSavedPartnerIds];
@@ -1313,12 +2728,10 @@ function syncAccountDataToForms() {
   setValue('signupCity', profile.city || '');
   setValue('signupState', profile.state || 'New York');
   setValue('signupContactName', profile.contactName || profile.businessName);
-  setValue('signupContactEmail', profile.contactEmail || profile.email || '');
-  setValue('signupEmail', profile.email || profile.contactEmail || '');
-
+  setValue('signupEmail', profile.contactEmail || profile.email);
   setValue('lsBizName', profile.businessName);
   setValue('lsCity', profile.city || '');
-  setValue('lsContactEmail', profile.contactEmail || profile.email || '');
+  setValue('lsContactEmail', profile.email);
   setValue('lsContactName', profile.contactName || profile.businessName);
   setValue('lsBizType', formatTypeLabel(profile.type));
   setValue('lsState', profile.state || 'New York');
@@ -1335,6 +2748,7 @@ function syncAccountDataToForms() {
     setValue('accountCity', parsedLocation.city);
   }
 }
+
 function updateProfileFromBusiness(biz) {
   if (!biz || !currentUser.profile) return;
   currentUser.profile.businessName = biz.name || currentUser.profile.businessName;
@@ -1358,22 +2772,11 @@ function getRatingMeta() {
   const trades = ownerListings.reduce((sum, biz) => sum + (biz.reviews || 0), 0);
   return `Based on ${trades} completed trades with licensed partners.`;
 }
-function seedInitialListingsIfNeeded() {
-  if (allListings.length) return;
-  LISTINGS.forEach(listing => {
-    upsertListingIntoCatalog({
-      ...listing,
-      isOwner: false
-    });
-  });
-}
-function getAllVisibleListings() {
-  seedInitialListingsIfNeeded();
 
+function getAllVisibleListings() {
   const ownerListings = getUserListings();
   const ownerIds = new Set(ownerListings.map(b => String(b.id)));
   const publicListings = allListings.filter(b => !ownerIds.has(String(b.id)));
-
   return [...ownerListings, ...publicListings];
 }
 
@@ -1381,14 +2784,34 @@ function renderCards(data) {
   const grid = document.getElementById('listingsGrid');
   grid.innerHTML = data.length
     ? data.map(biz => renderPremiumCard(biz, 'browse')).join('')
-    : `<div style="padding:30px;text-align:center;color:var(--muted);grid-column:1/-1;">
-         No businesses found. Try a different search.
-       </div>`;
+    : `<div style="
+        grid-column: 1 / -1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 20px;
+        text-align: center;
+        background: #ffffff;
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        box-shadow: var(--shadow-sm);
+      ">
+        <div style="font-size:2.4rem;margin-bottom:14px;">🔍</div>
+        <div style="font-size:1rem;font-weight:800;margin-bottom:8px;color:var(--text);">
+          No businesses found
+        </div>
+        <div style="font-size:.85rem;color:var(--muted);max-width:280px;margin-bottom:20px;">
+          Try adjusting your search or filter — or be the first to list in this category.
+        </div>
+        <button class="btn btn-primary" onclick="openModal('listingModal')">
+          + Post Your Listing Free
+        </button>
+      </div>`;
 }
 
+
 function handleBusinessCardClick(id) {
-  console.log("CLICK → handleBusinessCardClick", id);
-  console.log("Listings count:", document.querySelectorAll(".card").length);
   const biz = getAllVisibleListings().find(b => String(b.id) === String(id));
   if (!biz) return;
   if (biz.isOwner) {
@@ -1431,16 +2854,7 @@ function setFilter(f, el) {
 }
 
 function filterCards() {
-  const data = getFilteredData();
-
-  // 🔒 HARD SAFETY: never allow empty grid
-  if (!data || data.length === 0) {
-    console.warn("Prevented empty render — restoring listings");
-    renderCards(getAllVisibleListings());
-    return;
-  }
-
-  renderCards(data);
+  renderCards(getFilteredData());
 }
 
 function goToBrowseAndFocusSearch() {
@@ -1522,8 +2936,6 @@ function switchView(v) {
 
 
 function scrollToListings() {
-  console.log("RUN → scrollToListings");
-  console.log("Listings count:", document.querySelectorAll(".card").length);
   const anchor = document.getElementById('listingsAnchor');
   if (!anchor) return;
   anchor.scrollIntoView({ behavior: 'smooth' });
@@ -1680,41 +3092,50 @@ function clearSignupCooldown() {
 }
 
 function applySignupCooldownUi() {
-  const btn = document.getElementById('signupSubmitBtn');
+  const btn = getSignupSubmitBtn();
   const until = getSignupCooldownUntil();
-
   if (!btn) return;
-
   if (!until || until <= Date.now()) {
     clearSignupCooldown();
-    btn.disabled = false;
-    btn.style.opacity = '';
-    btn.style.pointerEvents = '';
-    btn.style.cursor = '';
-    btn.textContent = 'Create Account';
-
-    const statusEl = document.getElementById('authSignupStatus');
-    if (statusEl && statusEl.textContent.includes('Please wait')) {
+    setButtonBusy(btn, false, 'Creating account…', 'Create Free Account →');
+    if ((document.getElementById('authSignupStatus') || {}).textContent?.includes('Please wait')) {
       setAuthStatus('authSignupStatus', '');
     }
     return;
   }
-
   const secondsLeft = Math.max(1, Math.ceil((until - Date.now()) / 1000));
   btn.disabled = true;
-  btn.style.opacity = '0.6';
+  btn.style.opacity = '0.7';
   btn.style.pointerEvents = 'none';
-  btn.style.cursor = 'not-allowed';
   btn.textContent = `Please wait ${secondsLeft}s`;
-
-  setAuthStatus(
-    'authSignupStatus',
-    `Too many signup attempts. Please wait ${secondsLeft} seconds, then try again.`,
-    true
-  );
-
+  setAuthStatus('authSignupStatus', `Too many signup attempts. Please wait ${secondsLeft} seconds, then try again.`, true);
   window.setTimeout(applySignupCooldownUi, 1000);
 }
+
+async function verifyLicense() {
+  const licenseInput = document.getElementById('signupLicenseNumber');
+  const stageTwo = document.getElementById('signup-stage-2');
+
+  if (!licenseInput || !stageTwo) return;
+
+  const licenseNumber = licenseInput.value.trim();
+
+  if (!licenseNumber) {
+    setAuthStatus('authSignupStatus', 'Please enter your license number to continue.', true);
+    return;
+  }
+
+  // Accept any license number and move to Stage 2
+  // Admins can verify licenses manually after signup
+  stageTwo.style.display = 'block';
+  setAuthStatus('authSignupStatus', '✅ License accepted. Complete your account setup below.');
+
+  // Scroll Stage 2 into view on mobile
+  stageTwo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+
+window.verifyLicense = verifyLicense;
 
 function openFlowAfterMessageSent() {
   openFlowHandoff({
@@ -1963,129 +3384,100 @@ async function ensureProfileForCurrentUser(profileSeed = {}) {
     return { ok: false, reason: 'lookup-failed', error: existingError };
   }
 
-  if (existingProfile) {
-    return { ok: true, profile: existingProfile, created: false };
-  }
-
   const payload = {
     id: user.id,
-    email: profileSeed.email || user.email || '',
-    business_name: profileSeed.business_name || profileSeed.contact_name || '',
-    city: profileSeed.city || '',
-    state: profileSeed.state || null,
-    license_type: profileSeed.license_type || null,
-    license_number: profileSeed.license_number || null,
-    business_address: profileSeed.business_address || null,
-    contact_name: profileSeed.contact_name || profileSeed.business_name || '',
-    contact_email: profileSeed.contact_email || user.email || ''
+    email: profileSeed.email || existingProfile?.email || user.email || '',
+    business_name: profileSeed.business_name || existingProfile?.business_name || profileSeed.contact_name || '',
+    city: profileSeed.city || existingProfile?.city || '',
+    state: profileSeed.state || existingProfile?.state || null,
+    license_type: profileSeed.license_type || existingProfile?.license_type || null,
+    license_number: profileSeed.license_number || existingProfile?.license_number || null,
+    business_address: profileSeed.business_address || existingProfile?.business_address || null,
+    contact_name: profileSeed.contact_name || existingProfile?.contact_name || profileSeed.business_name || '',
+    contact_email: profileSeed.contact_email || existingProfile?.contact_email || user.email || ''
   };
 
-  const { data: createdProfile, error: createError } = await supabase
+  const { data: savedProfile, error: saveError } = await supabase
     .from('profiles')
     .upsert(payload)
     .select()
     .maybeSingle();
 
-  if (createError) {
-    console.error('Failed to create missing profile:', createError);
-    return { ok: false, reason: 'create-failed', error: createError };
+  if (saveError) {
+    console.error('Failed to save profile:', saveError);
+    return { ok: false, reason: 'save-failed', error: saveError };
   }
 
-  return { ok: true, profile: createdProfile || payload, created: true };
+  return {
+    ok: true,
+    profile: savedProfile || payload,
+    created: !existingProfile
+  };
 }
 
 async function signUpWithSupabase() {
   const supabase = getSupabaseClient();
-  const btn = document.getElementById('signupSubmitBtn');
-  const status = document.getElementById('authSignupStatus');
-  const stage2 = document.getElementById('signup-stage-2');
-
-  if (!btn || !status || !stage2) {
-    console.error('Signup UI is missing required elements.');
-    return;
-  }
-
+  const btn = getSignupSubmitBtn();
   const cooldownUntil = getSignupCooldownUntil();
   if (cooldownUntil > Date.now()) {
     applySignupCooldownUi();
     return;
   }
 
-  const licenseNumber = document.getElementById('signupLicenseNumber')?.value.trim() || '';
-  const email = document.getElementById('signupEmail')?.value.trim() || '';
-  const password = document.getElementById('signupPassword')?.value || '';
+  const licenseNumber = document.getElementById('signupLicenseNumber').value.trim();
+  const licenseType = document.getElementById('signupLicenseType').value;
+  const businessName = document.getElementById('signupBusinessName').value.trim();
+  const businessAddress = document.getElementById('signupBusinessAddress').value.trim();
+  const city = document.getElementById('signupCity').value.trim();
+  const state = document.getElementById('signupState').value;
+  const contactName = document.getElementById('signupContactName').value.trim();
+  const contactEmailInput = document.getElementById('signupContactEmail').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  const contactEmail = contactEmailInput || email;
 
-  if (!licenseNumber) {
-    setAuthStatus('authSignupStatus', 'Please enter your license number first.', true);
-    showToast('Please enter your license number first.');
+  if (!licenseNumber || !licenseType || !businessName || !businessAddress || !city || !state || !contactName || !email || !password) {
+    setAuthStatus('authSignupStatus', 'Please complete all sign up fields.', true);
+    showToast('Please complete all sign up fields.');
     return;
   }
-
-  if (stage2.style.display === 'none') {
-    setAuthStatus('authSignupStatus', 'Please verify your license before creating an account.', true);
-    showToast('Please verify your license before creating an account.');
-    return;
-  }
-
-  if (!email || !password) {
-    setAuthStatus('authSignupStatus', 'Please enter your login email and password.', true);
-    showToast('Please enter your login email and password.');
-    return;
-  }
-
-  const businessName = document.getElementById('signupBusinessName')?.value.trim() || '';
-  const businessAddress = document.getElementById('signupBusinessAddress')?.value.trim() || '';
-  const city = document.getElementById('signupCity')?.value.trim() || '';
-  const state = document.getElementById('signupState')?.value || '';
-  const licenseType = document.getElementById('signupLicenseType')?.value || '';
-  const contactName = document.getElementById('signupContactName')?.value.trim() || '';
-  const contactEmail = document.getElementById('signupContactEmail')?.value.trim() || email;
 
   setAuthStatus('authSignupStatus', 'Creating your account...');
-  setButtonBusy(btn, true, 'Creating account…', 'Create Account');
+  setButtonBusy(btn, true, 'Creating account…', 'Create Free Account →');
 
   try {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password
-    });
-
+    const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) {
       console.error('signUpWithSupabase failed:', error);
-
       const message = /rate limit/i.test(error.message || '')
         ? 'Too many signup attempts. Please wait about a minute, then try again once.'
         : (error.message || 'Sign up failed.');
-
       if (/rate limit/i.test(error.message || '')) {
         setSignupCooldown(60);
         applySignupCooldownUi();
       } else {
-        setButtonBusy(btn, false, 'Creating account…', 'Create Account');
+        setButtonBusy(btn, false, 'Creating account…', 'Create Free Account →');
       }
-
       setAuthStatus('authSignupStatus', message, true);
       showToast(message);
       return;
     }
 
     clearSignupCooldown();
-
-    const user = data?.user;
+    const user = data.user;
     if (!user) {
-      setButtonBusy(btn, false, 'Creating account…', 'Create Account');
+      setButtonBusy(btn, false, 'Creating account…', 'Create Free Account →');
       setAuthStatus('authSignupStatus', 'Account could not be created.', true);
       showToast('Account could not be created.');
       return;
     }
 
-    // IMPORTANT: handle "signup created but no active session yet" BEFORE profile creation
-    if (!data?.session) {
-      setButtonBusy(btn, false, 'Creating account…', 'Create Account');
+    if (!data.session) {
+      setButtonBusy(btn, false, 'Creating account…', 'Create Free Account →');
       setAuthStatus('authSignupStatus', 'Account created. Check your email to confirm, then log in.');
-      showToast('Account created. Check your email to confirm, then log in.');
       closeModal('authModal');
       clearAuthForms();
+      showToast('Account created. Check your email to confirm, then log in.');
       return;
     }
 
@@ -2102,16 +3494,15 @@ async function signUpWithSupabase() {
     });
 
     if (!profileResult.ok) {
-      setButtonBusy(btn, false, 'Creating account…', 'Create Account');
-      setAuthStatus('authSignupStatus', 'Your account was created, but your business profile could not be saved yet. Please log in and try again.');
-      showToast('Your account was created, but your business profile could not be saved yet. Please log in and try again.');
+      setButtonBusy(btn, false, 'Creating account…', 'Create Free Account →');
+      setAuthStatus('authSignupStatus', 'Account created, but profile setup needs another login.', true);
+      showToast('Account created, but profile setup needs another login.');
       closeModal('authModal');
       clearAuthForms();
       return;
     }
 
     await hydrateCurrentUserFromSupabase();
-
     currentUser.profile = {
       ...(currentUser.profile || {}),
       businessName: currentUser.profile?.businessName || businessName,
@@ -2124,19 +3515,14 @@ async function signUpWithSupabase() {
       address: currentUser.profile?.address || businessAddress,
       contactEmail: currentUser.profile?.contactEmail || contactEmail
     };
-
     closeModal('authModal');
     clearAuthForms();
     setSignedInUi();
     showToast('🎉 Account created. Next, add your first active listing.');
     setTimeout(() => openFlowAfterSignup(), 180);
-  } catch (err) {
-    console.error('signUpWithSupabase crashed:', err);
-    setAuthStatus('authSignupStatus', err.message || 'Signup failed. Please try again.', true);
-    showToast(err.message || 'Signup failed. Please try again.');
   } finally {
     if (getSignupCooldownUntil() <= Date.now()) {
-      setButtonBusy(btn, false, 'Creating account…', 'Create Account');
+      setButtonBusy(btn, false, 'Creating account…', 'Create Free Account →');
     }
   }
 }
@@ -2221,44 +3607,14 @@ function fakeAuth(mode = 'signup') {
 }
 
 function clearAuthForms() {
-  [
-    'signupLicenseNumber',
-    'signupBusinessName',
-    'signupBusinessAddress',
-    'signupCity',
-    'signupState',
-    'signupLicenseType',
-    'signupContactName',
-    'signupContactEmail',
-    'signupEmail',
-    'signupPassword',
-    'loginEmail',
-    'loginPassword'
-  ].forEach(id => {
+  ['signupLicenseNumber','signupLicenseType','signupBusinessName','signupBusinessAddress','signupCity','signupState','signupContactName','signupEmail','signupPassword','loginEmail','loginPassword'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
-
-  const stage2 = document.getElementById('signup-stage-2');
-  if (stage2) stage2.style.display = 'none';
-
-  const signupBtn = document.getElementById('signupSubmitBtn');
-  if (signupBtn) {
-    signupBtn.disabled = false;
-    signupBtn.style.opacity = '';
-    signupBtn.style.pointerEvents = '';
-    signupBtn.style.cursor = '';
-    signupBtn.textContent = 'Create Account';
-  }
-
   setAuthStatus('authSignupStatus', '');
   setAuthStatus('authLoginStatus', '');
-
-  if (window.signupLicenseVerified) {
-    window.signupLicenseVerified = false;
-  }
-
   applySignupCooldownUi();
+  setButtonBusy(getLoginSubmitBtn(), false, 'Logging in…', 'Log In →');
 }
 
 function resetCurrentUserState() {
@@ -2287,20 +3643,15 @@ function setSignedOutUi(options = {}) {
   isLoggedIn = false;
   currentEditingBusinessId = null;
   currentChatPartnerId = null;
-
   if (options.closeModals !== false) {
-    ['accountModal','editListingModal','chatModal','bizModal','listingModal','flowHandoffModal']
-      .forEach(id => closeModal(id));
+    ['accountModal','editListingModal','chatModal','bizModal','listingModal','flowHandoffModal'].forEach(id => closeModal(id));
   }
-
   clearAuthForms();
   resetCurrentUserState();
-
   const guest = document.getElementById('dashGuest');
   const user = document.getElementById('dashUser');
   if (guest) guest.classList.remove('hidden');
   if (user) user.classList.add('hidden');
-
   renderNavActions();
   renderConversationList();
   renderDashboardMessages();
@@ -2308,7 +3659,7 @@ function setSignedOutUi(options = {}) {
   renderRatingSection();
   renderDashboardGuidance();
   updateDashboardCounts();
-
+  filterCards();
   if (!options.preserveView) switchView('browse');
   if (!options.silent) showToast('👋 You have been logged out.');
 }
@@ -2428,71 +3779,149 @@ function resetListingForm() {
 }
 
 async function submitListing() {
-  const supabase = getSupabaseClient();
+  // Gate 1: must be logged in
   if (!isLoggedIn) {
+    showToast('Please log in to post a listing.');
     closeModal('listingModal');
     openModal('authModal');
-    showToast('Create an account to continue.');
     return;
   }
 
+  // Lock the publish button so the user knows something is happening
+  const publishBtn = document.querySelector('#ls-panel3 .btn-accent');
+  if (publishBtn) {
+    publishBtn.disabled = true;
+    publishBtn.textContent = 'Publishing…';
+  }
+
+  const restoreBtn = () => {
+    if (publishBtn) {
+      publishBtn.disabled = false;
+      publishBtn.textContent = '🎉 Publish Listing';
+    }
+  };
+
+  let supabase;
+  try {
+    supabase = getSupabaseClient();
+  } catch (e) {
+    showToast('Connection unavailable. Please refresh and try again.');
+    restoreBtn();
+    return;
+  }
+
+  // Gate 2: must have a valid Supabase session
   const { data: authData, error: authError } = await supabase.auth.getUser();
-  if (authError || !authData.user) {
-    showToast('Please log in first.');
+  if (authError || !authData?.user) {
+    showToast('Your session expired. Please log in again.');
+    restoreBtn();
+    closeModal('listingModal');
+    openModal('authModal');
     return;
   }
 
   const user = authData.user;
-  const businessName = document.getElementById('lsBizName').value.trim();
-  const licenseType = document.getElementById('lsBizType').value;
-  const licenseNumber = document.getElementById('lsLicense').value.trim();
-  const state = document.getElementById('lsState').value;
-  const city = document.getElementById('lsCity').value.trim();
-  const contactName = document.getElementById('lsContactName').value.trim() || (currentUser.profile?.contactName || businessName);
-  const contactEmail = document.getElementById('lsContactEmail').value.trim() || (currentUser.profile?.contactEmail || user.email || '');
 
-  if (!businessName || !licenseType || !state || !city) {
-    showToast('Please complete the required listing fields.');
+  // Read form values
+  const businessName = (document.getElementById('lsBizName')?.value || '').trim();
+  const licenseType = document.getElementById('lsBizType')?.value || '';
+  const licenseNumber = (document.getElementById('lsLicense')?.value || '').trim();
+  const state = document.getElementById('lsState')?.value || '';
+  const city = (document.getElementById('lsCity')?.value || '').trim();
+  const contactName = (document.getElementById('lsContactName')?.value || '').trim()
+    || currentUser.profile?.contactName
+    || businessName;
+  const contactEmail = (document.getElementById('lsContactEmail')?.value || '').trim()
+    || currentUser.profile?.contactEmail
+    || user.email
+    || '';
+
+  // Gate 3: required fields
+  if (!businessName) {
+    showToast('Please enter your business name on step 1.');
     goListingStep(1);
+    restoreBtn();
+    return;
+  }
+  if (!licenseType) {
+    showToast('Please select a license type on step 1.');
+    goListingStep(1);
+    restoreBtn();
+    return;
+  }
+  if (!state) {
+    showToast('Please select a state on step 1.');
+    goListingStep(1);
+    restoreBtn();
+    return;
+  }
+  if (!city) {
+    showToast('Please enter your city on step 1.');
+    goListingStep(1);
+    restoreBtn();
     return;
   }
 
-  const profileResult = await ensureProfileForCurrentUser({
-    email: currentUser.profile?.email || user.email || '',
-    business_name: businessName,
-    city,
-    state,
-    license_type: licenseType,
-    license_number: licenseNumber,
-    contact_name: contactName,
-    contact_email: contactEmail
-  });
-
-  if (!profileResult.ok) {
-    showToast('Your account is missing a profile record. Please log in again.');
-    return;
-  }
-
-  const { error } = await supabase
-    .from('listings')
-    .insert({
-      owner_id: user.id,
+  // Gate 4: ensure profile exists
+  let profileResult;
+  try {
+    profileResult = await ensureProfileForCurrentUser({
+      email: currentUser.profile?.email || user.email || '',
       business_name: businessName,
-      license_type: licenseType,
-      license_number: licenseNumber,
       city,
       state,
+      license_type: licenseType,
+      license_number: licenseNumber,
       contact_name: contactName,
-      contact_email: contactEmail,
-      sells: sellTags,
-      buys: buyTags
+      contact_email: contactEmail
     });
-
-  if (error) {
-    showToast(error.message);
+  } catch (e) {
+    console.error('ensureProfileForCurrentUser crashed:', e);
+    showToast('Profile setup failed. Please try again.');
+    restoreBtn();
     return;
   }
 
+  if (!profileResult?.ok) {
+    console.warn('Profile result not ok:', profileResult);
+    showToast('Profile could not be confirmed. Please log out and log in again.');
+    restoreBtn();
+    return;
+  }
+
+  // Gate 5: insert the listing
+  let insertError;
+  try {
+    const result = await supabase
+      .from('listings')
+      .insert({
+        owner_id: user.id,
+        business_name: businessName,
+        license_type: licenseType,
+        license_number: licenseNumber,
+        city,
+        state,
+        contact_name: contactName,
+        contact_email: contactEmail,
+        sells: sellTags,
+        buys: buyTags
+      });
+    insertError = result.error;
+  } catch (e) {
+    console.error('Listing insert crashed:', e);
+    showToast('An unexpected error occurred. Please try again.');
+    restoreBtn();
+    return;
+  }
+
+  if (insertError) {
+    console.error('Listing insert error:', insertError);
+    showToast('Could not save listing: ' + (insertError.message || 'Unknown error'));
+    restoreBtn();
+    return;
+  }
+
+  // Success
   await hydrateCurrentUserFromSupabase();
   await loadPublicListingsFromSupabase();
   closeModal('listingModal');
@@ -2502,124 +3931,13 @@ async function submitListing() {
   showToast('🎉 Listing published successfully.');
   setTimeout(() => openFlowAfterListingPublished(), 180);
 }
-async function verifyLicense() {
-  const licenseInput = document.getElementById('signupLicenseNumber');
-  const statusEl = document.getElementById('authSignupStatus');
-  const stage2 = document.getElementById('signup-stage-2');
 
-  if (!licenseInput || !statusEl || !stage2) return;
-
-  const rawLicense = licenseInput.value.trim();
-  const licenseNumber = rawLicense.toUpperCase();
-
-  stage2.style.display = 'none';
-
-  if (!licenseNumber) {
-    statusEl.textContent = 'Please enter your license number first.';
-    statusEl.style.color = '#b91c1c';
-    return;
-  }
-
-  statusEl.textContent = 'Checking official NY OCM license records...';
-  statusEl.style.color = 'var(--muted)';
-
-  try {
-    const endpoint =
-      `https://data.ny.gov/resource/jskf-tt3q.json?$limit=1&license_number=${encodeURIComponent(licenseNumber)}`;
-
-    const response = await fetch(endpoint, {
-      headers: {
-        Accept: 'application/json'
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`License lookup failed with status ${response.status}`);
-    }
-
-    const rows = await response.json();
-    const record = Array.isArray(rows) ? rows[0] : null;
-
-    if (!record) {
-      statusEl.textContent = 'We could not verify that license number in the official NY OCM records.';
-      statusEl.style.color = '#b91c1c';
-      stage2.style.display = 'none';
-      return;
-    }
-
-    const setValue = (id, value) => {
-      const el = document.getElementById(id);
-      if (el) el.value = value || '';
-    };
-
-    licenseInput.value = record.license_number || licenseNumber;
-
-    setValue('signupLicenseType', record.license_type || '');
-
-    setValue(
-      'signupBusinessName',
-      record.business_name ||
-      record.business_legal_name ||
-      record.licensee_name ||
-      record.doing_business_as_dba ||
-      ''
-    );
-
-    setValue(
-      'signupBusinessAddress',
-      record.business_address ||
-      record.premises_address ||
-      record.address ||
-      record.street_address ||
-      ''
-    );
-
-    setValue(
-      'signupCity',
-      record.city ||
-      record.business_city ||
-      record.premises_city ||
-      ''
-    );
-
-    setValue(
-      'signupState',
-      record.state ||
-      record.business_state ||
-      record.premises_state ||
-      'New York'
-    );
-
-    setValue(
-      'signupContactName',
-      record.primary_contact_name ||
-      record.contact_name ||
-      ''
-    );
-
-    setValue(
-      'signupContactEmail',
-      record.primary_contact_email ||
-      record.contact_email ||
-      ''
-    );
-
-    stage2.style.display = 'block';
-    statusEl.textContent = 'License verified. Please review the business details and finish creating your account.';
-    statusEl.style.color = 'green';
-  } catch (error) {
-    console.error('verifyLicense failed:', error);
-    stage2.style.display = 'none';
-    statusEl.textContent = 'We could not verify that license right now. Please try again.';
-    statusEl.style.color = '#b91c1c';
-  }
-}
 window.signUpWithSupabase = signUpWithSupabase;
 window.loginWithSupabase = loginWithSupabase;
 window.logout = logout;
 window.submitListing = submitListing;
 window.restoreSessionFromSupabase = restoreSessionFromSupabase;
-window.verifyLicense = verifyLicense;
+
 
 function renderStateCard({ kind = 'empty', icon = '•', title = '', copy = '', actions = [] }) {
   return `
@@ -4005,71 +5323,62 @@ function renderAllOwnerViews() {
   updateDashboardCounts();
 
   renderPersonalizationBanner();
+  renderLifecycleBanner();
+  renderNotificationCenter();
+  renderOutcomeBoard();
+  renderCelebrationMoments();
+  renderLiveMarketplaceFeed();
   renderSmartPriorities();
   renderDashboardNextStepBanner();
-
-  const lifecycleMount = document.getElementById('lifecycleBannerMount');
-  const notificationMount = document.getElementById('notificationCenterMount');
-  const outcomeMount = document.getElementById('outcomeBoardMount');
-  const celebrationMount = document.getElementById('celebrationMomentsMount');
-  const liveFeedMount = document.getElementById('liveMarketplaceFeedMount');
-
-  if (lifecycleMount) lifecycleMount.innerHTML = '';
-  if (notificationMount) notificationMount.innerHTML = '';
-  if (outcomeMount) outcomeMount.innerHTML = '';
-  if (celebrationMount) celebrationMount.innerHTML = '';
-  if (liveFeedMount) liveFeedMount.innerHTML = '';
 }
 function openBizModal(id) {
-  console.log("RUN → openBizModal", id);
-  console.log("Listings count:", document.querySelectorAll(".card").length);
   const biz = getAllVisibleListings().find(b => String(b.id) === String(id));
   if (!biz) return;
-
-  const body = document.getElementById('bizModalBody');
-  if (!body) return;
-
-  const sells = normalizeProductList(biz.sells);
-  const buys = normalizeProductList(biz.buys);
-
-  body.innerHTML = `
+  const sells = normalizeProductList(biz?.sells);
+  const buys = normalizeProductList(biz?.buys); 
+  document.getElementById('bizModalBody').innerHTML = `
     <div class="business-detail-top">
-      <div class="biz-avatar">${escapeHtml((biz.avatar || biz.name || 'B').charAt(0).toUpperCase())}</div>
+      <div class="biz-avatar" style="background:${escapeHtml(biz.avatarColor)}">${escapeHtml(biz.avatar)}</div>
       <div class="biz-meta">
-        <h2>${escapeHtml(biz.name || 'Business')}</h2>
-        <p>${escapeHtml(formatTypeLabel(biz.type || ''))} · 📍 ${escapeHtml(biz.location || 'Location not available')}</p>
+        <h2>${escapeHtml(biz.name)}</h2>
+        <p>${escapeHtml(formatTypeLabel(biz.type))} · 📍 ${escapeHtml(biz.location)}</p>
+        <div class="star-rating">
+          ${'★'.repeat(Math.max(1, Math.round(biz.rating || 0)))}
+          <span style="color:var(--muted);font-size:.78rem;">
+            ${(biz.rating || 0).toFixed(1)} (${biz.reviews || 0} reviews)
+          </span>
+        </div>
       </div>
     </div>
-
-    <div class="license-verify">
-      <span>${biz.verified ? '✅' : '⏳'}</span>
-      <p>${biz.verified ? 'License verified' : 'Verification pending'}</p>
-    </div>
-
-    <div class="product-list-preview">
-      <h3>Selling</h3>
-      ${
-        sells.length
-          ? sells.map(item => `<span class="product-pill">${escapeHtml(item)}</span>`).join('')
-          : '<p style="color:var(--muted);font-size:.85rem;">No selling products listed.</p>'
-      }
-    </div>
-
-    <div class="product-list-preview">
-      <h3>Buying</h3>
-      ${
-        buys.length
-          ? buys.map(item => `<span class="product-pill">${escapeHtml(item)}</span>`).join('')
-          : '<p style="color:var(--muted);font-size:.85rem;">No buying products listed.</p>'
-      }
-    </div>
-
-    <div style="display:flex;gap:10px;margin-top:20px;">
-      <button class="btn btn-primary" style="flex:1;" onclick="contactBiz('${escapeJsSingleQuoted(biz.id)}')">Message</button>
-      <button class="btn btn-ghost" style="flex:1;" onclick="saveBiz('${escapeJsSingleQuoted(biz.id)}')">Save</button>
+    ${biz.verified
+      ? `<div class="license-verify"><span>✅</span><p>License verified — active and in good standing</p></div>`
+      : `<div class="license-verify" style="background:#fef3c7;border-color:#fcd34d;"><span>⏳</span><p style="color:#92400e;">Verification pending</p></div>`}
+    ${renderConfidenceRow(biz)}
+    ${renderCredibilityRow(biz)}
+    <hr class="clean-divider"><div class="product-list-preview">
+  <div class="heading-lg">Selling</div>
+  ${sells.length
+    ? sells.map(p => `<span class="product-pill">📦 ${escapeHtml(p)}</span>`).join('')
+    : `<span class="product-pill">No selling products listed yet</span>`}
+</div>
+<hr class="clean-divider"><div class="product-list-preview">
+  <div class="heading-lg">Looking to Buy</div>
+  ${buys.length
+    ? buys.map(p => `<span class="product-pill">🛒 ${escapeHtml(p)}</span>`).join('')
+    : `<span class="product-pill">No buying products listed yet</span>`}
+</div>
+    ${biz.isOwner
+      ? `<button class="btn btn-primary btn-full btn-lg" style="margin-bottom:10px;" onclick="openBusinessEditModal('${escapeJsSingleQuoted(biz.id)}');closeModal('bizModal');">✏️ Edit This Business</button>`
+      : `<button class="btn btn-primary btn-full btn-lg" style="margin-bottom:10px;" onclick="withLoadingState(this, () => contactBiz('${escapeJsSingleQuoted(biz.id)}'))">💬 Send Message</button>
+         <button class="btn btn-ghost btn-full" onclick="withLoadingState(this, () => saveBiz('${escapeJsSingleQuoted(biz.id)}'))">🔖 Save Partner</button>`}
+    <div class="flow-inline-hint">
+      <div class="flow-inline-icon icon-badge">→</div>
+      <div>
+        <div class="heading-lg">${biz.isOwner ? 'Best next step: keep your business info current' : 'Best next step: message now'}</div>
+        <div class="text-subtle">${biz.isOwner ? 'Up-to-date details make your profile easier to trust and match.' : 'A quick message creates momentum faster than saving and leaving.'}</div>
+      </div>
     </div>
   `;
-
   openModal('bizModal');
 }
 
@@ -4500,32 +5809,28 @@ function showToast(msg, duration = 2800) {
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), duration);
 }
-document.addEventListener('DOMContentLoaded', async () => {
 
-  // 🔥 FORCE CLEAR AFTER BROWSER AUTOFILL
-  setTimeout(() => {
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) searchInput.value = '';
-  }, 100);
+/* ── Init ── */
+renderNavActions();
+renderConversationList();
+renderDashboardMessages();
+renderSavedPartners();
+renderRatingSection();
+updateDashboardCounts();
+setSignedOutUi({ preserveView: true, silent: true, closeModals: false });
 
-  seedInitialListingsIfNeeded();
-
-  renderNavActions();
-  renderConversationList();
-  renderDashboardMessages();
-  renderSavedPartners();
-  renderRatingSection();
-  updateDashboardCounts();
-
-  filterCards();
-
-  try {
-    await restoreSessionFromSupabase({ preserveView: true });
-    await loadPublicListingsFromSupabase();
-  } catch (err) {
-    console.warn('Startup restore/load skipped:', err);
+// Load demo seed listings immediately so browse is never blank
+LISTINGS.forEach(biz => {
+  if (!allListings.find(b => String(b.id) === String(biz.id))) {
+    allListings.push(biz);
   }
 });
+filterCards();
+
+// Then load live Supabase listings and session (will re-run filterCards when done)
+restoreSessionFromSupabase({ preserveView: true });
+loadPublicListingsFromSupabase();
+
 </script>
 
 
@@ -4539,32 +5844,7 @@ document.addEventListener('click', function uxButtonFeedback(e) {
 }, true);
 </script>
 
-  <div class="modal-overlay" id="flowHandoffModal"
-     onclick="overlayClose(event,'flowHandoffModal')">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-header">
-      <h2 id="flowHandoffTitle">Next step ready</h2>
-      <button class="modal-close" onclick="closeModal('flowHandoffModal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <p id="flowHandoffCopy" style="font-size:.9rem;color:#6b7280;margin-bottom:20px;"></p>
-      <div id="flowHandoffActions"
-           style="display:flex;flex-direction:column;gap:10px;"></div>
-    </div>
-  </div>
-</div>
-=======
-<!-- JavaScript Modules -->
-<script src="js/utils.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/api.js"></script>
-<script src="js/ui.js"></script>
-<script src="js/dashboard.js"></script>
-<script src="js/messaging.js"></script>
-<script src="js/matching.js"></script>
-<script src="js/main.js"></script>
->>>>>>> 33d86f57dee3a4af0dcc2d33716cb508b3c4fef7
+
 
 </body>
 </html>
