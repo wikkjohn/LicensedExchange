@@ -3499,7 +3499,7 @@ async function signUpWithSupabase() {
   const licenseNumber  = document.getElementById('signupLicenseNumber').value.trim();
   const licenseType    = document.getElementById('signupLicenseType').value.trim();
   const businessName   = document.getElementById('signupBusinessName').value.trim();
-  const city           = document.getElementById('lsCity')?.value.trim() || 'Brooklyn';
+  const city = document.getElementById('signupCity')?.value.trim() || 'Brooklyn';
   const state          = document.getElementById('signupState')?.value.trim() || 'New York'; // BUG 1 FIX
   const contactName    = document.getElementById('signupContactName').value.trim();
   const email          = document.getElementById('signupEmail').value.trim();
@@ -3654,15 +3654,24 @@ async function loginWithSupabase() {
 }
 
 function clearAuthForms() {
-  ['signupLicenseNumber','signupLicenseType','signupBusinessName','lsCity','signupContactName','signupEmail','signupPassword','loginEmail','loginPassword'].forEach(id => {
+  ['signupLicenseNumber','signupLicenseType','signupBusinessName',
+   'signupCity','signupContactName','signupEmail','signupPassword',
+   'loginEmail','loginPassword'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
+  // Reset stage visibility
+  const stage1 = document.getElementById('signup-stage-1');
+  const stage2 = document.getElementById('signup-stage-2');
+  if (stage1) stage1.style.display = 'block';
+  if (stage2) stage2.style.display = 'none';  // hide stage 2 on fresh open
+  
   setAuthStatus('authSignupStatus', '');
   setAuthStatus('authLoginStatus', '');
   applySignupCooldownUi();
   setButtonBusy(getLoginSubmitBtn(), false, 'Logging in…', 'Log In →');
 }
+
 
 function resetCurrentUserState() {
   currentUser.profile = null;
@@ -3889,57 +3898,84 @@ async function submitListing() {
 
   if (!businessName) {
     showToast('Please enter your business name on step 1.');
-    goListingStep(1);
-    restoreBtn();
-    return;
+    goListingStep(1); restoreBtn(); return;
   }
   if (!licenseType) {
     showToast('Please select a license type on step 1.');
-    goListingStep(1);
-    restoreBtn();
-    return;
+    goListingStep(1); restoreBtn(); return;
   }
   if (!state) {
     showToast('Please select a state on step 1.');
-    goListingStep(1);
-    restoreBtn();
-    return;
+    goListingStep(1); restoreBtn(); return;
   }
   if (!city) {
     showToast('Please enter your city on step 1.');
-    goListingStep(1);
-    restoreBtn();
-    return;
+    goListingStep(1); restoreBtn(); return;
   }
 
-  let profileResult;
+  // ── ACTUAL INSERT ──────────────────────────────────────────
   try {
-    profileResult = await ensureProfileForCurrentUser({
-      email: currentUser.profile?.email || user.email || '',
+    const { data: insertedListing, error: insertError } = await supabase
+      .from('listings')
+      .insert({
+        owner_id:      user.id,
+        business_name: businessName,
+        license_type:  licenseType.toLowerCase(),
+        license_number: licenseNumber || null,
+        city,
+        state,
+        contact_name:  contactName,
+        contact_email: contactEmail,
+        sells: sellTags,
+        buys:  buyTags
+      })
+      .select()
+      .single();
+
+    if (insertError) {
+      console.error('submitListing insert failed:', insertError);
+      showToast(insertError.message || 'Failed to publish listing. Please try again.');
+      restoreBtn();
+      return;
+    }
+
+    // Mirror the new listing into the local catalog immediately
+    const newCard = mapSupabaseListingRowToCard(insertedListing, {
+      isOwner: true,
+      ownerId: user.id
+    });
+    currentUser.listings.unshift(newCard);
+    upsertListingIntoCatalog({ ...newCard, isOwner: false });
+
+    // Ensure profile exists / is updated
+    await ensureProfileForCurrentUser({
+      email:         currentUser.profile?.email || user.email || '',
       business_name: businessName,
       city,
       state,
-      license_type: licenseType,
+      license_type:  licenseType,
       license_number: licenseNumber,
-      contact_name: contactName,
+      contact_name:  contactName,
       contact_email: contactEmail
     });
-  } catch (e) {
-    console.error('ensureProfileForCurrentUser crashed:', e);
-    showToast('Profile setup failed. Please try again.');
-    restoreBtn();
-    return;
-  }
 
-  if (!profileResult?.ok) {
-    console.warn('Profile result not ok:', profileResult);
-    showToast('Profile could not be confirmed. Please log out and log in again.');
-    restoreBtn();
-    return;
-  }
+    // Refresh everything from Supabase
+    await hydrateCurrentUserFromSupabase();
+    await loadPublicListingsFromSupabase();
 
-  // keep the rest of your existing submitListing logic unchanged
+    closeModal('listingModal');
+    resetListingForm();
+    setSignedInUi({ preserveView: true });
+    showToast('🎉 Listing published! It\'s now live on the marketplace.');
+    setTimeout(() => openFlowAfterListingPublished(), 180);
+
+  } catch (err) {
+    console.error('submitListing crashed:', err);
+    showToast(err.message || 'Failed to publish listing.');
+    restoreBtn();
+  }
 }
+
 
 window.signUpWithSupabase = signUpWithSupabase;
 window.loginWithSupabase = loginWithSupabase;
