@@ -2485,6 +2485,11 @@ const LISTINGS = [
   }
 ];
 
+/* ── Per-business logo overrides (name → image path) ── */
+const LOGO_OVERRIDES = {
+  "FUFA LLC": "NobleSteedFarmsLogo.jpg"
+};
+
 let currentFilter = 'all';
 let isLoggedIn = false;
 let sellTags = [];
@@ -2734,6 +2739,7 @@ function renderPremiumCard(biz, mode = 'browse') {
       : `handleBusinessCardClick('${safeId}')`;
 
   const logoMark = (biz.avatar || biz.name || 'B').charAt(0).toUpperCase();
+  const logoOverride = LOGO_OVERRIDES[biz.name] || null;
   const hasRating = (biz.rating || 0) > 0;
   const rating = (biz.rating || 0).toFixed(1);
 
@@ -2759,10 +2765,13 @@ function renderPremiumCard(biz, mode = 'browse') {
 
   return `
     <div class="air-card" onclick="${clickAction}">
-      <div class="air-card-media" style="background:${brandGradient(biz.name)}">
+      <div class="air-card-media" style="background:${logoOverride ? '#f5f5f5' : brandGradient(biz.name)}">
         ${badge}
         ${saveBtn}
-        <span class="air-card-logo">${escapeHtml(logoMark)}</span>
+        ${logoOverride
+          ? `<img src="${escapeHtml(logoOverride)}" alt="${escapeHtml(biz.name)} logo" style="width:80%;height:80%;object-fit:contain;">`
+          : `<span class="air-card-logo">${escapeHtml(logoMark)}</span>`
+        }
       </div>
       <div class="air-card-body">
         <div class="air-card-titlerow">
