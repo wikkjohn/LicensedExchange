@@ -25,92 +25,83 @@ Then open: http://localhost:3000
 2. Set `SUPABASE_URL` and `SUPABASE_ANON_KEY` in `index.html`.
 3. Create the required tables & policies.
 
-### SQL to run in Supabase SQL editor
+### Database schema
+
+The app talks to these five tables (all with Row Level Security enabled and
+owner-scoped policies). This matches the live project — use it as the source
+of truth when recreating the database in a new Supabase project.
 
 ```sql
--- Listings table
-create table listings (
-  id text primary key,
-  owner_id text not null,
-  name text,
-  licenseid text,
-  status text,
-  location text,
-  categories text[],
-  buys text[],
-  sells text[],
-  contact jsonb,
-  notes text,
-  updatedat timestamptz default now()
+-- profiles: one row per auth user (id references auth.users.id)
+create table profiles (
+  id uuid primary key references auth.users(id),
+  email text,
+  contact_email text,
+  contact_name text,
+  business_name text,
+  license_number text,
+  license_type text,
+  city text,
+  state text default 'New York',
+  business_address text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
 );
 
-alter table listings enable row level security;
+-- listings: businesses and the products they buy/sell
+create table listings (
+  id uuid primary key default gen_random_uuid(),
+  owner_id uuid not null references auth.users(id),
+  business_name text not null,
+  license_type text,
+  license_number text,
+  city text,
+  state text default 'New York',
+  contact_name text,
+  contact_email text,
+  sells text[],
+  buys text[],
+  is_default_listing boolean default false,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
 
-create policy "Listings: select" on listings
-  for select using (
-    auth.role() = 'authenticated' and (
-      owner_id = auth.uid() or owner_id = 'public'
-    )
-  );
-
-create policy "Listings: insert" on listings
-  for insert with check (
-    auth.role() = 'authenticated' and owner_id = auth.uid()
-  );
-
-create policy "Listings: update" on listings
-  for update using (
-    auth.role() = 'authenticated' and owner_id = auth.uid()
-  );
-
-create policy "Listings: delete" on listings
-  for delete using (
-    auth.role() = 'authenticated' and owner_id = auth.uid()
-  );
-
--- Messages table
-create table messages (
-  id text primary key,
-  sender text not null,
-  receiver text not null,
-  text text not null,
+-- conversations: a thread between two listings
+create table conversations (
+  id uuid primary key default gen_random_uuid(),
+  listing_a_id uuid references listings(id),
+  listing_b_id uuid references listings(id),
+  created_by uuid references auth.users(id),
   created_at timestamptz default now()
 );
 
-alter table messages enable row level security;
-
-create policy "Messages: select" on messages
-  for select using (
-    auth.role() = 'authenticated' and (
-      sender = auth.email() or receiver = auth.email()
-    )
-  );
-
-create policy "Messages: insert" on messages
-  for insert with check (
-    auth.role() = 'authenticated' and sender = auth.email()
-  );
-
--- Presence table
-create table presence (
-  email text primary key,
-  last_seen timestamptz not null default now()
+-- messages: individual chat messages within a conversation
+create table messages (
+  id uuid primary key default gen_random_uuid(),
+  conversation_id uuid references conversations(id),
+  sender_id uuid references auth.users(id),
+  body text not null,
+  created_at timestamptz default now()
 );
 
-alter table presence enable row level security;
+-- saved_partners: listings a user has bookmarked
+create table saved_partners (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id),
+  listing_id uuid references listings(id),
+  created_at timestamptz default now()
+);
 
-create policy "Presence: select" on presence
-  for select using (
-    auth.role() = 'authenticated' and email = auth.email()
-  );
-
-create policy "Presence: upsert" on presence
-  for insert with check (
-    auth.role() = 'authenticated' and email = auth.email()
-  ) using (
-    auth.role() = 'authenticated' and email = auth.email()
-  );
+alter table profiles       enable row level security;
+alter table listings       enable row level security;
+alter table conversations  enable row level security;
+alter table messages       enable row level security;
+alter table saved_partners enable row level security;
 ```
+
+> RLS policies (owner-scoped reads/writes, public read of listings for
+> browse) are already configured on the live project. Recreate them to match
+> when standing up a fresh database.
 
 ### (Optional) Supabase CLI commands
 
@@ -122,17 +113,24 @@ supabase link --project-ref <your-project-ref>
 supabase db reset --yes
 ```
 
-4. Deploy the Edge Function (license verification):
+4. (Optional) License verification.
 
-```bash
-supabase functions deploy verify-license
-```
+   The app currently verifies licenses by querying the NYS OCM open-data API
+   (`data.ny.gov`) **directly from the browser** in `verifyLicense()` — no
+   backend is required for it to work today.
 
-5. Update `index.html`:
+   A `supabase/functions/verify-license` Edge Function is included as an
+   optional server-side alternative (e.g. to hide the upstream call or add
+   caching). It is **not deployed or wired into the frontend** by default. To
+   use it, deploy it and point the frontend at its URL:
 
-```js
-const OCM_LICENSE_API = "https://<project>.functions.supabase.co/verify-license";
-```
+   ```bash
+   supabase functions deploy verify-license
+   ```
+
+   ```js
+   const OCM_LICENSE_API = "https://<project>.functions.supabase.co/verify-license";
+   ```
 
 ## 🧩 Deploy
 
