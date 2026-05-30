@@ -466,6 +466,26 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
     }
     .star-rating { color: #000000; font-size: .85rem; }
 
+    /* ── Logo upload ── */
+    .logo-upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+    .logo-upload-area:hover { border-color: #000; background: #fafafa; }
+    .logo-preview-img {
+      width: 100%; max-height: 140px;
+      object-fit: contain;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      display: none;
+    }
+    .logo-preview-img.visible { display: block; }
+    .logo-upload-hint { font-size: .82rem; color: var(--muted); margin-top: 6px; }
+
     /* ── Airbnb-style listing cards ── */
     .air-card {
       cursor: pointer;
@@ -2256,6 +2276,15 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
         <label>Contact email</label>
         <input type="email" id="accountContactEmail" placeholder="you@business.com" />
       </div>
+      <div class="form-group">
+        <label>Business logo</label>
+        <div class="logo-upload-area" onclick="document.getElementById('accountLogoInput').click()">
+          <img id="accountLogoPreview" class="logo-preview-img" alt="Logo preview" />
+          <div id="accountLogoHint" class="logo-upload-hint">Tap to upload a logo (JPG, PNG, WebP · max 2 MB)</div>
+        </div>
+        <input type="file" id="accountLogoInput" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none"
+               onchange="previewLogoUpload('accountLogoInput','accountLogoPreview','accountLogoHint')" />
+      </div>
       <button class="btn btn-primary btn-full btn-lg" onclick="saveAccountInfo()">Save Business Changes</button>
     </div>
   </div>
@@ -2322,6 +2351,15 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
       <div class="form-group">
         <label>Contact email</label>
         <input type="email" id="editListingContactEmail" placeholder="you@business.com" />
+      </div>
+      <div class="form-group">
+        <label>Business logo</label>
+        <div class="logo-upload-area" onclick="document.getElementById('editListingLogoInput').click()">
+          <img id="editListingLogoPreview" class="logo-preview-img" alt="Logo preview" />
+          <div id="editListingLogoHint" class="logo-upload-hint">Tap to upload a logo (JPG, PNG, WebP · max 2 MB)</div>
+        </div>
+        <input type="file" id="editListingLogoInput" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none"
+               onchange="previewLogoUpload('editListingLogoInput','editListingLogoPreview','editListingLogoHint')" />
       </div>
       <button class="btn btn-primary btn-full btn-lg" onclick="saveListingInfo()">Save Listing Changes</button>
     </div>
@@ -2485,10 +2523,6 @@ const LISTINGS = [
   }
 ];
 
-/* ── Per-business logo overrides (name → image path) ── */
-const LOGO_OVERRIDES = {
-  "FUFA LLC": "NobleSteedFarmsLogo.jpg"
-};
 
 let currentFilter = 'all';
 let isLoggedIn = false;
@@ -2739,7 +2773,7 @@ function renderPremiumCard(biz, mode = 'browse') {
       : `handleBusinessCardClick('${safeId}')`;
 
   const logoMark = (biz.avatar || biz.name || 'B').charAt(0).toUpperCase();
-  const logoOverride = LOGO_OVERRIDES[biz.name] || null;
+  const logoOverride = biz.imageUrl || null;
   const hasRating = (biz.rating || 0) > 0;
   const rating = (biz.rating || 0).toFixed(1);
 
@@ -3665,7 +3699,8 @@ function mapSupabaseListingRowToCard(row, options = {}) {
     isOwner: !!options.isOwner,
     contactName: row.contact_name || '',
     contactEmail: row.contact_email || '',
-    licenseNumber: row.license_number || ''
+    licenseNumber: row.license_number || '',
+    imageUrl: row.image_url || null
   };
 }
 
@@ -4322,6 +4357,8 @@ function openBusinessEditModal(id) {
   document.getElementById('accountCity').value = parsedLocation.city;
   document.getElementById('accountContactName').value = biz.contactName || '';
   document.getElementById('accountContactEmail').value = biz.contactEmail || '';
+  populateLogoPreview('accountLogoPreview', 'accountLogoHint', biz.imageUrl);
+  document.getElementById('accountLogoInput').value = '';
   openModal('accountModal');
 }
 
@@ -4342,9 +4379,53 @@ function openListingEditModal(id) {
   document.getElementById('editListingBuys').value = normalizeProductList(biz?.buys).join('\n');
   document.getElementById('editListingContactName').value = biz.contactName || '';
   document.getElementById('editListingContactEmail').value = biz.contactEmail || '';
+  populateLogoPreview('editListingLogoPreview', 'editListingLogoHint', biz.imageUrl);
+  document.getElementById('editListingLogoInput').value = '';
   openModal('editListingModal');
 }
 
+function populateLogoPreview(previewId, hintId, imageUrl) {
+  const img = document.getElementById(previewId);
+  const hint = document.getElementById(hintId);
+  if (!img || !hint) return;
+  if (imageUrl) {
+    img.src = imageUrl;
+    img.classList.add('visible');
+    hint.textContent = 'Tap to replace logo';
+  } else {
+    img.src = '';
+    img.classList.remove('visible');
+    hint.textContent = 'Tap to upload a logo (JPG, PNG, WebP · max 2 MB)';
+  }
+}
+
+function previewLogoUpload(inputId, previewId, hintId) {
+  const input = document.getElementById(inputId);
+  const file = input?.files?.[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    showToast('Image must be under 2 MB.');
+    input.value = '';
+    return;
+  }
+  const url = URL.createObjectURL(file);
+  const img = document.getElementById(previewId);
+  const hint = document.getElementById(hintId);
+  if (img) { img.src = url; img.classList.add('visible'); }
+  if (hint) hint.textContent = file.name;
+}
+
+async function uploadLogoToStorage(file, listingId) {
+  const supabase = getSupabaseClient();
+  const ext = file.name.split('.').pop().toLowerCase();
+  const path = `${listingId}/logo.${ext}`;
+  const { error } = await supabase.storage
+    .from('listing-logos')
+    .upload(path, file, { upsert: true, contentType: file.type });
+  if (error) throw error;
+  const { data } = supabase.storage.from('listing-logos').getPublicUrl(path);
+  return data.publicUrl + '?t=' + Date.now();
+}
 
 async function getCurrentAuthUserOrThrow() {
   const supabase = getSupabaseClient();
@@ -4389,11 +4470,16 @@ async function saveListingInfo() {
     || biz.contactName
     || '';
 
-
   try {
     const supabase = getSupabaseClient();
-
     const user = await getCurrentAuthUserOrThrow();
+
+    let imageUrl = biz.imageUrl || null;
+    const logoFile = document.getElementById('editListingLogoInput')?.files?.[0];
+    if (logoFile) {
+      imageUrl = await uploadLogoToStorage(logoFile, biz.id);
+    }
+
     const { error } = await supabase
       .from('listings')
       .update({
@@ -4404,7 +4490,8 @@ async function saveListingInfo() {
         contact_name: contactName,
         contact_email: contactEmail,
         sells,
-        buys
+        buys,
+        image_url: imageUrl
       })
       .eq('id', biz.id)
       .eq('owner_id', user.id);
@@ -4453,6 +4540,14 @@ async function saveBusinessInfo() {
     const user = await getCurrentAuthUserOrThrow();
     const supabase = getSupabaseClient();
 
+    let imageUrl = biz.imageUrl || null;
+    if (isSupabaseUuidLike(biz.id)) {
+      const logoFile = document.getElementById('accountLogoInput')?.files?.[0];
+      if (logoFile) {
+        imageUrl = await uploadLogoToStorage(logoFile, biz.id);
+      }
+    }
+
     const profilePayload = {
       id: user.id,
       business_name: businessName,
@@ -4475,7 +4570,7 @@ async function saveBusinessInfo() {
     }
 
     if (isSupabaseUuidLike(biz.id)) {
-            const { error: listingError } = await supabase
+      const { error: listingError } = await supabase
         .from('listings')
         .update({
           business_name: businessName,
@@ -4483,7 +4578,8 @@ async function saveBusinessInfo() {
           city,
           state: stateName,
           contact_name: contactName,
-          contact_email: contactEmail
+          contact_email: contactEmail,
+          image_url: imageUrl
         })
         .eq('id', biz.id)
         .eq('owner_id', user.id);
