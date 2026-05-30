@@ -2769,7 +2769,7 @@ function renderPremiumCard(biz, mode = 'browse') {
         ${badge}
         ${saveBtn}
         ${logoOverride
-          ? `<img src="${escapeHtml(logoOverride)}" alt="${escapeHtml(biz.name)} logo" style="width:80%;height:80%;object-fit:contain;">`
+          ? `<img src="${escapeHtml(logoOverride)}" alt="${escapeHtml(biz.name)} logo" style="width:100%;height:100%;object-fit:cover;">`
           : `<span class="air-card-logo">${escapeHtml(logoMark)}</span>`
         }
       </div>
