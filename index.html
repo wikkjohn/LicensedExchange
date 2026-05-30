@@ -4149,6 +4149,23 @@ function resetListingForm() {
   goListingStep(1);
 }
 
+// Returns an existing listing that already uses this license number
+// (case/whitespace-insensitive), or null. Optionally ignores one listing id
+// (the one being edited). This is a UX pre-check only — the unique index on
+// listings.license_number is the real enforcement.
+async function findConflictingLicenseListing(supabase, licenseNumber, excludeListingId) {
+  const norm = (licenseNumber || '').trim().toLowerCase();
+  if (!norm) return null;
+  const { data, error } = await supabase
+    .from('listings')
+    .select('id, business_name, owner_id, license_number');
+  if (error || !Array.isArray(data)) return null;
+  return data.find(row =>
+    String(row.id) !== String(excludeListingId || '') &&
+    (row.license_number || '').trim().toLowerCase() === norm
+  ) || null;
+}
+
 // 6) OPTIONAL HARDENING: scope listing reads to the modal so future duplicate IDs cannot break publish
 async function submitListing() {
   if (!isLoggedIn) {
@@ -4225,6 +4242,16 @@ async function submitListing() {
     goListingStep(1); restoreBtn(); return;
   }
 
+  // Block reuse of a license already registered to another listing. This is a
+  // friendly pre-check; the unique index is the actual guarantee below.
+  if (licenseNumber) {
+    const conflict = await findConflictingLicenseListing(supabase, licenseNumber, null);
+    if (conflict) {
+      showToast('That license number is already registered to another listing.');
+      goListingStep(1); restoreBtn(); return;
+    }
+  }
+
   // ── ACTUAL INSERT ──────────────────────────────────────────
   try {
     const { data: insertedListing, error: insertError } = await supabase
@@ -4246,7 +4273,12 @@ async function submitListing() {
 
     if (insertError) {
       console.error('submitListing insert failed:', insertError);
-      showToast(insertError.message || 'Failed to publish listing. Please try again.');
+      // 23505 = unique_violation: the license is already on another listing.
+      const duplicateLicense = insertError.code === '23505';
+      showToast(duplicateLicense
+        ? 'That license number is already registered to another listing.'
+        : (insertError.message || 'Failed to publish listing. Please try again.'));
+      if (duplicateLicense) goListingStep(1);
       restoreBtn();
       return;
     }
