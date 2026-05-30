@@ -3179,7 +3179,7 @@ function openFlowAfterPartnerSaved(id) {
     title: 'Partner saved',
     copy: 'Nice move. The strongest next step is usually a quick first message while the match is still fresh.',
     actions: [
-      { label: 'Message them now', kind: 'primary', onclick: "closeModal('flowHandoffModal'); if (typeof openGuidedMessageComposer === 'function') openGuidedMessageComposer(" + JSON.stringify(id) + "); else contactBiz(" + JSON.stringify(id) + ");" },
+      { label: 'Message them now', kind: 'primary', onclick: `closeModal('flowHandoffModal'); contactBiz('${escapeJsSingleQuoted(id)}');` },
       { label: 'Keep browsing', kind: 'ghost', onclick: "closeModal('flowHandoffModal'); switchView('browse');" }
     ]
   });
