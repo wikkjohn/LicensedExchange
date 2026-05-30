@@ -5854,32 +5854,6 @@ async function sendMessage() {
   }
   setTimeout(() => showUxToast('Progress updated', 'Your conversation count just increased.'), 450);
   setTimeout(() => openFlowAfterMessageSent(), 180);
-
-  const typingWrap = document.createElement('div');
-  typingWrap.innerHTML = renderTypingIndicator(partnerName);
-  msgs.appendChild(typingWrap.firstElementChild);
-  msgs.scrollTop = msgs.scrollHeight;
-
-  setTimeout(() => {
-    const typing = document.getElementById('chatTypingIndicator');
-    if (typing) typing.remove();
-    const reply = document.createElement('div');
-    reply.className = 'msg msg-in';
-    reply.textContent = 'Got it! Let me check our current stock and get back to you.';
-    msgs.appendChild(reply);
-    msgs.scrollTop = msgs.scrollHeight;
-
-    const convo = currentUser.messages.find(msg => String(msg.partnerId) === String(partnerId));
-    if (convo) {
-      convo.preview = 'Got it! Let me check our current stock and get back to you.';
-      convo.time = 'Just now';
-      convo.unread = true;
-      renderConversationList();
-      renderDashboardMessages();
-      renderDashboardGuidance();
-      updateDashboardCounts();
-    }
-  }, 1200);
 }
 
 async function persistSavedPartnerToSupabase(id) {
