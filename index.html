@@ -282,7 +282,9 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
     .see-all { font-size: .85rem; color: var(--green); font-weight: 600; text-decoration: none; }
     /* ── Premium Listing Cards ── */
     .listings-grid {
-      display: flex; flex-direction: column; gap: 14px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px 14px;
     }
     .card {
       background: #ffffff;
@@ -463,6 +465,95 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
       flex-wrap: wrap;
     }
     .star-rating { color: #000000; font-size: .85rem; }
+
+    /* ── Airbnb-style listing cards ── */
+    .air-card {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .air-card-media {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .05);
+      transition: transform .25s ease;
+    }
+    .air-card:hover .air-card-media { transform: scale(1.012); }
+    .air-card-logo {
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -.02em;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, .28);
+    }
+    .air-card-badge {
+      position: absolute;
+      top: 12px; left: 12px;
+      background: #ffffff;
+      color: #000000;
+      font-size: .72rem;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 999px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+    }
+    .air-card-save {
+      position: absolute;
+      top: 10px; right: 10px;
+      width: 34px; height: 34px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, .35);
+      color: #ffffff;
+      font-size: 1.15rem;
+      line-height: 1;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform .15s, background .15s;
+    }
+    .air-card-save:hover { background: rgba(0, 0, 0, .55); transform: scale(1.08); }
+    .air-card-save:active { transform: scale(.92); }
+    .air-card-body { display: flex; flex-direction: column; gap: 3px; }
+    .air-card-titlerow {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+    }
+    .air-card-title {
+      font-size: .95rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.25;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      min-width: 0;
+    }
+    .air-card-rating {
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+    .air-card-desc {
+      font-size: .86rem;
+      color: var(--muted);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .air-card-price {
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--text);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .air-card-meta {
+      font-size: .8rem;
+      color: var(--muted);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
 
     /* ── Stats Banner ── */
     .stats-bar {
@@ -995,7 +1086,7 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
 
     /* ── Responsive ── */
     @media (min-width: 640px) {
-      .listings-grid    { display: grid; grid-template-columns: 1fr 1fr; }
+      .listings-grid    { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
       .trust-grid       { grid-template-columns: repeat(4, 1fr); }
       .dashboard-stats  { grid-template-columns: repeat(4, 1fr); }
     }
@@ -2544,6 +2635,24 @@ function getBuyPreview(biz) {
     : 'Open to buying, selling, and collaboration opportunities.';
 }
 
+function summarizeProducts(value, max = 2) {
+  const items = normalizeProductList(value);
+  if (!items.length) return '';
+  const shown = items.slice(0, max).join(', ');
+  const extra = items.length - max;
+  return extra > 0 ? `${shown} +${extra} more` : shown;
+}
+
+function brandGradient(seed) {
+  const str = String(seed || 'Business');
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 31 + str.charCodeAt(i)) % 360;
+  }
+  const h2 = (hash + 38) % 360;
+  return `linear-gradient(135deg, hsl(${hash} 56% 46%), hsl(${h2} 60% 32%))`;
+}
+
 function getCardIntent(biz) {
   const sells = normalizeProductList(biz?.sells);
   const buys = normalizeProductList(biz?.buys);
@@ -2617,61 +2726,52 @@ return `
 }
 
 function renderPremiumCard(biz, mode = 'browse') {
-  const ownerBadge = biz.isOwner ? `<div class="owner-badge">👤 ${mode === 'listing' ? 'Tap to manage this listing' : 'Tap to edit this business'}</div>` : '';
+  const safeId = escapeJsSingleQuoted(biz.id);
+  const clickAction = mode === 'business'
+    ? `openBusinessEditModal('${safeId}')`
+    : mode === 'listing'
+      ? `openListingEditModal('${safeId}')`
+      : `handleBusinessCardClick('${safeId}')`;
+
+  const logoMark = (biz.avatar || biz.name || 'B').charAt(0).toUpperCase();
+  const hasRating = (biz.rating || 0) > 0;
+  const rating = (biz.rating || 0).toFixed(1);
+
+  const sells = summarizeProducts(biz.sells);
+  const buys = summarizeProducts(biz.buys);
+  const sellsLine = sells ? `Sells: ${sells}` : 'No products listed yet';
+  const buysLine = buys ? `Buys: ${buys}` : 'Open to offers';
+
   const locationText = biz.location || 'Location not added yet';
-  const summaryTitle = mode === 'business' ? 'Business information' : 'Looking to';
-  const summaryText = mode === 'business' ? getBuyPreview(biz) : getCardIntent(biz);
-  const focusText = mode === 'business' ? `Primary license: ${formatTypeLabel(biz.type)}` : getSellPreview(biz);
-  const footerText = biz.contactEmail || 'Email not added yet';
-  const statusHtml = mode === 'listing' ? `<span class="listing-status">Active listing</span>` : '';
-  const avatarText = (biz.avatar || biz.name || 'B').charAt(0).toUpperCase();
+  const typeLabel = formatTypeLabel(biz.type);
+  const metaExtra = biz.isOwner
+    ? (mode === 'listing' ? ' · Tap to manage' : ' · Tap to edit')
+    : '';
+
+  const badge = biz.verified
+    ? `<span class="air-card-badge">✓ Verified</span>`
+    : '';
+
+  const canSave = mode === 'browse' && !biz.isOwner && isSupabaseUuidLike(biz.id);
+  const saveBtn = canSave
+    ? `<button class="air-card-save" aria-label="Save partner" onclick="event.stopPropagation();saveBiz('${safeId}')">♡</button>`
+    : '';
 
   return `
-    <div class="card premium-card" onclick="${mode === 'business' ? `openBusinessEditModal('${escapeJsSingleQuoted(biz.id)}')` : mode === 'listing' ? `openListingEditModal('${escapeJsSingleQuoted(biz.id)}')` : `handleBusinessCardClick('${escapeJsSingleQuoted(biz.id)}')`}">
-      ${ownerBadge}
-      <div class="premium-card-header">
-        <div class="business-meta">
-          <div class="business-avatar">${escapeHtml(avatarText)}</div>
-          <div class="business-text">
-            <div class="card-name">${escapeHtml(biz.name)}</div>
-            <div class="card-subline">
-              <span class="card-type">${escapeHtml(formatTypeLabel(biz.type))}</span>
-              ${statusHtml}
-            </div>
-            <div class="card-location">📍 ${escapeHtml(locationText)}</div>
-          </div>
+    <div class="air-card" onclick="${clickAction}">
+      <div class="air-card-media" style="background:${brandGradient(biz.name)}">
+        ${badge}
+        ${saveBtn}
+        <span class="air-card-logo">${escapeHtml(logoMark)}</span>
+      </div>
+      <div class="air-card-body">
+        <div class="air-card-titlerow">
+          <span class="air-card-title">${escapeHtml(biz.name)}</span>
+          ${hasRating ? `<span class="air-card-rating">★ ${rating}</span>` : ''}
         </div>
-      </div>
-
-      <div class="trust-row">
-        ${renderTrustPillsHtml(biz, mode)}
-      </div>
-
-      <div class="card-summary">
-        <div class="summary-row">
-          <div class="summary-label">${summaryTitle}</div>
-          <div class="summary-value">${escapeHtml(summaryText)}</div>
-        </div>
-        <div class="summary-row">
-          <div class="summary-label">${mode === 'business' ? 'Contact' : 'Featured offer'}</div>
-          <div class="summary-value">${escapeHtml(focusText)}</div>
-        </div>
-      </div>
-
-      <div class="card-tags">
-        ${renderTagsHtml(biz, mode)}
-      </div>
-
-      <div class="card-actions">
-        ${renderCardActions(biz, mode)}
-      </div>
-
-      <div class="card-footer">
-        <div class="card-footer-meta">
-          <span class="star-rating">${'★'.repeat(Math.max(1, Math.round(biz.rating || 0)))}</span>
-          <span>${(biz.rating || 0).toFixed(1)} rating</span>
-        </div>
-        <div class="card-footer-meta">${escapeHtml(footerText)}</div>
+        <div class="air-card-desc">${escapeHtml(sellsLine)}</div>
+        <div class="air-card-price">${escapeHtml(buysLine)}</div>
+        <div class="air-card-meta">📍 ${escapeHtml(locationText)} · ${escapeHtml(typeLabel)}${escapeHtml(metaExtra)}</div>
       </div>
     </div>
   `;
