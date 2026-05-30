@@ -4451,13 +4451,14 @@ async function getCurrentAuthUserOrThrow() {
 
 
 async function saveListingInfo() {
-  if (currentEditingBusinessId == null) return;
-
-  const biz = getUserListings().find(b => String(b.id) === String(currentEditingBusinessId));
+  const biz = (currentEditingBusinessId != null
+      ? getUserListings().find(b => String(b.id) === String(currentEditingBusinessId))
+      : null) || getPrimaryBusiness();
   if (!biz) {
-    showToast('Listing could not be found.');
+    showToast('Add your listing details first, then save.');
     return;
   }
+  if (currentEditingBusinessId == null) currentEditingBusinessId = biz.id;
 
   if (!isSupabaseUuidLike(biz.id)) {
     showToast('This listing is local demo data and cannot be saved to Supabase.');
@@ -4528,13 +4529,17 @@ async function saveListingInfo() {
   }
 }
 async function saveBusinessInfo() {
-  if (currentEditingBusinessId == null) return;
-
-  const biz = getUserListings().find(b => String(b.id) === String(currentEditingBusinessId)) || getPrimaryBusiness();
+  // Recover the target business even if currentEditingBusinessId was cleared
+  // (e.g. by an auth-state refresh) while the Edit Business modal was open, so
+  // the Save button never silently no-ops.
+  const biz = (currentEditingBusinessId != null
+      ? getUserListings().find(b => String(b.id) === String(currentEditingBusinessId))
+      : null) || getPrimaryBusiness();
   if (!biz) {
-    showToast('Business could not be found.');
+    showToast('Add your business details first, then save.');
     return;
   }
+  if (currentEditingBusinessId == null) currentEditingBusinessId = biz.id;
 
   const businessName = document.getElementById('accountBizName').value.trim() || biz.name || '';
   const licenseType = (document.getElementById('accountBizType').value || biz.type || '').toLowerCase();
