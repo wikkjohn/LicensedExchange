@@ -733,7 +733,7 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
     .add-product-row {
       display: flex; gap: 8px; align-items: center; margin-top: 8px;
     }
-    .add-product-row input { flex: 1; }
+    .add-product-row input { flex: 1; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: .95rem; background: var(--white); }
 
     /* ── Business Detail ── */
     .business-detail-top {
@@ -2123,13 +2123,13 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
           <label>License type</label>
           <select id="lsBizType">
             <option value="">Select type…</option>
-            <option>MicroBusiness</option>
-            <option>Cultivator</option>
-            <option>Dispensary</option>
-            <option>Distributor</option>
-            <option>Processor</option>
-            <option>Lab</option>
-            <option>Retailer</option>
+            <option value="MicroBusiness">MicroBusiness</option>
+            <option value="Cultivator">Cultivator</option>
+            <option value="Dispensary">Dispensary</option>
+            <option value="Distributor">Distributor</option>
+            <option value="Processor">Processor</option>
+            <option value="Lab">Lab</option>
+            <option value="Retailer">Retailer</option>
           </select>
         </div>
 
@@ -3227,8 +3227,8 @@ function openModal(id) {
   if (id === 'authModal' && !isLoggedIn) {
     clearAuthForms();
   }
-  if (id === 'listingModal' && isLoggedIn) {
-    syncAccountDataToForms();
+  if (id === 'listingModal') {
+    resetListingForm();
   }
 
   modal.classList.add('open');
@@ -4078,6 +4078,19 @@ function goListingStep(step) {
     showToast('Create an account to continue.');
     return;
   }
+
+  // Validate step 1 fields before advancing to step 2
+  if (step === 2) {
+    const bizName = (document.getElementById('lsBizName')?.value || '').trim();
+    const bizType = document.getElementById('lsBizType')?.value || '';
+    const city    = (document.getElementById('lsCity')?.value || '').trim();
+    const state   = document.getElementById('lsState')?.value || '';
+    if (!bizName) { showToast('Please enter your business name.'); return; }
+    if (!bizType) { showToast('Please select a license type.'); return; }
+    if (!city)    { showToast('Please enter your city.'); return; }
+    if (!state)   { showToast('Please select a state.'); return; }
+  }
+
   [1,2,3].forEach(n => {
     document.getElementById('ls-panel' + n).classList.toggle('hidden', n !== step);
     const s = document.getElementById('ls-step' + n);
