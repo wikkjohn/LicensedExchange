@@ -2043,6 +2043,7 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
   <div class="form-group">
     <label for="signupPassword">Password</label>
     <input type="password" id="signupPassword" placeholder="Min. 8 characters" />
+    <div class="form-hint">At least 8 characters, including an uppercase letter, a lowercase letter, a number, and a symbol.</div>
   </div>
   <button id="signupSubmitBtn" class="btn btn-primary btn-full btn-lg" onclick="signUpWithSupabase()">
     Create Free Account →
@@ -3786,6 +3787,20 @@ async function ensureProfileForCurrentUser(profileSeed = {}) {
   };
 }
 
+// Mirrors the Supabase auth password policy so we can warn the user before
+// the network round-trip and give a clear message instead of the raw error.
+function getPasswordPolicyError(password) {
+  const pw = password || '';
+  if (pw.length < 8) return 'Password must be at least 8 characters.';
+  const missing = [];
+  if (!/[a-z]/.test(pw)) missing.push('a lowercase letter');
+  if (!/[A-Z]/.test(pw)) missing.push('an uppercase letter');
+  if (!/[0-9]/.test(pw)) missing.push('a number');
+  if (!/[^a-zA-Z0-9]/.test(pw)) missing.push('a symbol');
+  if (missing.length) return 'Password must include ' + missing.join(', ') + '.';
+  return null;
+}
+
 async function signUpWithSupabase() {
   const supabase = getSupabaseClient();
   const btn = getSignupSubmitBtn();
@@ -3811,6 +3826,14 @@ async function signUpWithSupabase() {
     return;
   }
 
+  const passwordError = getPasswordPolicyError(password);
+  if (passwordError) {
+    setAuthStatus('authSignupStatus', passwordError, true);
+    showToast(passwordError);
+    document.getElementById('signupPassword')?.focus();
+    return;
+  }
+
   setAuthStatus('authSignupStatus', 'Creating your account...');
   setButtonBusy(btn, true, 'Creating account…', 'Create Free Account →');
 
@@ -3818,10 +3841,15 @@ async function signUpWithSupabase() {
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) {
       console.error('signUpWithSupabase failed:', error);
-      const message = /rate limit/i.test(error.message || '')
+      const rawMessage = error.message || '';
+      const isWeakPassword = error.name === 'AuthWeakPasswordError' || /weak|should contain at least one character/i.test(rawMessage);
+      const message = /rate limit/i.test(rawMessage)
         ? 'Too many signup attempts. Please wait about a minute, then try again once.'
-        : (error.message || 'Sign up failed.');
-      if (/rate limit/i.test(error.message || '')) {
+        : isWeakPassword
+          ? 'Password must include an uppercase letter, a lowercase letter, a number, and a symbol.'
+          : (rawMessage || 'Sign up failed.');
+      if (isWeakPassword) document.getElementById('signupPassword')?.focus();
+      if (/rate limit/i.test(rawMessage)) {
         setSignupCooldown(60);
         applySignupCooldownUi();
       } else {
