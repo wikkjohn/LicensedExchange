@@ -3156,6 +3156,16 @@ function renderDashboardGuidance() {
   const percent = Math.round((doneCount / steps.length) * 100);
   const nextStep = steps.find(step => !step.done);
 
+  const welcomeCard = document.getElementById('dashboardWelcomeCard');
+  const onboardingCard = document.getElementById('dashboardOnboardingCard');
+  if (percent === 100) {
+    if (welcomeCard) welcomeCard.style.display = 'none';
+    if (onboardingCard) onboardingCard.style.display = 'none';
+    return;
+  }
+  if (welcomeCard) welcomeCard.style.display = '';
+  if (onboardingCard) onboardingCard.style.display = '';
+
   title.textContent = percent === 100
     ? `${firstName}, your dashboard is fully set up`
     : `${firstName}, here’s your next best step`;
