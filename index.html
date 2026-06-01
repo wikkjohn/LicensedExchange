@@ -1819,8 +1819,8 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
       <div class="notif-item">
         <div class="notif-icon">🔔</div>
         <div class="notif-text">
-          <h4>New match: Green Valley Farms</h4>
-          <p>They listed Blue Dream (1lb) — matches your buy list</p>
+          <h4>New match found</h4>
+          <p>A business on your match list posted a new listing.</p>
         </div>
       </div>
       <div class="notif-item">
@@ -2100,7 +2100,7 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
       <div id="ls-panel1">
         <div class="form-group">
           <label>Business name</label>
-          <input type="text" id="lsBizName" placeholder="e.g. Green Valley Farms" />
+          <input type="text" id="lsBizName" placeholder="Your business name" />
         </div>
 
         <!-- CHANGE 5: MicroBusiness is first option after the placeholder -->
@@ -2448,65 +2448,6 @@ function getSupabaseClient() {
 
 
 
-/* ── Sample Data ── */
-const LISTINGS = [
-  {
-    id: 1, name: "Green Valley Farms", type: "cultivator", verified: true,
-    location: "Los Angeles, CA", rating: 4.9, reviews: 38,
-    sells: ["Blue Dream · Flower · 1 lb", "OG Kush · Flower · 5 lb", "Gelato · Pre-roll · 50ct"],
-    buys:  ["Packaging · Bags · 1000ct", "Nutrients · Liquid · 1 gal"],
-    avatar: "G", avatarColor: "#000000"
-  },
-  {
-    id: 2, name: "SunRise Dispensary", type: "dispensary", verified: true,
-    location: "Denver, CO", rating: 4.7, reviews: 24,
-    sells: ["House Blend · Edible · 10mg", "CBD Tincture · Oil · 30ml"],
-    buys:  ["Blue Dream · Flower · 1 lb", "Sativa Mix · Flower · 5 lb", "Concentrates · Wax · 1 oz"],
-    avatar: "S", avatarColor: "#000000"
-  },
-  {
-    id: 3, name: "Pacific Roots Distro", type: "distributor", verified: false,
-    location: "Portland, OR", rating: 4.5, reviews: 17,
-    sells: ["Logistics · Distribution · Statewide"],
-    buys:  ["Any · Flower · Bulk", "Any · Concentrate · Bulk"],
-    avatar: "P", avatarColor: "#000000"
-  },
-  {
-    id: 4, name: "Highland Processing", type: "processor", verified: true,
-    location: "Las Vegas, NV", rating: 4.8, reviews: 42,
-    sells: ["Cartridges · Vape · 1g", "Live Resin · Concentrate · 1g", "RSO · Oil · 1g"],
-    buys:  ["OG Kush · Trim · 1 lb", "Mixed · Biomass · 10 lb"],
-    avatar: "H", avatarColor: "#000000"
-  },
-  {
-    id: 5, name: "Emerald Coast Farms", type: "cultivator", verified: true,
-    location: "Humboldt, CA", rating: 5.0, reviews: 11,
-    sells: ["Zkittlez · Flower · 1 lb", "Purple Haze · Flower · QP", "Runtz · Flower · HP"],
-    buys:  ["Soil · Growing Media · Pallet"],
-    avatar: "E", avatarColor: "#000000"
-  },
-  {
-    id: 6, name: "Brooklyn MicroBiz", type: "microbusiness", verified: true,
-    location: "Brooklyn, NY", rating: 4.6, reviews: 8,
-    sells: ["House Sativa · Flower · 3.5g", "Local Blend · Pre-roll · 10ct"],
-    buys:  ["Blue Dream · Flower · QP", "OG Kush · Flower · HP"],
-    avatar: "B", avatarColor: "#000000"
-  },
-  {
-    id: 7, name: "Mountain High Retail", type: "dispensary", verified: false,
-    location: "Boulder, CO", rating: 4.3, reviews: 9,
-    sells: ["House Indica · Flower · 3.5g", "Gummies · Edible · 100mg"],
-    buys:  ["Blue Dream · Flower · HP", "Girl Scout Cookies · Flower · 1 lb"],
-    avatar: "M", avatarColor: "#000000"
-  },
-  {
-    id: 8, name: "Precision Test Labs", type: "lab", verified: true,
-    location: "Albany, NY", rating: 4.9, reviews: 31,
-    sells: ["Potency Testing · COA · 24 hr", "Contaminant Panel · Lab Service · Rush"],
-    buys:  ["Sample Intake Kits · Supplies · 100ct"],
-    avatar: "L", avatarColor: "#000000"
-  }
-];
 
 
 let currentFilter = 'all';
@@ -6281,15 +6222,9 @@ renderRatingSection();
 updateDashboardCounts();
 setSignedOutUi({ preserveView: true, silent: true, closeModals: false });
 
-// Load demo seed listings immediately so browse is never blank
-LISTINGS.forEach(biz => {
-  if (!allListings.find(b => String(b.id) === String(biz.id))) {
-    allListings.push(biz);
-  }
-});
 filterCards();
 
-// Then load live Supabase listings and session (will re-run filterCards when done)
+// Load live Supabase listings and session (will re-run filterCards when done)
 restoreSessionFromSupabase({ preserveView: true });
 loadPublicListingsFromSupabase();
 
