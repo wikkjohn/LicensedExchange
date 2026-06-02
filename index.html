@@ -1693,12 +1693,12 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
     spellcheck="false"
     placeholder="Search by name, location, product, or license type…"
     id="searchInput"
-    oninput="filterCards(); document.getElementById('searchClearBtn').style.display = this.value ? 'flex' : 'none';"
+    oninput="onBrowseSearchInput()"
     style="padding-right: 44px;"
   />
   <button
     id="searchClearBtn"
-    onclick="document.getElementById('searchInput').value=''; filterCards(); this.style.display='none'; document.getElementById('searchInput').focus();"
+    onclick="clearBrowseSearch()"
     style="
       display: none;
       position: absolute;
@@ -2481,6 +2481,9 @@ const LISTINGS_PAGE_SIZE = 24;
 let listingsOffset = 0;
 let listingsHasMore = true;
 let listingsLoading = false;
+// Ordered ids of the public listings currently shown in Browse, accumulated
+// page by page from the server (search + filter are applied in the query).
+let browseOrderIds = [];
 
 const currentUser = {
   profile: null,
@@ -3036,40 +3039,68 @@ function handleBusinessCardClick(id) {
 }
 
 
-function getFilteredData() {
-  const query = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
-  const base = getAllVisibleListings();
-
-  return base.filter(biz => {
-    const fields = [
-      biz.name,
-      biz.location,
-      formatTypeLabel(biz.type),
-      ...normalizeProductList(biz?.sells),
-      ...normalizeProductList(biz?.buys)
-    ]
-      .filter(Boolean)
-      .map(v => String(v).toLowerCase());
-
-    const matchesQuery = !query || fields.some(v => v.includes(query));
-    const matchesType = currentFilter === 'all' ||
-      String(biz.type || '').toLowerCase() === currentFilter;
-
-    return matchesQuery && matchesType;
-  });
+function getBrowseSearchTerm() {
+  return (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
 }
 
+// Local match predicate — mirrors the server-side search/filter so the user's
+// own in-memory listings (and product-array matches the server can't ilike)
+// stay consistent with the paged server results.
+function listingMatchesLocal(biz, term, filter) {
+  const matchesType = !filter || filter === 'all' ||
+    String(biz.type || '').toLowerCase().includes(filter);
+  if (!matchesType) return false;
+  if (!term) return true;
+  const fields = [
+    biz.name,
+    biz.location,
+    formatTypeLabel(biz.type),
+    ...normalizeProductList(biz?.sells),
+    ...normalizeProductList(biz?.buys)
+  ]
+    .filter(Boolean)
+    .map(v => String(v).toLowerCase());
+  return fields.some(v => v.includes(term));
+}
 
 function setFilter(f, el) {
   currentFilter = f;
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
-  filterCards();
+  loadPublicListingsFromSupabase({ reset: true });
 }
 
+// Re-render the Browse grid from the current paged public results plus the
+// owner's matching listings. Pure render — does not hit the network.
 function filterCards() {
-  renderCards(getFilteredData());
+  const term = getBrowseSearchTerm();
+  const ownerMatches = getUserListings().filter(b => listingMatchesLocal(b, term, currentFilter));
+  const ownerIds = new Set(ownerMatches.map(b => String(b.id)));
+  const publicCards = browseOrderIds
+    .map(id => allListings.find(b => String(b.id) === String(id)))
+    .filter(b => b && !ownerIds.has(String(b.id)));
+  renderCards([...ownerMatches, ...publicCards]);
   renderLoadMoreButton();
+}
+
+let browseSearchDebounce = null;
+// Debounced so we issue one server query after the user stops typing, not one
+// per keystroke.
+function onBrowseSearchInput() {
+  const input = document.getElementById('searchInput');
+  document.getElementById('searchClearBtn').style.display = input.value ? 'flex' : 'none';
+  clearTimeout(browseSearchDebounce);
+  browseSearchDebounce = setTimeout(() => {
+    loadPublicListingsFromSupabase({ reset: true });
+  }, 300);
+}
+
+function clearBrowseSearch() {
+  const input = document.getElementById('searchInput');
+  input.value = '';
+  document.getElementById('searchClearBtn').style.display = 'none';
+  input.focus();
+  loadPublicListingsFromSupabase({ reset: true });
 }
 
 function goToBrowseAndFocusSearch() {
@@ -3664,6 +3695,7 @@ async function loadPublicListingsFromSupabase(options = {}) {
   if (options.reset) {
     listingsOffset = 0;
     listingsHasMore = true;
+    browseOrderIds = [];
   }
   if (!listingsHasMore) {
     renderLoadMoreButton();
@@ -3676,11 +3708,39 @@ async function loadPublicListingsFromSupabase(options = {}) {
     const supabase = getSupabaseClient();
     const from = listingsOffset;
     const to = from + LISTINGS_PAGE_SIZE - 1;
-    const { data, error } = await supabase
+
+    let query = supabase
       .from('listings')
       .select('*')
-      .order('created_at', { ascending: false })
-      .range(from, to);
+      .order('created_at', { ascending: false });
+
+    // License-type filter (chips). ilike-contains so verbose license strings
+    // like "Adult-Use Retail Dispensary License" still match the "dispensary" chip.
+    if (currentFilter && currentFilter !== 'all') {
+      query = query.ilike('license_type', `%${currentFilter}%`);
+    }
+
+    // Free-text search across the scalar text columns. Sanitize out the
+    // characters PostgREST uses as or()/ilike delimiters so the term can't
+    // break the filter expression.
+    const term = getBrowseSearchTerm();
+    if (term) {
+      const safe = term.replace(/[,()%*]/g, ' ').trim();
+      if (safe) {
+        query = query.or(
+          `business_name.ilike.%${safe}%,city.ilike.%${safe}%,state.ilike.%${safe}%,license_type.ilike.%${safe}%`
+        );
+      }
+    }
+
+    // Exclude the signed-in user's own listings; those are merged in client-side
+    // via filterCards() so they stay consistent and never duplicate.
+    const myOwnerId = currentUser.profile?.id;
+    if (myOwnerId) {
+      query = query.neq('owner_id', myOwnerId);
+    }
+
+    const { data, error } = await query.range(from, to);
 
     if (error) {
       console.warn('Public listings load skipped:', error);
@@ -3690,6 +3750,8 @@ async function loadPublicListingsFromSupabase(options = {}) {
     const rows = data || [];
     rows.forEach(row => {
       upsertListingIntoCatalog(mapSupabaseListingRowToCard(row));
+      const id = String(row.id);
+      if (!browseOrderIds.includes(id)) browseOrderIds.push(id);
     });
 
     listingsOffset += rows.length;
