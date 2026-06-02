@@ -798,6 +798,16 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
 
     /* ── Chat ── */
     .chat-window { display: flex; flex-direction: column; height: 100%; }
+    .chat-sender-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 16px; border-bottom: 1px solid var(--border);
+      background: var(--bg); font-size: .82rem;
+    }
+    .chat-sender-bar label { color: var(--muted); font-weight: 600; white-space: nowrap; }
+    .chat-sender-bar select {
+      flex: 1; padding: 6px 8px; border: 1.5px solid var(--border);
+      border-radius: 8px; font-size: .85rem; background: var(--white);
+    }
     .chat-messages {
       flex: 1; overflow-y: auto; padding: 16px;
       display: flex; flex-direction: column; gap: 10px;
@@ -1895,7 +1905,7 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
           <div class="progress-fill" id="dashboardProgressFill" style="width:0%;"></div>
         </div>
         <div class="dashboard-quick-actions">
-          <button class="btn btn-primary" onclick="openModal('listingModal')">Add Listing</button>
+          <button class="btn btn-primary" onclick="openModal('listingModal')">Add a Business</button>
           <button class="btn btn-ghost" onclick="goToBrowseAndFocusSearch()">Browse Matches</button>
         </div>
       </div>
@@ -1912,9 +1922,9 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
         <button class="dash-stat" type="button" onclick="scrollToDashboardSection('dashboard-messages')"><div class="num" id="dashMessagesCount">0</div><div class="lbl">Messages</div></button>
         <button class="dash-stat" type="button" onclick="scrollToDashboardSection('dashboard-saved-partners')"><div class="num" id="dashSavedPartnersCount">0</div><div class="lbl">Saved Partners</div></button>
       </div>
-      <div class="section-header" style="margin-top:20px;"><h2>Your Main Business Card</h2></div>
+      <div class="section-header" style="margin-top:20px;"><h2>Your Businesses</h2></div>
       <div class="listings-grid" id="myBusinessCardGrid"></div>
-      <div class="section-header" id="dashboard-active-listings" style="margin-top:20px;"><h2>Active Listings</h2></div>
+      <div class="section-header" id="dashboard-active-listings" style="margin-top:20px;"><h2>Your Other Businesses &amp; Listings</h2></div>
       <div class="listings-grid swipe-track" id="myListingsGrid"></div>
       <div class="dashboard-section-card" id="dashboard-messages" style="margin-top:20px;">
         <div class="heading-lg">Messages</div>
@@ -2377,6 +2387,10 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
       <h2 id="chatPartnerName">Chat</h2>
       <button class="modal-close" onclick="closeModal('chatModal')">✕</button>
     </div>
+    <div id="chatSenderBar" class="chat-sender-bar" style="display:none;">
+      <label for="chatSenderSelect">Messaging as</label>
+      <select id="chatSenderSelect" onchange="onChatSenderChange()"></select>
+    </div>
     <div class="chat-window">
       <div class="chat-messages" id="chatMessages">
       </div>
@@ -2458,6 +2472,9 @@ let buyTags = [];
 let nextId = 1000;
 let currentEditingBusinessId = null;
 let currentChatPartnerId = null;
+// Which of the signed-in user's listings is the "from" identity for messaging.
+// Lets an owner with multiple stores act as any one of them in a conversation.
+let currentSenderListingId = null;
 
 const stateMap = {
   "New York": "NY",
@@ -3631,9 +3648,15 @@ const previousMessages = Array.isArray(currentUser?.messages) ? [...currentUser.
           const partnerId = ownedListingIds.includes(conversation.listing_a_id)
             ? conversation.listing_b_id
             : conversation.listing_a_id;
+          // Which of my listings this conversation belongs to, so opening it
+          // from the dashboard loads the right thread even with multiple stores.
+          const ownedListingId = ownedListingIds.includes(conversation.listing_a_id)
+            ? conversation.listing_a_id
+            : conversation.listing_b_id;
           return {
             id: latestMessage.id,
             partnerId,
+            ownedListingId,
             partnerName: partnerNameById.get(partnerId) || 'Partner',
             preview: latestMessage.body || 'New message',
             time: formatDashboardMessageTime(latestMessage.created_at),
@@ -4444,15 +4467,15 @@ function renderMyListings() {
   }
   if (hasRealListings()) {
     grid.innerHTML = `<div class="dashboard-section-card" style="grid-column:1/-1;margin:0;">
-         <h3 style="margin-bottom:8px;">Your first listing is already live</h3>
-         <p style="font-size:.84rem;color:var(--muted);margin-bottom:14px;">Your first real listing is featured above as your main business card. Add another listing only when you want to show a separate buying or selling need.</p>
-         <button class="btn btn-primary" onclick="openModal('listingModal')">Add Another Listing</button>
+         <h3 style="margin-bottom:8px;">Run more than one business?</h3>
+         <p style="font-size:.84rem;color:var(--muted);margin-bottom:14px;">Add each store, location, or license as its own business — all managed from this one account. Each gets its own listing, license, and conversations.</p>
+         <button class="btn btn-primary" onclick="openModal('listingModal')">Add Another Business</button>
        </div>`;
     return;
   }
   grid.innerHTML = `<div class="dashboard-section-card" style="grid-column:1/-1;margin:0;">
        <h3 style="margin-bottom:8px;">Post your first active listing</h3>
-       <p style="font-size:.84rem;color:var(--muted);margin-bottom:14px;">Your main business profile is live. Add a buying or selling listing so partners know exactly what you need.</p>
+       <p style="font-size:.84rem;color:var(--muted);margin-bottom:14px;">Your main business profile is live. Add a buying or selling listing so partners know exactly what you need. Have multiple stores or licenses? Add each one as its own business.</p>
        <button class="btn btn-primary" onclick="openModal('listingModal')">Add First Listing</button>
      </div>`;
 }
@@ -5918,6 +5941,46 @@ function openBizModal(id) {
   openModal('bizModal');
 }
 
+// The listing the user is currently acting as when messaging. Falls back to
+// their first listing if nothing valid is selected.
+function getActingListingId() {
+  const owned = getUserListings().filter(b => isSupabaseUuidLike(b.id));
+  if (currentSenderListingId && owned.some(b => String(b.id) === String(currentSenderListingId))) {
+    return currentSenderListingId;
+  }
+  return owned[0]?.id || null;
+}
+
+// Builds the "Messaging as" dropdown in the chat header. Hidden when the user
+// has only one listing (nothing to choose).
+function renderChatSenderBar() {
+  const bar = document.getElementById('chatSenderBar');
+  const select = document.getElementById('chatSenderSelect');
+  if (!bar || !select) return;
+  const owned = getUserListings().filter(b => isSupabaseUuidLike(b.id));
+  if (owned.length <= 1) {
+    bar.style.display = 'none';
+    return;
+  }
+  const acting = getActingListingId();
+  currentSenderListingId = acting;
+  select.innerHTML = owned.map(b =>
+    `<option value="${escapeHtml(String(b.id))}" ${String(b.id) === String(acting) ? 'selected' : ''}>${escapeHtml(b.name || 'My business')}</option>`
+  ).join('');
+  bar.style.display = 'flex';
+}
+
+async function onChatSenderChange() {
+  const select = document.getElementById('chatSenderSelect');
+  if (!select) return;
+  currentSenderListingId = select.value;
+  // The conversation thread is keyed by the sender listing, so reload it.
+  const partnerName = document.getElementById('chatPartnerName')?.textContent || 'Partner';
+  const chatMessages = document.getElementById('chatMessages');
+  if (chatMessages) chatMessages.innerHTML = `<div class="msg msg-in">Loading conversation…</div>`;
+  await loadChatThreadFromSupabase(currentChatPartnerId, partnerName);
+}
+
 function contactBiz(id) {
   if (!isLoggedIn) {
     closeModal('bizModal');
@@ -5925,7 +5988,7 @@ function contactBiz(id) {
     showToast('Sign up free to message businesses.');
     return;
   }
-  const ownedListingId = getUserListings()[0]?.id;
+  const ownedListingId = getActingListingId();
 if (!isSupabaseUuidLike(ownedListingId)) {
   closeModal('bizModal');
   showToast('Create your first live listing before messaging businesses.');
@@ -5949,14 +6012,25 @@ function openChatByPartnerId(partnerId) {
     getAllVisibleListings().find(b => String(b.id) === String(partnerId)) ||
     allListings.find(b => String(b.id) === String(partnerId));
 
-  if (!biz) return;
+  // The partner may not be in the loaded browse page (listings are paginated)
+  // or in the visible set, so don't bail when the card isn't loaded — fall back
+  // to the conversation we already hydrated for the dashboard message list.
+  const knownMessage = currentUser.messages.find(m => String(m.partnerId) === String(partnerId));
+  const resolvedId = biz?.id || partnerId;
+  const name = biz?.name || knownMessage?.partnerName || 'Partner';
 
-  if (!isSupabaseUuidLike(biz.id)) {
+  if (!isSupabaseUuidLike(resolvedId)) {
     showToast('This business is a demo card. Open a real Supabase listing to test persistent messages.');
     return;
   }
 
-  openChat(biz.name, biz.id);
+  // If this conversation belongs to a specific one of my listings, act as that
+  // listing so the existing thread loads (matters when I run multiple stores).
+  if (isSupabaseUuidLike(knownMessage?.ownedListingId)) {
+    currentSenderListingId = knownMessage.ownedListingId;
+  }
+
+  openChat(name, resolvedId);
 }
 
 async function openChat(name, partnerId = null) {
@@ -5976,6 +6050,7 @@ async function openChat(name, partnerId = null) {
   document.getElementById('chatPartnerName').textContent = name;
   closeModal('bizModal');
   openModal('chatModal');
+  renderChatSenderBar();
 
   const chatMessages = document.getElementById('chatMessages');
   if (chatMessages) {
@@ -5994,7 +6069,7 @@ async function loadChatThreadFromSupabase(partnerId, partnerName = 'Partner') {
     return;
   }
 
-  const ownedListingId = getUserListings()[0]?.id;
+  const ownedListingId = getActingListingId();
   if (!isSupabaseUuidLike(ownedListingId)) {
     chatMessages.innerHTML = `<div class="msg msg-in">Your business listing is not ready yet, so the thread could not be loaded.</div>`;
     return;
@@ -6060,7 +6135,7 @@ async function loadChatThreadFromSupabase(partnerId, partnerName = 'Partner') {
 }
 async function persistMessageToSupabase(partnerId, text, partnerName = '') {
   if (!isSupabaseUuidLike(partnerId)) return null;
-  const ownedListingId = getUserListings()[0]?.id;
+  const ownedListingId = getActingListingId();
   if (!isSupabaseUuidLike(ownedListingId)) return null;
   const supabase = getSupabaseClient();
   const { data: authData } = await supabase.auth.getUser();

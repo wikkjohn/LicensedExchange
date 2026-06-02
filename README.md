@@ -50,6 +50,8 @@ What each suite covers:
 | `tests/e2e_full.js` | The whole journey: sign up → log in → post a listing → message a partner → save a partner → log out. |
 | `tests/test_pagination.js` | Browse loads listings 24 at a time, and "Load more" fetches the next page. |
 | `tests/test_server_search.js` | Search and the category filter run inside the database query and return the right results. |
+| `tests/test_multi_listing.js` | One account with multiple stores can message partners as any of its businesses, creating separate conversation threads. |
+| `tests/test_open_conversation.js` | The dashboard "Open" button opens a conversation even when the partner's listing isn't in the loaded browse page. |
 
 ## 🧠 Supabase setup
 
