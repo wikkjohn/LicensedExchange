@@ -464,7 +464,6 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
       gap: 6px;
       flex-wrap: wrap;
     }
-    .star-rating { color: #000000; font-size: .85rem; }
 
     /* ── Logo upload ── */
     .logo-upload-area {
@@ -551,12 +550,6 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
       line-height: 1.25;
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
       min-width: 0;
-    }
-    .air-card-rating {
-      font-size: .85rem;
-      font-weight: 600;
-      color: var(--text);
-      flex-shrink: 0;
     }
     .air-card-desc {
       font-size: .86rem;
@@ -1425,8 +1418,7 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
 }
 
 #dashboardMessagesList .mini-row,
-#dashboardSavedPartnersList .mini-row,
-#dashboardRatingHighlights .mini-row {
+#dashboardSavedPartnersList .mini-row {
   background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -1434,8 +1426,7 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
 }
 
 #dashboardMessagesList .mini-row + .mini-row,
-#dashboardSavedPartnersList .mini-row + .mini-row,
-#dashboardRatingHighlights .mini-row + .mini-row {
+#dashboardSavedPartnersList .mini-row + .mini-row {
   margin-top: 10px;
 }
 
@@ -1582,34 +1573,6 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
     @keyframes skeletonShimmer {
       0% { background-position: 100% 0; }
       100% { background-position: 0 0; }
-    }
-
-    /* ── Confidence & credibility signal rows (business detail modal) ── */
-    .confidence-row,
-    .credibility-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    .confidence-badge,
-    .credibility-pill {
-      display: inline-flex;
-      align-items: center;
-      min-height: 28px;
-      padding: 0 11px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: #f8f8f8;
-      color: #3b3b3b;
-      font-size: .76rem;
-      font-weight: 700;
-    }
-    .confidence-summary,
-    .credibility-summary {
-      font-size: .82rem;
-      color: var(--muted);
-      margin-bottom: 14px;
     }
 
     /* ── Misc helpers ── */
@@ -1789,11 +1752,6 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
         <p>Every business confirmed before listing</p>
       </div>
       <div class="trust-card">
-        <div class="trust-icon">⭐</div>
-        <h3>Rated Partners</h3>
-        <p>Real reviews from real trades</p>
-      </div>
-      <div class="trust-card">
         <div class="trust-icon">💬</div>
         <h3>Direct Messaging</h3>
         <p>No middleman. No confusion.</p>
@@ -1846,13 +1804,6 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
         <div class="notif-text">
           <h4>Your license was verified</h4>
           <p>Your listing is now visible to all buyers</p>
-        </div>
-      </div>
-      <div class="notif-item">
-        <div class="notif-icon">⭐</div>
-        <div class="notif-text">
-          <h4>New review received</h4>
-          <p>Pacific Roots left you a 5-star review</p>
         </div>
       </div>
     </div>
@@ -2514,16 +2465,10 @@ const currentUser = {
   profile: null,
   listings: [],
   messages: [],
-  savedPartnerIds: [],
-  ratingHighlights: []
+  savedPartnerIds: []
 };
 
 const starterSavedPartnerIds = [3, 5];
-
-const starterRatingHighlights = [
-  { label: "Fast communication", meta: "Mentioned in 19 reviews" },
-  { label: "Reliable fulfillment", meta: "Mentioned in 16 reviews" }
-];
 
 function capitalize(s) {
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
@@ -2610,11 +2555,8 @@ function parseLocation(location) {
 
 function buildTrustPills(biz, mode = 'browse') {
   const pills = [];
-  pills.push(`⭐ ${(biz.rating || 0).toFixed(1)}`);
   pills.push(biz.verified ? 'License verified' : 'Verification pending');
-  if ((biz.reviews || 0) > 0) {
-    pills.push(`${biz.reviews} completed trades`);
-  } else if (mode === 'listing') {
+  if (mode === 'listing') {
     pills.push('Active listing');
   } else {
     pills.push('Open to connect');
@@ -2737,9 +2679,6 @@ function renderPremiumCard(biz, mode = 'browse') {
 
   const logoMark = (biz.avatar || biz.name || 'B').charAt(0).toUpperCase();
   const logoOverride = biz.imageUrl || null;
-  const hasRating = (biz.rating || 0) > 0;
-  const rating = (biz.rating || 0).toFixed(1);
-
   const sells = summarizeProducts(biz.sells);
   const buys = summarizeProducts(biz.buys);
   const sellsLine = sells ? `Sells: ${sells}` : 'No products listed yet';
@@ -2773,7 +2712,6 @@ function renderPremiumCard(biz, mode = 'browse') {
       <div class="air-card-body">
         <div class="air-card-titlerow">
           <span class="air-card-title">${escapeHtml(biz.name)}</span>
-          ${hasRating ? `<span class="air-card-rating">★ ${rating}</span>` : ''}
         </div>
         <div class="air-card-desc">${escapeHtml(sellsLine)}</div>
         <div class="air-card-price">${escapeHtml(buysLine)}</div>
@@ -2804,8 +2742,6 @@ function buildPrimaryBusinessFromProfile() {
     location,
     city: profile.city || '',
     state: profile.state || '',
-    rating: 0,
-    reviews: 0,
     sells: [],
     buys: [],
     avatar: (profile.businessName || 'B').charAt(0).toUpperCase(),
@@ -2919,8 +2855,6 @@ function createOwnerBusinessFromProfile(profile) {
     type: (profile.type || 'microbusiness').toLowerCase(),
     verified: true,
     location: locationFromParts(profile.city, profile.state || 'New York'),
-    rating: 0,
-    reviews: 0,
     sells: ['Add your first product · Listing · Coming soon'],
     buys: ['Add what you want to buy · Matchmaking · Coming soon'],
     avatar: (profile.businessName || 'Y').charAt(0).toUpperCase(),
@@ -2943,7 +2877,6 @@ function seedDemoAccount() {
   currentUser.listings = [createOwnerBusinessFromProfile(currentUser.profile)];
   currentUser.messages = [];
   currentUser.savedPartnerIds = [...starterSavedPartnerIds];
-  currentUser.ratingHighlights = starterRatingHighlights.map(item => ({ ...item }));
 }
 
 function createFreshAccount() {
@@ -2951,7 +2884,6 @@ function createFreshAccount() {
   currentUser.listings = [createOwnerBusinessFromProfile(currentUser.profile)];
   currentUser.messages = [];
   currentUser.savedPartnerIds = [];
-  currentUser.ratingHighlights = [];
 }
 
 // 4) FORM SYNC: write to both fields explicitly
@@ -3000,19 +2932,6 @@ function updateProfileFromBusiness(biz) {
   const parsedLocation = parseLocation(biz.location);
   currentUser.profile.state = parsedLocation.state || currentUser.profile.state;
   currentUser.profile.city = parsedLocation.city || currentUser.profile.city;
-}
-
-function getRatingDisplay() {
-  const ownerListings = getUserListings();
-  if (!ownerListings.length) return '0.0⭐';
-  const avg = ownerListings.reduce((sum, biz) => sum + (biz.rating || 0), 0) / ownerListings.length;
-  return `${avg.toFixed(1)}⭐`;
-}
-
-function getRatingMeta() {
-  const ownerListings = getUserListings();
-  const trades = ownerListings.reduce((sum, biz) => sum + (biz.reviews || 0), 0);
-  return `Based on ${trades} completed trades with licensed partners.`;
 }
 
 function getAllVisibleListings() {
@@ -3144,7 +3063,7 @@ function handlePrimaryNextStep() {
     nextStep.action();
     return;
   }
-  scrollToDashboardSection('dashboard-rating');
+  scrollToDashboardSection('dashboard-active-listings');
 }
 
 function renderDashboardGuidance() {
@@ -3200,7 +3119,7 @@ function renderDashboardGuidance() {
     </div>
   `).join('');
 
-  nextBtn.textContent = nextStep ? nextStep.actionLabel : 'View your rating';
+  nextBtn.textContent = nextStep ? nextStep.actionLabel : 'View your dashboard';
 }
 
 function switchView(v) {
@@ -3683,7 +3602,6 @@ const previousMessages = Array.isArray(currentUser?.messages) ? [...currentUser.
   hydratedMessages = previousMessages;
 }
 currentUser.messages = hydratedMessages;
-  currentUser.ratingHighlights = [];
   isLoggedIn = true;
 }
 
@@ -3698,8 +3616,6 @@ function mapSupabaseListingRowToCard(row, options = {}) {
     location: [row.city, row.state].filter(Boolean).join(', '),
     city: row.city || '',
     state: row.state || '',
-    rating: 0,
-    reviews: 0,
     sells: normalizeProductList(row.sells),
     buys: normalizeProductList(row.buys),
     avatar: (row.business_name || 'B').charAt(0).toUpperCase(),
@@ -4078,7 +3994,6 @@ function resetCurrentUserState() {
   currentUser.listings = [];
   currentUser.messages = [];
   currentUser.savedPartnerIds = [];
-  currentUser.ratingHighlights = [];
 }
 
 function setSignedInUi(options = {}) {
@@ -4112,7 +4027,6 @@ function setSignedOutUi(options = {}) {
   renderConversationList();
   renderDashboardMessages();
   renderSavedPartners();
-  renderRatingSection();
   renderDashboardGuidance();
   updateDashboardCounts();
   filterCards();
@@ -5527,137 +5441,6 @@ function messageMostRecentSavedPartner() {
 }
 
 
-function inferTransactionsCompleted(biz) {
-  const reviews = Number(biz?.reviews || 0);
-  const rating = Number(biz?.rating || 0);
-  if (reviews >= 12) return reviews;
-  if (reviews >= 6) return reviews + 2;
-  if (rating >= 4.5) return Math.max(3, reviews + 1);
-  return reviews;
-}
-
-function inferActiveAgoLabel(biz) {
-  const rating = Number(biz?.rating || 0);
-  const verified = !!biz?.verified;
-  const sells = normalizeProductList(biz?.sells);
-  const buys = normalizeProductList(biz?.buys);
-  const hasRealSupply = sells.some(item => !/coming soon/i.test(String(item)));
-  const hasRealDemand = buys.some(item => !/opportunities/i.test(String(item)));
-
-  if (verified && rating >= 4.5 && hasRealSupply) return 'Active 2 hours ago';
-  if (verified && (hasRealSupply || hasRealDemand)) return 'Active 2 hours ago';
-  if (hasRealSupply || hasRealDemand) return 'Active this week';
-  return 'Recently active';
-}
-
-function inferResponseSpeedLabel(biz) {
-  const verified = !!biz?.verified;
-  const reviews = Number(biz?.reviews || 0);
-  const rating = Number(biz?.rating || 0);
-  if (verified && rating >= 4.5) return 'Typically responds in 30 mins';
-  if (verified || reviews >= 5) return 'Typically responds in under 2 hours';
-  return 'Usually responds this day';
-}
-
-function inferTrustedByCount(biz) {
-  const reviews = Number(biz?.reviews || 0);
-  const base = reviews >= 1 ? reviews : (biz?.verified ? 4 : 2);
-  return Math.max(base, Math.round(base * 1.5));
-}
-
-function getCredibilitySignals(biz) {
-  if (!biz) return [];
-  const transactions = inferTransactionsCompleted(biz);
-  const activeAgo = inferActiveAgoLabel(biz);
-  const responseSpeed = inferResponseSpeedLabel(biz);
-  const trustedBy = inferTrustedByCount(biz);
-
-  const signals = [];
-  if (transactions > 0) {
-    signals.push({ kind: 'proof', label: `🤝 ${transactions} transactions completed` });
-  }
-  signals.push({ kind: 'time', label: `🕒 ${activeAgo}` });
-  signals.push({ kind: 'speed', label: `⚡ ${responseSpeed}` });
-  if (trustedBy > 0) {
-    signals.push({ kind: 'trust', label: `🛡 Trusted by ${trustedBy} businesses` });
-  }
-  return signals.slice(0, 3);
-}
-
-function getCredibilitySummary(biz) {
-  const signals = getCredibilitySignals(biz);
-  if (!signals.length) return 'This business shows practical proof signals that help reduce hesitation.';
-  if (signals.some(s => s.label.includes('transactions completed'))) {
-    return 'Past activity suggests this business is established and worth serious consideration.';
-  }
-  if (signals.some(s => s.label.includes('Trusted by'))) {
-    return 'Trust proof helps this business feel more credible at first glance.';
-  }
-  return 'These real-world proof signals make the next step feel safer and more justified.';
-}
-
-function renderCredibilityRow(biz) {
-  const signals = getCredibilitySignals(biz);
-  if (!signals.length) return '';
-  return `
-    <div class="credibility-row">
-      ${signals.map(signal => `<span class="credibility-pill ${signal.kind}">${escapeHtml(signal.label)}</span>`).join('')}
-    </div>
-    <div class="credibility-summary">${escapeHtml(getCredibilitySummary(biz))}</div>
-  `;
-}
-function getConfidenceSignals(biz) {
-  const signals = [];
-  if (!biz) return signals;
-
-  const rating = Number(biz.rating || 0);
-  const reviews = Number(biz.reviews || 0);
-  const sells = normalizeProductList(biz?.sells);
-  const buys = normalizeProductList(biz?.buys);
-  const hasRealSupply = sells.some(item => !/coming soon/i.test(String(item)));
-  const hasRealDemand = buys.some(item => !/opportunities/i.test(String(item)));
-  const activity = hasRealSupply || hasRealDemand;
-
-  if (biz.verified) {
-    signals.push({ kind: 'trust', label: '🟢 License confidence' });
-  }
-  if (activity) {
-    signals.push({ kind: 'active', label: '⚡ Active this week' });
-  }
-  if (rating >= 4.5 || reviews >= 8) {
-    signals.push({ kind: 'trust', label: `🤝 ${Math.max(reviews, 1)} successful connections` });
-  }
-  if (biz.matchReason && /best|convert|align|fit/i.test(String(biz.matchReason))) {
-    signals.push({ kind: 'hot', label: '🔥 High response likelihood' });
-  }
-  if (!signals.some(s => s.label.includes('High response likelihood')) && (biz.verified || rating >= 4.2)) {
-    signals.push({ kind: 'fast', label: '🟢 Responds quickly' });
-  }
-
-  return signals.slice(0, 3);
-}
-
-function getConfidenceSummary(biz) {
-  const signals = getConfidenceSignals(biz);
-  if (!signals.length) return 'Worth a closer look based on your current profile and marketplace activity.';
-  const top = signals[0].label.replace(/^[^\s]+\s/, '');
-  if (/response likelihood/i.test(top)) return 'Strong outreach candidate right now.';
-  if (/active this week/i.test(top)) return 'Looks current and worth contacting now.';
-  if (/successful connections/i.test(top)) return 'Shows trust signals that reduce hesitation.';
-  if (/responds quickly/i.test(top)) return 'Good option when you want a faster next step.';
-  return 'Confidence signals suggest this business is worth your time.';
-}
-
-function renderConfidenceRow(biz) {
-  const signals = getConfidenceSignals(biz);
-  if (!signals.length) return '';
-  return `
-    <div class="confidence-row">
-      ${signals.map(signal => `<span class="confidence-badge ${signal.kind}">${escapeHtml(signal.label)}</span>`).join('')}
-    </div>
-    <div class="confidence-summary">${escapeHtml(getConfidenceSummary(biz))}</div>
-  `;
-}
 function scoreMatchOpportunity(biz) {
   if (!currentUser || !biz) return { score: 0, labels: [], reason: 'Worth a look' };
   const profile = currentUser.profile || {};
@@ -5717,10 +5500,6 @@ const bizBuy = new Set(
   if (biz.verified) {
     score += 2
     reasons.push('Verified')
-  }
-  if ((biz.rating || 0) >= 4.5) {
-    score += 2
-    reasons.push('Strong rating')
   }
 
   if (score >= 11) labels.push('🔥 Best match right now')
@@ -5847,24 +5626,6 @@ const partners = currentUser.savedPartnerIds
     : `<div class="mini-row uniform-card"><div><strong>No saved partners yet</strong><div class="mini-meta">Save a business from Browse so you can come back to it quickly.</div></div><button class="btn btn-ghost" onclick="goToBrowseAndFocusSearch()">Browse</button></div>`;
 }
 
-function renderRatingSection() {
-  const summary = document.getElementById('dashboardRatingSummary');
-  const meta = document.getElementById('dashboardRatingMeta');
-  const list = document.getElementById('dashboardRatingHighlights');
-  if (summary) summary.textContent = getRatingDisplay();
-  if (meta) meta.textContent = getRatingMeta();
-  if (list) {
-    const items = currentUser.ratingHighlights.length ? currentUser.ratingHighlights : [{ label: 'No ratings yet', meta: 'Complete your first trade to build your rating.' }];
-    list.innerHTML = items.map(item => `
-      <div class="mini-row uniform-card">
-        <div><strong>${escapeHtml(item.label)}</strong><div class="mini-meta">${escapeHtml(item.meta)}</div></div>
-        <span class="star-rating">${item.label === 'No ratings yet' ? '☆☆☆☆☆' : '★★★★★'}</span>
-      </div>
-    `).join('');
-  }
-}
-
-
 function updateDashboardCounts() {
   // Dashboard stat tiles
   const setText = (id, val) => {
@@ -5874,7 +5635,6 @@ function updateDashboardCounts() {
   setText('dashActiveListingsCount', getUserListings().length);
   setText('dashMessagesCount', currentUser.messages.length);
   setText('dashSavedPartnersCount', currentUser.savedPartnerIds.length);
-  setText('dashRatingCount', getRatingDisplay());
   // Bottom nav badges — use actual data
   const unreadCount = currentUser.messages.filter(m => m.unread).length;
   const msgBadge = document.getElementById('nav-messages-badge');
@@ -5897,7 +5657,6 @@ function renderAllOwnerViews() {
   renderConversationList();
   renderDashboardMessages();
   renderSavedPartners();
-  renderRatingSection();
   renderDashboardGuidance();
   updateDashboardCounts();
 
@@ -5921,19 +5680,11 @@ function openBizModal(id) {
       <div class="biz-meta">
         <h2>${escapeHtml(biz.name)}</h2>
         <p>${escapeHtml(formatTypeLabel(biz.type))} · 📍 ${escapeHtml(biz.location)}</p>
-        <div class="star-rating">
-          ${'★'.repeat(Math.max(1, Math.round(biz.rating || 0)))}
-          <span style="color:var(--muted);font-size:.78rem;">
-            ${(biz.rating || 0).toFixed(1)} (${biz.reviews || 0} reviews)
-          </span>
-        </div>
       </div>
     </div>
     ${biz.verified
       ? `<div class="license-verify"><span>✅</span><p>License verified — active and in good standing</p></div>`
       : `<div class="license-verify" style="background:#fef3c7;border-color:#fcd34d;"><span>⏳</span><p style="color:#92400e;">Verification pending</p></div>`}
-    ${renderConfidenceRow(biz)}
-    ${renderCredibilityRow(biz)}
     <hr class="clean-divider"><div class="product-list-preview">
   <div class="heading-lg">Selling</div>
   ${sells.length
@@ -6420,7 +6171,6 @@ renderNavActions();
 renderConversationList();
 renderDashboardMessages();
 renderSavedPartners();
-renderRatingSection();
 updateDashboardCounts();
 setSignedOutUi({ preserveView: true, silent: true, closeModals: false });
 
