@@ -19,6 +19,38 @@ npm start
 
 Then open: http://localhost:3000
 
+## ✅ Running the tests
+
+The `tests/` folder has automated browser tests that drive the real app
+(signup, login, posting a listing, messaging, saving partners, search,
+filtering, and pagination) against an in-memory fake of Supabase — so they
+never touch the live database.
+
+**First time only**, download the browser the tests use:
+
+```bash
+npm install
+npm run test:setup
+```
+
+Then, any time you want to check that everything still works:
+
+```bash
+npm test
+```
+
+You'll see a list of checks ending in either `✅ All 3 test suites passed.`
+or a red `❌` with the failing check. Run this after making changes and
+before deploying — if it's green, the core user flows still work.
+
+What each suite covers:
+
+| File | What it checks |
+|------|----------------|
+| `tests/e2e_full.js` | The whole journey: sign up → log in → post a listing → message a partner → save a partner → log out. |
+| `tests/test_pagination.js` | Browse loads listings 24 at a time, and "Load more" fetches the next page. |
+| `tests/test_server_search.js` | Search and the category filter run inside the database query and return the right results. |
+
 ## 🧠 Supabase setup
 
 1. Create a Supabase project.
