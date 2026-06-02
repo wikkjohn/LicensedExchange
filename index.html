@@ -2265,6 +2265,14 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
         </select>
       </div>
       <div class="form-group">
+        <label>Selling products</label>
+        <textarea id="accountSells" rows="4" placeholder="One product per line"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Buying products</label>
+        <textarea id="accountBuys" rows="4" placeholder="One product per line"></textarea>
+      </div>
+      <div class="form-group">
         <label>Contact name</label>
         <input type="text" id="accountContactName" placeholder="Your name" />
       </div>
@@ -4493,6 +4501,8 @@ function openBusinessEditModal(id) {
   const parsedLocation = parseLocation(biz.location);
   document.getElementById('accountState').value = parsedLocation.state;
   document.getElementById('accountCity').value = parsedLocation.city;
+  document.getElementById('accountSells').value = normalizeProductList(biz?.sells).join('\n');
+  document.getElementById('accountBuys').value = normalizeProductList(biz?.buys).join('\n');
   document.getElementById('accountContactName').value = biz.contactName || '';
   document.getElementById('accountContactEmail').value = biz.contactEmail || '';
   populateLogoPreview('accountLogoPreview', 'accountLogoHint', biz.imageUrl);
@@ -4670,6 +4680,14 @@ async function saveBusinessInfo() {
   const licenseType = (document.getElementById('accountBizType').value || biz.type || '').toLowerCase();
   const stateName = document.getElementById('accountState').value || biz.state || 'New York';
   const city = document.getElementById('accountCity').value.trim();
+  const sells = document.getElementById('accountSells').value
+    .split('\n')
+    .map(item => item.trim())
+    .filter(Boolean);
+  const buys = document.getElementById('accountBuys').value
+    .split('\n')
+    .map(item => item.trim())
+    .filter(Boolean);
   const contactEmail = (document.getElementById('accountContactEmail')?.value || '').trim()
     || biz.contactEmail
     || currentUser.profile?.contactEmail
@@ -4722,6 +4740,8 @@ async function saveBusinessInfo() {
           state: stateName,
           contact_name: contactName,
           contact_email: contactEmail,
+          sells,
+          buys,
           image_url: imageUrl
         })
         .eq('id', biz.id)

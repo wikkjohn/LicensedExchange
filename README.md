@@ -52,6 +52,7 @@ What each suite covers:
 | `tests/test_server_search.js` | Search and the category filter run inside the database query and return the right results. |
 | `tests/test_multi_listing.js` | One account with multiple stores can message partners as any of its businesses, creating separate conversation threads. |
 | `tests/test_open_conversation.js` | The dashboard "Open" button opens a conversation even when the partner's listing isn't in the loaded browse page. |
+| `tests/test_edit_business_products.js` | The "Edit Business Information" popup can add and save the products the main business buys and sells. |
 
 ## 🧠 Supabase setup
 
