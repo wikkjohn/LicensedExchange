@@ -1693,12 +1693,12 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
     spellcheck="false"
     placeholder="Search by name, location, product, or license type…"
     id="searchInput"
-    oninput="filterCards(); document.getElementById('searchClearBtn').style.display = this.value ? 'flex' : 'none';"
+    oninput="onBrowseSearchInput()"
     style="padding-right: 44px;"
   />
   <button
     id="searchClearBtn"
-    onclick="document.getElementById('searchInput').value=''; filterCards(); this.style.display='none'; document.getElementById('searchInput').focus();"
+    onclick="clearBrowseSearch()"
     style="
       display: none;
       position: absolute;
@@ -1738,6 +1738,7 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
       <h2>Featured Businesses</h2>
     </div>
     <div class="listings-grid" id="listingsGrid"></div>
+    <div id="listingsLoadMore" style="margin-top:16px;"></div>
   </section>
 
   <!-- How It Works -->
@@ -1819,8 +1820,8 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
       <div class="notif-item">
         <div class="notif-icon">🔔</div>
         <div class="notif-text">
-          <h4>New match: Green Valley Farms</h4>
-          <p>They listed Blue Dream (1lb) — matches your buy list</p>
+          <h4>New match found</h4>
+          <p>A business on your match list posted a new listing.</p>
         </div>
       </div>
       <div class="notif-item">
@@ -1879,14 +1880,9 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
       </div>
     </div>
     <div id="dashUser" class="hidden">
-       <div id="personalization-banner"></div>
-  <div id="lifecycleBannerMount"></div>
-  <div id="notificationCenterMount"></div>
-  <div id="outcomeBoardMount"></div>
-  <div id="celebrationMomentsMount"></div>
+       <div id="lifecycleBannerMount"></div>
   <div id="liveMarketplaceFeedMount"></div>
   <div id="dashboardNextStepBanner"></div>
-  <div id="smartPriorityMount"></div>
       <div class="dashboard-welcome" id="dashboardWelcomeCard">
         <div class="dashboard-welcome-top">
           <div>
@@ -1915,13 +1911,7 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
         <button class="dash-stat" type="button" onclick="scrollToDashboardSection('dashboard-active-listings')"><div class="num" id="dashActiveListingsCount">0</div><div class="lbl">Active Listings</div></button>
         <button class="dash-stat" type="button" onclick="scrollToDashboardSection('dashboard-messages')"><div class="num" id="dashMessagesCount">0</div><div class="lbl">Messages</div></button>
         <button class="dash-stat" type="button" onclick="scrollToDashboardSection('dashboard-saved-partners')"><div class="num" id="dashSavedPartnersCount">0</div><div class="lbl">Saved Partners</div></button>
-        <button class="dash-stat" type="button" onclick="scrollToDashboardSection('dashboard-rating')"><div class="num" id="dashRatingCount">0.0⭐</div><div class="lbl">Your Rating</div></button>
       </div>
-      <button
-        class="btn btn-primary btn-full"
-        style="margin-bottom:12px;"
-        onclick="openModal('listingModal')"
-      >+ Add New Listing</button>
       <div class="section-header" style="margin-top:20px;"><h2>Your Main Business Card</h2></div>
       <div class="listings-grid" id="myBusinessCardGrid"></div>
       <div class="section-header" id="dashboard-active-listings" style="margin-top:20px;"><h2>Active Listings</h2></div>
@@ -1934,12 +1924,7 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
         <div class="heading-lg">Saved Partners</div>
         <div class="mini-list swipe-track" id="dashboardSavedPartnersList"></div>
       </div>
-      <div class="dashboard-section-card" id="dashboard-rating">
-        <div class="heading-lg">Your Rating</div>
-        <div id="dashboardRatingSummary" style="font-size:2rem;font-weight:800;color:var(--text);margin-bottom:8px;">0.0⭐</div>
-        <p id="dashboardRatingMeta" style="font-size:.85rem;color:var(--muted);margin-bottom:12px;">Based on 0 completed trades with licensed partners.</p>
-        <div class="mini-list" id="dashboardRatingHighlights"></div>
-      </div>    </div>
+    </div>
   </section>
 </div>
 
@@ -2116,7 +2101,7 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
       <div id="ls-panel1">
         <div class="form-group">
           <label>Business name</label>
-          <input type="text" id="lsBizName" placeholder="e.g. Green Valley Farms" />
+          <input type="text" id="lsBizName" placeholder="Your business name" />
         </div>
 
         <!-- CHANGE 5: MicroBusiness is first option after the placeholder -->
@@ -2464,65 +2449,6 @@ function getSupabaseClient() {
 
 
 
-/* ── Sample Data ── */
-const LISTINGS = [
-  {
-    id: 1, name: "Green Valley Farms", type: "cultivator", verified: true,
-    location: "Los Angeles, CA", rating: 4.9, reviews: 38,
-    sells: ["Blue Dream · Flower · 1 lb", "OG Kush · Flower · 5 lb", "Gelato · Pre-roll · 50ct"],
-    buys:  ["Packaging · Bags · 1000ct", "Nutrients · Liquid · 1 gal"],
-    avatar: "G", avatarColor: "#000000"
-  },
-  {
-    id: 2, name: "SunRise Dispensary", type: "dispensary", verified: true,
-    location: "Denver, CO", rating: 4.7, reviews: 24,
-    sells: ["House Blend · Edible · 10mg", "CBD Tincture · Oil · 30ml"],
-    buys:  ["Blue Dream · Flower · 1 lb", "Sativa Mix · Flower · 5 lb", "Concentrates · Wax · 1 oz"],
-    avatar: "S", avatarColor: "#000000"
-  },
-  {
-    id: 3, name: "Pacific Roots Distro", type: "distributor", verified: false,
-    location: "Portland, OR", rating: 4.5, reviews: 17,
-    sells: ["Logistics · Distribution · Statewide"],
-    buys:  ["Any · Flower · Bulk", "Any · Concentrate · Bulk"],
-    avatar: "P", avatarColor: "#000000"
-  },
-  {
-    id: 4, name: "Highland Processing", type: "processor", verified: true,
-    location: "Las Vegas, NV", rating: 4.8, reviews: 42,
-    sells: ["Cartridges · Vape · 1g", "Live Resin · Concentrate · 1g", "RSO · Oil · 1g"],
-    buys:  ["OG Kush · Trim · 1 lb", "Mixed · Biomass · 10 lb"],
-    avatar: "H", avatarColor: "#000000"
-  },
-  {
-    id: 5, name: "Emerald Coast Farms", type: "cultivator", verified: true,
-    location: "Humboldt, CA", rating: 5.0, reviews: 11,
-    sells: ["Zkittlez · Flower · 1 lb", "Purple Haze · Flower · QP", "Runtz · Flower · HP"],
-    buys:  ["Soil · Growing Media · Pallet"],
-    avatar: "E", avatarColor: "#000000"
-  },
-  {
-    id: 6, name: "Brooklyn MicroBiz", type: "microbusiness", verified: true,
-    location: "Brooklyn, NY", rating: 4.6, reviews: 8,
-    sells: ["House Sativa · Flower · 3.5g", "Local Blend · Pre-roll · 10ct"],
-    buys:  ["Blue Dream · Flower · QP", "OG Kush · Flower · HP"],
-    avatar: "B", avatarColor: "#000000"
-  },
-  {
-    id: 7, name: "Mountain High Retail", type: "dispensary", verified: false,
-    location: "Boulder, CO", rating: 4.3, reviews: 9,
-    sells: ["House Indica · Flower · 3.5g", "Gummies · Edible · 100mg"],
-    buys:  ["Blue Dream · Flower · HP", "Girl Scout Cookies · Flower · 1 lb"],
-    avatar: "M", avatarColor: "#000000"
-  },
-  {
-    id: 8, name: "Precision Test Labs", type: "lab", verified: true,
-    location: "Albany, NY", rating: 4.9, reviews: 31,
-    sells: ["Potency Testing · COA · 24 hr", "Contaminant Panel · Lab Service · Rush"],
-    buys:  ["Sample Intake Kits · Supplies · 100ct"],
-    avatar: "L", avatarColor: "#000000"
-  }
-];
 
 
 let currentFilter = 'all';
@@ -2547,6 +2473,17 @@ const stateMap = {
 };
 
 const allListings = [];
+
+// ── Browse listings pagination ──
+// We fetch the public catalog one page at a time instead of SELECT * on the
+// whole table, so the query and payload stay flat as the marketplace grows.
+const LISTINGS_PAGE_SIZE = 24;
+let listingsOffset = 0;
+let listingsHasMore = true;
+let listingsLoading = false;
+// Ordered ids of the public listings currently shown in Browse, accumulated
+// page by page from the server (search + filter are applied in the query).
+let browseOrderIds = [];
 
 const currentUser = {
   profile: null,
@@ -2804,7 +2741,7 @@ function renderPremiumCard(biz, mode = 'browse') {
         ${badge}
         ${saveBtn}
         ${logoOverride
-          ? `<img src="${escapeHtml(logoOverride)}" alt="${escapeHtml(biz.name)} logo" style="width:100%;height:100%;object-fit:cover;">`
+          ? `<img src="${escapeHtml(logoOverride)}" alt="${escapeHtml(biz.name)} logo" style="width:100%;height:100%;object-fit:contain;">`
           : `<span class="air-card-logo">${escapeHtml(logoMark)}</span>`
         }
       </div>
@@ -3102,39 +3039,68 @@ function handleBusinessCardClick(id) {
 }
 
 
-function getFilteredData() {
-  const query = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
-  const base = getAllVisibleListings();
-
-  return base.filter(biz => {
-    const fields = [
-      biz.name,
-      biz.location,
-      formatTypeLabel(biz.type),
-      ...normalizeProductList(biz?.sells),
-      ...normalizeProductList(biz?.buys)
-    ]
-      .filter(Boolean)
-      .map(v => String(v).toLowerCase());
-
-    const matchesQuery = !query || fields.some(v => v.includes(query));
-    const matchesType = currentFilter === 'all' ||
-      String(biz.type || '').toLowerCase() === currentFilter;
-
-    return matchesQuery && matchesType;
-  });
+function getBrowseSearchTerm() {
+  return (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
 }
 
+// Local match predicate — mirrors the server-side search/filter so the user's
+// own in-memory listings (and product-array matches the server can't ilike)
+// stay consistent with the paged server results.
+function listingMatchesLocal(biz, term, filter) {
+  const matchesType = !filter || filter === 'all' ||
+    String(biz.type || '').toLowerCase().includes(filter);
+  if (!matchesType) return false;
+  if (!term) return true;
+  const fields = [
+    biz.name,
+    biz.location,
+    formatTypeLabel(biz.type),
+    ...normalizeProductList(biz?.sells),
+    ...normalizeProductList(biz?.buys)
+  ]
+    .filter(Boolean)
+    .map(v => String(v).toLowerCase());
+  return fields.some(v => v.includes(term));
+}
 
 function setFilter(f, el) {
   currentFilter = f;
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
-  filterCards();
+  loadPublicListingsFromSupabase({ reset: true });
 }
 
+// Re-render the Browse grid from the current paged public results plus the
+// owner's matching listings. Pure render — does not hit the network.
 function filterCards() {
-  renderCards(getFilteredData());
+  const term = getBrowseSearchTerm();
+  const ownerMatches = getUserListings().filter(b => listingMatchesLocal(b, term, currentFilter));
+  const ownerIds = new Set(ownerMatches.map(b => String(b.id)));
+  const publicCards = browseOrderIds
+    .map(id => allListings.find(b => String(b.id) === String(id)))
+    .filter(b => b && !ownerIds.has(String(b.id)));
+  renderCards([...ownerMatches, ...publicCards]);
+  renderLoadMoreButton();
+}
+
+let browseSearchDebounce = null;
+// Debounced so we issue one server query after the user stops typing, not one
+// per keystroke.
+function onBrowseSearchInput() {
+  const input = document.getElementById('searchInput');
+  document.getElementById('searchClearBtn').style.display = input.value ? 'flex' : 'none';
+  clearTimeout(browseSearchDebounce);
+  browseSearchDebounce = setTimeout(() => {
+    loadPublicListingsFromSupabase({ reset: true });
+  }, 300);
+}
+
+function clearBrowseSearch() {
+  const input = document.getElementById('searchInput');
+  input.value = '';
+  document.getElementById('searchClearBtn').style.display = 'none';
+  input.focus();
+  loadPublicListingsFromSupabase({ reset: true });
 }
 
 function goToBrowseAndFocusSearch() {
@@ -3171,6 +3137,16 @@ function renderDashboardGuidance() {
   const doneCount = steps.filter(step => step.done).length;
   const percent = Math.round((doneCount / steps.length) * 100);
   const nextStep = steps.find(step => !step.done);
+
+  const welcomeCard = document.getElementById('dashboardWelcomeCard');
+  const onboardingCard = document.getElementById('dashboardOnboardingCard');
+  if (percent === 100) {
+    if (welcomeCard) welcomeCard.style.display = 'none';
+    if (onboardingCard) onboardingCard.style.display = 'none';
+    return;
+  }
+  if (welcomeCard) welcomeCard.style.display = '';
+  if (onboardingCard) onboardingCard.style.display = '';
 
   title.textContent = percent === 100
     ? `${firstName}, your dashboard is fully set up`
@@ -3714,27 +3690,93 @@ function upsertListingIntoCatalog(listing) {
   allListings.unshift({ ...listing, isOwner: false });
 }
 
-async function loadPublicListingsFromSupabase() {
+async function loadPublicListingsFromSupabase(options = {}) {
+  if (listingsLoading) return;
+  if (options.reset) {
+    listingsOffset = 0;
+    listingsHasMore = true;
+    browseOrderIds = [];
+  }
+  if (!listingsHasMore) {
+    renderLoadMoreButton();
+    return;
+  }
+
+  listingsLoading = true;
+  renderLoadMoreButton();
   try {
     const supabase = getSupabaseClient();
-    const { data, error } = await supabase
+    const from = listingsOffset;
+    const to = from + LISTINGS_PAGE_SIZE - 1;
+
+    let query = supabase
       .from('listings')
       .select('*')
       .order('created_at', { ascending: false });
+
+    // License-type filter (chips). ilike-contains so verbose license strings
+    // like "Adult-Use Retail Dispensary License" still match the "dispensary" chip.
+    if (currentFilter && currentFilter !== 'all') {
+      query = query.ilike('license_type', `%${currentFilter}%`);
+    }
+
+    // Free-text search across the scalar text columns. Sanitize out the
+    // characters PostgREST uses as or()/ilike delimiters so the term can't
+    // break the filter expression.
+    const term = getBrowseSearchTerm();
+    if (term) {
+      const safe = term.replace(/[,()%*]/g, ' ').trim();
+      if (safe) {
+        query = query.or(
+          `business_name.ilike.%${safe}%,city.ilike.%${safe}%,state.ilike.%${safe}%,license_type.ilike.%${safe}%`
+        );
+      }
+    }
+
+    // Exclude the signed-in user's own listings; those are merged in client-side
+    // via filterCards() so they stay consistent and never duplicate.
+    const myOwnerId = currentUser.profile?.id;
+    if (myOwnerId) {
+      query = query.neq('owner_id', myOwnerId);
+    }
+
+    const { data, error } = await query.range(from, to);
 
     if (error) {
       console.warn('Public listings load skipped:', error);
       return;
     }
 
-    (data || []).forEach(row => {
+    const rows = data || [];
+    rows.forEach(row => {
       upsertListingIntoCatalog(mapSupabaseListingRowToCard(row));
+      const id = String(row.id);
+      if (!browseOrderIds.includes(id)) browseOrderIds.push(id);
     });
+
+    listingsOffset += rows.length;
+    listingsHasMore = rows.length === LISTINGS_PAGE_SIZE;
 
     filterCards();
   } catch (err) {
     console.warn('Public listings load failed:', err);
+  } finally {
+    listingsLoading = false;
+    renderLoadMoreButton();
   }
+}
+
+function renderLoadMoreButton() {
+  const mount = document.getElementById('listingsLoadMore');
+  if (!mount) return;
+  if (!listingsHasMore && !listingsLoading) {
+    mount.innerHTML = '';
+    return;
+  }
+  mount.innerHTML = `
+    <button class="btn btn-ghost btn-full" onclick="loadPublicListingsFromSupabase()" ${listingsLoading ? 'disabled' : ''}>
+      ${listingsLoading ? 'Loading…' : 'Load more businesses'}
+    </button>`;
 }
 
 async function ensureProfileForCurrentUser(profileSeed = {}) {
@@ -4333,7 +4375,7 @@ async function submitListing() {
 
     // Refresh everything from Supabase
     await hydrateCurrentUserFromSupabase();
-    await loadPublicListingsFromSupabase();
+    await loadPublicListingsFromSupabase({ reset: true });
 
     closeModal('listingModal');
     resetListingForm();
@@ -4576,7 +4618,7 @@ async function saveListingInfo() {
     }
 
     await hydrateCurrentUserFromSupabase();
-    await loadPublicListingsFromSupabase();
+    await loadPublicListingsFromSupabase({ reset: true });
     syncAccountDataToForms();
 
     closeModal('editListingModal');
@@ -4670,7 +4712,7 @@ async function saveBusinessInfo() {
     }
 
     await hydrateCurrentUserFromSupabase();
-    await loadPublicListingsFromSupabase();
+    await loadPublicListingsFromSupabase({ reset: true });
     syncAccountDataToForms();
 
     closeModal('accountModal');
@@ -6287,17 +6329,11 @@ renderRatingSection();
 updateDashboardCounts();
 setSignedOutUi({ preserveView: true, silent: true, closeModals: false });
 
-// Load demo seed listings immediately so browse is never blank
-LISTINGS.forEach(biz => {
-  if (!allListings.find(b => String(b.id) === String(biz.id))) {
-    allListings.push(biz);
-  }
-});
 filterCards();
 
-// Then load live Supabase listings and session (will re-run filterCards when done)
+// Load live Supabase listings and session (will re-run filterCards when done)
 restoreSessionFromSupabase({ preserveView: true });
-loadPublicListingsFromSupabase();
+loadPublicListingsFromSupabase({ reset: true });
 
 </script>
 
