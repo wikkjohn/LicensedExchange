@@ -1738,6 +1738,7 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
       <h2>Featured Businesses</h2>
     </div>
     <div class="listings-grid" id="listingsGrid"></div>
+    <div id="listingsLoadMore" style="margin-top:16px;"></div>
   </section>
 
   <!-- How It Works -->
@@ -2473,6 +2474,14 @@ const stateMap = {
 
 const allListings = [];
 
+// ── Browse listings pagination ──
+// We fetch the public catalog one page at a time instead of SELECT * on the
+// whole table, so the query and payload stay flat as the marketplace grows.
+const LISTINGS_PAGE_SIZE = 24;
+let listingsOffset = 0;
+let listingsHasMore = true;
+let listingsLoading = false;
+
 const currentUser = {
   profile: null,
   listings: [],
@@ -3060,6 +3069,7 @@ function setFilter(f, el) {
 
 function filterCards() {
   renderCards(getFilteredData());
+  renderLoadMoreButton();
 }
 
 function goToBrowseAndFocusSearch() {
@@ -3649,27 +3659,62 @@ function upsertListingIntoCatalog(listing) {
   allListings.unshift({ ...listing, isOwner: false });
 }
 
-async function loadPublicListingsFromSupabase() {
+async function loadPublicListingsFromSupabase(options = {}) {
+  if (listingsLoading) return;
+  if (options.reset) {
+    listingsOffset = 0;
+    listingsHasMore = true;
+  }
+  if (!listingsHasMore) {
+    renderLoadMoreButton();
+    return;
+  }
+
+  listingsLoading = true;
+  renderLoadMoreButton();
   try {
     const supabase = getSupabaseClient();
+    const from = listingsOffset;
+    const to = from + LISTINGS_PAGE_SIZE - 1;
     const { data, error } = await supabase
       .from('listings')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .range(from, to);
 
     if (error) {
       console.warn('Public listings load skipped:', error);
       return;
     }
 
-    (data || []).forEach(row => {
+    const rows = data || [];
+    rows.forEach(row => {
       upsertListingIntoCatalog(mapSupabaseListingRowToCard(row));
     });
+
+    listingsOffset += rows.length;
+    listingsHasMore = rows.length === LISTINGS_PAGE_SIZE;
 
     filterCards();
   } catch (err) {
     console.warn('Public listings load failed:', err);
+  } finally {
+    listingsLoading = false;
+    renderLoadMoreButton();
   }
+}
+
+function renderLoadMoreButton() {
+  const mount = document.getElementById('listingsLoadMore');
+  if (!mount) return;
+  if (!listingsHasMore && !listingsLoading) {
+    mount.innerHTML = '';
+    return;
+  }
+  mount.innerHTML = `
+    <button class="btn btn-ghost btn-full" onclick="loadPublicListingsFromSupabase()" ${listingsLoading ? 'disabled' : ''}>
+      ${listingsLoading ? 'Loading…' : 'Load more businesses'}
+    </button>`;
 }
 
 async function ensureProfileForCurrentUser(profileSeed = {}) {
@@ -4268,7 +4313,7 @@ async function submitListing() {
 
     // Refresh everything from Supabase
     await hydrateCurrentUserFromSupabase();
-    await loadPublicListingsFromSupabase();
+    await loadPublicListingsFromSupabase({ reset: true });
 
     closeModal('listingModal');
     resetListingForm();
@@ -4511,7 +4556,7 @@ async function saveListingInfo() {
     }
 
     await hydrateCurrentUserFromSupabase();
-    await loadPublicListingsFromSupabase();
+    await loadPublicListingsFromSupabase({ reset: true });
     syncAccountDataToForms();
 
     closeModal('editListingModal');
@@ -4605,7 +4650,7 @@ async function saveBusinessInfo() {
     }
 
     await hydrateCurrentUserFromSupabase();
-    await loadPublicListingsFromSupabase();
+    await loadPublicListingsFromSupabase({ reset: true });
     syncAccountDataToForms();
 
     closeModal('accountModal');
@@ -6226,7 +6271,7 @@ filterCards();
 
 // Load live Supabase listings and session (will re-run filterCards when done)
 restoreSessionFromSupabase({ preserveView: true });
-loadPublicListingsFromSupabase();
+loadPublicListingsFromSupabase({ reset: true });
 
 </script>
 
