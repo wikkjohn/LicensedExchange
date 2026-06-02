@@ -8,7 +8,8 @@ const suites = [
   'test_pagination.js',    // listings load 24 at a time + "Load more"
   'test_server_search.js', // search + category filter run in the database query
   'test_multi_listing.js', // one account, multiple stores: message as each, separate threads
-  'test_open_conversation.js' // dashboard "Open" works even when the partner isn't in the loaded page
+  'test_open_conversation.js', // dashboard "Open" works even when the partner isn't in the loaded page
+  'test_edit_business_products.js' // main-business editor can add/save buy & sell products
 ];
 
 let failed = 0;
