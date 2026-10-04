@@ -26,7 +26,8 @@ function initScript() {
     ],
     conversations: [],
     messages: [],
-    saved_partners: []
+    saved_partners: [],
+    invites: [{ id: 'inv-001', code: 'HARVEST-2026', used_at: null, used_by_email: null }]
   };
   window.__db = db;
   window.__authCb = null;
@@ -207,8 +208,9 @@ function initScript() {
     await clickEl('#dashGuest button');
     rec('Auth modal opens from dashboard CTA', await isOpen('authModal'));
 
-    // 5. Signup stage 1: verify license
+    // 5. Signup stage 1: verify invite code + license
     await clearToasts();
+    await page.fill('#signupInviteCode', 'HARVEST-2026');
     await page.fill('#signupLicenseNumber', 'OCM-MICR-24-000999');
     await clickEl('button[onclick="verifyLicense()"]');
     await page.waitForTimeout(300);
