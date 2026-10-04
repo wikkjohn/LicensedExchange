@@ -1937,8 +1937,18 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
   <!-- STAGE 1: LICENSE VERIFICATION -->
   <div id="signup-stage-1">
   <p style="font-size:.85rem;color:var(--muted);margin-bottom:16px;">
-    Enter your cannabis license number to get started. We'll look up your business automatically.
+    Enter your invite code and cannabis license number to get started. We'll look up your business automatically.
   </p>
+  <div class="form-group">
+    <label for="signupInviteCode">Invite code</label>
+    <input
+      type="text"
+      id="signupInviteCode"
+      placeholder="e.g. HARVEST-2026"
+      autocomplete="off"
+    />
+    <div class="form-hint">Don't have a code? <a href="mailto:hello@licensedexchange.com" style="color:var(--text);">Request access →</a></div>
+  </div>
   <div class="form-group">
     <label for="signupLicenseNumber">License number</label>
     <input
@@ -2397,6 +2407,10 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
 <script>
 window.SUPABASE_URL = 'https://grxzagpvypzmyfycmlba.supabase.co';
 window.SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdyeHphZ3B2eXB6bXlmeWNtbGJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwMzQzNDYsImV4cCI6MjA4NzYxMDM0Nn0.78b4DCS2sK0srA5_lsnAPxru0HqRgJduzpDsdrwIExU';
+// Edge Function for new-message email notifications.
+// Deploy `supabase/functions/notify-message/index.ts` then set this to
+// `${SUPABASE_URL}/functions/v1/notify-message`. Leave null to skip.
+window.NOTIFY_MESSAGE_URL = null;
 window.supabaseApp = (window.supabase && typeof window.supabase.createClient === 'function')
   ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY)
   : null;
@@ -3312,18 +3326,54 @@ function applySignupCooldownUi() {
   window.setTimeout(applySignupCooldownUi, 1000);
 }
 
-// 3) LICENSE VERIFY: fill signupCity, not lsCity
+let licenseVerified = false;
+
+// 3) LICENSE VERIFY: validate invite code, then verify license via OCM
 async function verifyLicense() {
   const licenseInput = document.getElementById('signupLicenseNumber');
   const stageTwo = document.getElementById('signup-stage-2');
+  licenseVerified = false;
 
   if (!licenseInput || !stageTwo) return;
 
+  const inviteCode = (document.getElementById('signupInviteCode')?.value || '').trim().toUpperCase();
   const rawLicenseNumber = licenseInput.value.trim();
+
+  if (!inviteCode) {
+    stageTwo.style.display = 'none';
+    setAuthStatus('authSignupStatus', 'Please enter an invite code.', true);
+    return;
+  }
 
   if (!rawLicenseNumber) {
     stageTwo.style.display = 'none';
     setAuthStatus('authSignupStatus', 'Please enter your license number to continue.', true);
+    return;
+  }
+
+  setAuthStatus('authSignupStatus', 'Checking invite code…', false);
+  try {
+    const supabase = getSupabaseClient();
+    const { data: inviteRow, error: inviteError } = await supabase
+      .from('invites')
+      .select('id, used_at')
+      .eq('code', inviteCode)
+      .maybeSingle();
+    if (inviteError) throw inviteError;
+    if (!inviteRow) {
+      stageTwo.style.display = 'none';
+      setAuthStatus('authSignupStatus', 'That invite code is not valid. Please check and try again.', true);
+      return;
+    }
+    if (inviteRow.used_at) {
+      stageTwo.style.display = 'none';
+      setAuthStatus('authSignupStatus', 'That invite code has already been used.', true);
+      return;
+    }
+  } catch (err) {
+    console.error('Invite check failed:', err);
+    stageTwo.style.display = 'none';
+    setAuthStatus('authSignupStatus', 'Could not verify invite code. Please try again.', true);
     return;
   }
 
@@ -3403,11 +3453,12 @@ async function verifyLicense() {
     setValueIfPresent('signupState', state);
 
     licenseInput.value = rawLicenseNumber;
+    licenseVerified = true;
     stageTwo.style.display = 'block';
 
     setAuthStatus(
       'authSignupStatus',
-      '✅ License found in the OCM database. Review the details below and finish creating your account.',
+      '✅ License verified. Review the details below and finish creating your account.',
       false
     );
 
@@ -3809,6 +3860,13 @@ async function signUpWithSupabase() {
   const contactEmail   = email; // BUG 2 FIX — contactEmail mirrors email at signup
   const password       = document.getElementById('signupPassword').value;
 
+  if (!licenseVerified) {
+    setAuthStatus('authSignupStatus', 'Please verify your license before creating an account.', true);
+    showToast('Please verify your license first.');
+    document.getElementById('signup-stage-1')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+
   if (!licenseNumber || !licenseType || !businessName || !city || !state || !contactName || !email || !password) {
     setAuthStatus('authSignupStatus', 'Please complete all sign up fields.', true);
     showToast('Please complete all sign up fields.');
@@ -3857,6 +3915,20 @@ async function signUpWithSupabase() {
       showToast('Account could not be created.');
       return;
     }
+
+    // Burn the invite code so it can't be reused
+    try {
+      const inviteCode = (document.getElementById('signupInviteCode')?.value || '').trim().toUpperCase();
+      if (inviteCode) {
+        await getSupabaseClient()
+          .from('invites')
+          .update({ used_at: new Date().toISOString(), used_by_email: email })
+          .eq('code', inviteCode);
+      }
+    } catch (err) {
+      console.warn('Invite burn failed (non-fatal):', err);
+    }
+    licenseVerified = false;
 
     if (!data.session) {
       setButtonBusy(btn, false, 'Creating account…', 'Create Free Account →');
@@ -3970,7 +4042,8 @@ async function loginWithSupabase() {
 }
 
 function clearAuthForms() {
-  ['signupLicenseNumber','signupLicenseType','signupBusinessName',
+  licenseVerified = false;
+  ['signupInviteCode','signupLicenseNumber','signupLicenseType','signupBusinessName',
    'signupCity','signupContactName','signupEmail','signupPassword',
    'loginEmail','loginPassword'].forEach(id => {
     const el = document.getElementById(id);
@@ -5904,6 +5977,25 @@ async function loadChatThreadFromSupabase(partnerId, partnerName = 'Partner') {
     chatMessages.innerHTML = `<div class="msg msg-in">Could not load this conversation.</div>`;
   }
 }
+// Fire-and-forget email notification to the partner's listing contact_email.
+// Requires NOTIFY_MESSAGE_URL to point to a deployed Supabase Edge Function.
+// Edge Function receives: { conversation_id, sender_listing_id, partner_listing_id,
+//   partner_name, sender_name, preview }.
+// It looks up partner contact_email from the listings table and sends via Resend/Postmark.
+async function notifyPartnerOfMessage({ conversationId, senderListingId, partnerListingId, partnerName, senderName, preview }) {
+  const url = window.NOTIFY_MESSAGE_URL;
+  if (!url) return;
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${window.SUPABASE_KEY}` },
+      body: JSON.stringify({ conversation_id: conversationId, sender_listing_id: senderListingId, partner_listing_id: partnerListingId, partner_name: partnerName, sender_name: senderName, preview })
+    });
+  } catch (err) {
+    console.warn('Notification delivery failed (non-fatal):', err);
+  }
+}
+
 async function persistMessageToSupabase(partnerId, text, partnerName = '') {
   if (!isSupabaseUuidLike(partnerId)) return null;
   const ownedListingId = getActingListingId();
@@ -5944,6 +6036,20 @@ async function persistMessageToSupabase(partnerId, text, partnerName = '') {
     .single();
 
   if (insertedMessageError) throw insertedMessageError;
+
+  const senderName = (() => {
+    const owned = getUserListings().find(l => String(l.id) === String(ownedListingId));
+    return owned?.business_name || owned?.name || currentUser?.profile?.businessName || 'A partner';
+  })();
+
+  notifyPartnerOfMessage({
+    conversationId,
+    senderListingId: ownedListingId,
+    partnerListingId: partnerId,
+    partnerName,
+    senderName,
+    preview: text
+  });
 
   return {
     id: insertedMessage?.id || Date.now(),
