@@ -2408,9 +2408,7 @@ nav .btn-primary:hover { box-shadow: inset 999px 999px 0 rgba(0,0,0,.04); }
 window.SUPABASE_URL = 'https://grxzagpvypzmyfycmlba.supabase.co';
 window.SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdyeHphZ3B2eXB6bXlmeWNtbGJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwMzQzNDYsImV4cCI6MjA4NzYxMDM0Nn0.78b4DCS2sK0srA5_lsnAPxru0HqRgJduzpDsdrwIExU';
 // Edge Function for new-message email notifications.
-// Deploy `supabase/functions/notify-message/index.ts` then set this to
-// `${SUPABASE_URL}/functions/v1/notify-message`. Leave null to skip.
-window.NOTIFY_MESSAGE_URL = null;
+window.NOTIFY_MESSAGE_URL = 'https://grxzagpvypzmyfycmlba.supabase.co/functions/v1/notify-message';
 window.supabaseApp = (window.supabase && typeof window.supabase.createClient === 'function')
   ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_KEY)
   : null;
